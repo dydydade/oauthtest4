@@ -1,12 +1,10 @@
 package login.oauthtest4.global.oauth2;
 
 import login.oauthtest4.domain.user.Role;
+import login.oauthtest4.domain.user.SocialProfile;
 import login.oauthtest4.domain.user.SocialType;
 import login.oauthtest4.domain.user.User;
-import login.oauthtest4.global.oauth2.userinfo.GoogleOAuth2UserInfo;
-import login.oauthtest4.global.oauth2.userinfo.KakaoOAuth2UserInfo;
-import login.oauthtest4.global.oauth2.userinfo.NaverOAuth2UserInfo;
-import login.oauthtest4.global.oauth2.userinfo.OAuth2UserInfo;
+import login.oauthtest4.global.oauth2.userinfo.*;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -44,13 +42,30 @@ public class OAuthAttributes {
         if (socialType == SocialType.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
         }
+        if (socialType == SocialType.FACEBOOK) {
+            return ofFacebook(userNameAttributeName, attributes);
+        }
         return ofGoogle(userNameAttributeName, attributes);
+    }
+
+    public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new NaverOAuth2UserInfo(attributes))
+                .build();
     }
 
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
         return OAuthAttributes.builder()
                 .nameAttributeKey(userNameAttributeName)
                 .oauth2UserInfo(new KakaoOAuth2UserInfo(attributes))
+                .build();
+    }
+
+    public static OAuthAttributes ofFacebook(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2UserInfo(new FacebookOAuth2UserInfo(attributes))
                 .build();
     }
 
@@ -61,13 +76,6 @@ public class OAuthAttributes {
                 .build();
     }
 
-    public static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
-        return OAuthAttributes.builder()
-                .nameAttributeKey(userNameAttributeName)
-                .oauth2UserInfo(new NaverOAuth2UserInfo(attributes))
-                .build();
-    }
-
     /**
      * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
      * OAuth2UserInfo에서 socialId(식별값), nickname, imageUrl을 가져와서 build
@@ -75,9 +83,12 @@ public class OAuthAttributes {
      * role은 GUEST로 설정
      */
     public User toEntity(SocialType socialType, OAuth2UserInfo oauth2UserInfo) {
-        return User.builder()
+        SocialProfile profile = SocialProfile.builder()
                 .socialType(socialType)
-                .socialId(oauth2UserInfo.getId())
+                .socialId(oauth2UserInfo.getSocialId())
+                .socialEmail(oauth2UserInfo.getEmail())
+                .build();
+        return User.builder()
                 .email(UUID.randomUUID() + "@socialUser.com")
                 .nickname(oauth2UserInfo.getNickname())
                 .imageUrl(oauth2UserInfo.getImageUrl())

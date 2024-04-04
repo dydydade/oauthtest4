@@ -51,14 +51,14 @@ public class SecurityConfig {
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .csrf(csrf -> csrf.disable())
                 .formLogin(formLogin -> formLogin.disable())
-//                .headers().frameOptions().disable()
                 // 세션 사용하지 않으므로 STATELESS로 설정
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeRequests(auth -> auth
                         // 아이콘, css, js 관련
-                        // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
-                        .requestMatchers("/","/sign-up","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
+                        // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능
+                        .requestMatchers("/","/sign-up","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 // 원래 스프링 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작

@@ -1,10 +1,13 @@
 package login.oauthtest4.domain.user.service;
 
+import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
 import login.oauthtest4.domain.user.Role;
 import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.user.dto.FindUserResponse;
 import login.oauthtest4.domain.user.dto.UserSignUpDto;
 import login.oauthtest4.domain.user.exception.AlreadySignedUpUserException;
+import login.oauthtest4.domain.user.exception.RegisteredUserNotFoundException;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,14 +37,23 @@ public class UserService {
                 .email(userSignUpDto.getEmail())
                 .password(userSignUpDto.getPassword())
                 .nickname(userSignUpDto.getNickname())
-                .age(userSignUpDto.getAge())
-                .city(userSignUpDto.getCity())
                 .role(Role.USER)
                 .build();
 
         user.passwordEncode(passwordEncoder);
         userRepository.save(user);
     }
+
+    public FindUserResponse findUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(RegisteredUserNotFoundException::new);
+
+        boolean doesPasswordExists = StringUtils.isNotEmpty(user.getPassword()) ? true : false;
+
+        return new FindUserResponse(user.getEmail(), doesPasswordExists);
+    }
+
+
 }
 
 

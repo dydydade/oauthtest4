@@ -3,12 +3,21 @@ package login.oauthtest4.domain.user.repository;
 import login.oauthtest4.domain.user.SocialType;
 import login.oauthtest4.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
+
+    @Query("select u from User u left join fetch u.socialProfiles where u.email = :email")
+    Optional<User> findByEmailWithSocialProfiles(String email);
+
+    @Query("select u from User u left join fetch u.socialProfiles sp where sp.socialEmail = :email")
+    Optional<User> checkUserSocialEmailMatched(String email);
 
     Optional<User> findByNickname(String nickname);
 
@@ -20,5 +29,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * 유저 객체는 DB에 있지만, 추가 정보가 빠진 상태이다.
      * 따라서 추가 정보를 입력받아 회원 가입을 진행할 때 소셜 타입, 식별자로 해당 회원을 찾기 위한 메소드
      */
-    Optional<User> findBySocialTypeAndSocialId(SocialType socialType, String socialId);
+//    Optional<User> findBySocialTypeAndSocialId(SocialType socialType, String socialId);
 }

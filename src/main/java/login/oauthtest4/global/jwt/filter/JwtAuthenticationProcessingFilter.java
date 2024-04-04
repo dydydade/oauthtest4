@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Jwt 인증 필터
@@ -37,7 +38,14 @@ import java.io.IOException;
 @Slf4j
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
+    // 로그인 경로로 들어오는 요청은 Filter 작동 X
+    private static final List<String> NO_CHECK_URLS = List.of(
+            "/api/v1/auth",
+            "/oauth2/authorization/kakao",
+            "/oauth2/authorization/naver",
+            "/oauth2/authorization/google",
+            "/oauth2/authorization/apple"
+    );
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -46,8 +54,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
+        String requestURI = request.getRequestURI();
+
+        // 요청 URI가 NO_CHECK_URLS 목록에 포함되어 있는지 확인
+        if (NO_CHECK_URLS.stream().anyMatch(requestURI::startsWith)) {
+            filterChain.doFilter(request, response); // 로그인 경로로 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
 
@@ -70,9 +81,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
         // AccessToken이 없거나 유효하지 않다면, 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 에러 발생
         // AccessToken이 유효하다면, 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
-        if (refreshToken == null) {
-            checkAccessTokenAndAuthentication(request, response, filterChain);
-        }
+        checkAccessTokenAndAuthentication(request, response, filterChain);
     }
 
     /**

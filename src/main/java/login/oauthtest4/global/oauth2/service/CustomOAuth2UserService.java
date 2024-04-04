@@ -1,10 +1,15 @@
 package login.oauthtest4.global.oauth2.service;
 
+import login.oauthtest4.domain.user.SocialProfile;
 import login.oauthtest4.domain.user.SocialType;
 import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.user.exception.RegisteredUserNotFoundException;
+import login.oauthtest4.domain.user.exception.UserNotLinkedWithSocialException;
+import login.oauthtest4.domain.user.repository.SocialProfileRepository;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.global.oauth2.CustomOAuth2User;
 import login.oauthtest4.global.oauth2.OAuthAttributes;
+import login.oauthtest4.global.oauth2.userinfo.OAuth2UserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -24,13 +30,15 @@ import java.util.Map;
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
+    private final SocialProfileRepository socialProfileRepository;
 
     private static final String NAVER = "naver";
     private static final String KAKAO = "kakao";
+    private static final String FACEBOOK = "facebook";
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("CustomOAuth2UserService.loadUser() 실행 - OAuth2 로그인 요청 진입");
+        log.debug("CustomOAuth2UserService.loadUser() 실행 - OAuth2 로그인 요청 진입");
 
         /**
          * DefaultOAuth2UserService 객체를 생성하여, loadUser(userRequest)를 통해 DefaultOAuth2User 객체를 생성 후 반환
@@ -74,6 +82,9 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if(KAKAO.equals(registrationId)) {
             return SocialType.KAKAO;
         }
+        if(FACEBOOK.equals(registrationId)) {
+            return SocialType.FACEBOOK;
+        }
         return SocialType.GOOGLE;
     }
 
@@ -82,13 +93,39 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
      * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
      */
     private User getUser(OAuthAttributes attributes, SocialType socialType) {
-        User findUser = userRepository.findBySocialTypeAndSocialId(socialType,
-                attributes.getOauth2UserInfo().getId()).orElse(null);
 
-        if(findUser == null) {
-            return saveUser(attributes, socialType);
+        // 리소스 서버로부터 넘겨받은 user 정보
+        OAuth2UserInfo oauth2UserInfo = attributes.getOauth2UserInfo();
+
+        // 리소스 서버로부터 넘겨받은 socialEmail
+        String socialEmail = oauth2UserInfo.getEmail();
+
+        // 리소스 서버로부터 넘겨받은 socialId
+        String socialId = oauth2UserInfo.getSocialId();
+
+        // 리소스 서버에서 넘겨받은 socialEmail 과 앱 계정의 email 이 일치하는 사용자 조회
+        // 사용자가 존재하지 않으면, RegisteredUserNotFoundException 던짐
+        User user = userRepository.findByEmail(socialEmail)
+                .orElseThrow(RegisteredUserNotFoundException::new); // 회원가입 페이지로 보냄
+
+        // app 계정이 존재하는 경우, 연동된 socialProfile 조회
+        Optional<SocialProfile> socialProfileOptional = socialProfileRepository.findBySocialEmailAndSocialTypeWithUser(socialEmail, socialType);
+
+        // socialProfile 연동이 안 되어있는 경우,
+        if (socialProfileOptional.isEmpty()) {
+            // socialProfile 자동 연동해준 뒤 홈 화면으로 이동시킴
+            SocialProfile socialProfile = SocialProfile.builder()
+                    .user(user)
+                    .socialType(socialType)
+                    .socialId(socialId)
+                    .socialEmail(socialEmail)
+                    .build();
+            socialProfileRepository.save(socialProfile); // 소셜 프로필 연동
         }
-        return findUser;
+
+        // 소셜 로그인 시도한 socialProfile 이 이미 연동되어있는 경우,
+        // 인증 성공시키고 홈 화면으로 보냄
+        return user;
     }
 
     /**

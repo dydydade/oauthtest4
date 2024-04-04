@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Builder
 @Table(name = "USERS")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User {
 
@@ -29,10 +32,8 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @Enumerated(EnumType.STRING)
-    private SocialType socialType; // KAKAO, NAVER, GOOGLE, FACEBOOK
-
-    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+    @OneToMany(mappedBy = "user")
+    private List<SocialProfile> socialProfiles;
 
     private String refreshToken; // 리프레시 토큰
 
