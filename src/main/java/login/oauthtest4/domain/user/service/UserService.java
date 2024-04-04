@@ -48,12 +48,10 @@ public class UserService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
 
-        boolean doesPasswordExists = StringUtils.isNotEmpty(user.getPassword()) ? true : false;
+        boolean doesPasswordExists = StringUtils.isNotEmpty(user.getPassword());
 
         return new FindUserResponse(user.getEmail(), doesPasswordExists);
     }
-
-
 }
 
 
