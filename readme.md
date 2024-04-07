@@ -2,7 +2,8 @@
 
 
 ### API 목록
-![img_2.png](img_2.png)
+![image](https://github.com/dydydade/oauthtest4/assets/78246372/951d1b17-d333-46ca-bc54-1b4322bee778)
+
 
 <br/>
 
