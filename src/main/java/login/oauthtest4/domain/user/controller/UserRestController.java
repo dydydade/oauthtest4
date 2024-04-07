@@ -65,12 +65,17 @@ public class UserRestController {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.failure("이미 사용 중인 닉네임입니다."));
     }
 
-//    @PutMapping("/{userId}/password")
-//    public ResponseEntity<?> changePassword(
-//            @PathVariable("userId") Long userId,
-//            @RequestBody PasswordChangeRequest passwordChangeRequest,
-//            @AuthenticationPrincipal UserDetails currentUser
-//    ) {
-//
-//    }
+    @PutMapping("/{userId}/password")
+    public ResponseEntity<?> setUserPassword(
+            @RequestBody PasswordChangeRequest passwordChangeRequest
+    ) {
+        verifyTempToken(passwordChangeRequest);
+
+        userService.setUserPassword(passwordChangeRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("비밀번호 설정을 완료하였습니다."));
+    }
+
+    private void verifyTempToken(PasswordChangeRequest passwordChangeRequest) {
+        // TODO: 이메일 인증 성공 시점에 발급한 임시 토큰 검증
+    }
 }

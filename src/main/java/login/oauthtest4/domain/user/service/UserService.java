@@ -127,23 +127,19 @@ public class UserService {
         }
     }
 
-    public void changePassword(
-            Long userId,
-            PasswordChangeRequest passwordChangeRequest,
-            UserDetails currentUser
+    @Transactional
+    public void setUserPassword(
+            PasswordChangeRequest passwordChangeRequest
     ) {
-        Optional<User> userOptional = userRepository.findById(userId);
+        String email = passwordChangeRequest.getEmail();
+        Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
             throw new RegisteredUserNotFoundException();
         }
 
-        String targetUserEmail = userOptional.get().getUsername();
-        String currentUserEmail = currentUser.getUsername();
-
-        if (!targetUserEmail.equals(currentUserEmail)) {
-            throw new UnauthorizedAccountAttemptException();
-        }
+        User user = userOptional.get();
+        user.updatePassword(passwordChangeRequest.getNewPassword(), passwordEncoder);
     }
 }
 
