@@ -461,7 +461,7 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 <br/>
 
 
-### 추가예정
+### readme 파일에 추가 정리 예정
 ### 3. 이메일로 가입된 계정 찾기
 ### 4. 비밀번호 설정
 ### 5. 닉네임 중복 여부 체크
