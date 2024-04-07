@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * 초기 상태 등록 Config
@@ -21,6 +22,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final SocialProfileRepository socialProfileRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * 앱 계정(User) 및 소셜 연동 정보 저장
@@ -31,10 +33,10 @@ public class InitializeDefaultConfig implements CommandLineRunner {
                 .id(1L)
                 .username("dydydade")
                 .age(32)
-                .email("xx5882@naver.com")
+                .email("dydydade@gmail.com")
                 .city("Seoul")
                 .role(Role.USER)
-                .password("1234")
+                .password(passwordEncoder.encode("1234"))
                 .build();
         SocialProfile naver = SocialProfile.builder()
                 .id(1L)

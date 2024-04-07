@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class FindUserResponse {
 
     private String email;
-    private boolean doesPasswordExists;
+    private boolean passwordExists;
 }

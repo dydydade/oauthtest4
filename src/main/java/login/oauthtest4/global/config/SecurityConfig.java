@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -59,6 +61,7 @@ public class SecurityConfig {
                         // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능
                         .requestMatchers("/","/sign-up","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll() // 회원가입 요청은 인증 대상 제외
                         .anyRequest().authenticated()
                 )
                 // 원래 스프링 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작

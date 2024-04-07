@@ -13,7 +13,6 @@ import java.util.Map;
 
 @ControllerAdvice
 public class UserExceptionHandler {
-
     @ExceptionHandler(AlreadySignedUpUserException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> handleAlreadySignedUpUserException(AlreadySignedUpUserException ex) {
