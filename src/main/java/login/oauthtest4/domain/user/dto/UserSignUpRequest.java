@@ -17,3 +17,5 @@ public class UserSignUpRequest {
 
     private UserSignUpSocialProfileDto socialProfileDto;
 }
+
+

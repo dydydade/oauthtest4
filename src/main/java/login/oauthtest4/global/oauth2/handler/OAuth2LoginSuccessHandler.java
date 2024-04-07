@@ -17,12 +17,11 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-//@Transactional
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
-//    private final UserRepository userRepository;
 
+    // TODO: 아래 코드 수정 필요(LEMON 앱의 정책에 따라서)
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         log.info("OAuth2 Login 성공!");
