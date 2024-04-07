@@ -467,5 +467,22 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 ### 4. 비밀번호 설정
 ### 5. 닉네임 중복 여부 체크
 ### 7. 이메일 인증코드 발송
+① CertificationGenerator 로 인증 코드 생성 후, Redis 서버에 "email" : "인증코드" 형식으로 저장(만료시간 180초)
+② JavaMailSender 로 이메일 발송, 메일에 링크 클릭하면 /api/v1/auth/verification-codes/verify 경로로 요청
 ### 8. 이메일 인증코드 검증
+① 메일 링크 클릭해서 요청이 들어올 때, 요청 파라미터로 포함된 email 정보로 레디스 서버 조회
+② 요청 파라미터로 함께 넘어온 인증코드가 레디스 서버에서 조회한 것과 일치하면 인증 성공 처리
+
+## 추가로 만들어야 하는 부분
+### 이메일 인증 코드 발송 부분, 5회 초과 시도하면 예외 발생시키기
+### 비밀번호 설정 시 임시 토큰 함께 넘기도록 수정
+LEMON 앱 정책상 비밀번호를 설정하는 시점에는 로그인 이전으로 인증 정보(jwt)가 없음
+이메일 인증 > 성공 시 비밀번호 설정 화면으로 넘어가는데,
+이메일 verify 시점에 임시 토큰을 클라이언트 측으로 함께 전송하여
+비밀번호 설정 api 에 함께 넘기도록 구현 필요할 것 같음
+
+### RefreshToken 별도 테이블로 분리
+### OAuth2SuccessHandler, OAuth2FailureHandler 수정(현재는 앱 정책이랑 맞지 않게 작성된 상태)
+### LoginSuccessHandler, LoginFailureHandler 수정(현재는 앱 정책이랑 맞지 않게 작성된 상태)
+
 
