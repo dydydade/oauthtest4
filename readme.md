@@ -457,6 +457,51 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 
 
 <br/>
+
+### 7~8. 이메일 인증코드 발송/검증
+이 부분은 아래 블로그에서 가져왔는데, 내용 정리가 잘 되어 있어서 링크로 대체하겠습니다.
+https://velog.io/@wlsgur1533/%EC%9D%B4%EB%A9%94%EC%9D%BC-%EC%9D%B8%EC%A6%9D%ED%95%98%EA%B8%B0
+
+위 코드에서 딱 한 부분만 수정했는데, 수정한 부분은 다음과 같습니다.
+
+▼ MailSendService 코드
+```java
+    @Async // <-- sendEmailForCertification 메서드 비동기 메서드로 설정(인증코드 메일 발송 직후 클라이언트 측으로 딜레이 없이 응답을 띄우기 위함)
+    public CompletableFuture<EmailCertificationResponse> sendEmailForCertification(String email) throws NoSuchAlgorithmException, MessagingException {
+        String certificationNumber = generator.createCertificationNumber();
+        String content = String.format("%s/api/v1/auth/verify?certificationNumber=%s&email=%s   링크를 3분 이내에 클릭해주세요.", DOMAIN_NAME, certificationNumber, email);
+        certificationNumberDao.saveCertificationNumber(email, certificationNumber);
+        sendMail(email, content);
+        return CompletableFuture.completedFuture(new EmailCertificationResponse(email, certificationNumber));
+    }
+```
+
+▼ AuthRestController 코드
+인증 코드 발송 응답은 비동기적으로 즉시 반환하고,
+응답을 반환한 이후라도 오류가 발생하여 메일 발송에 실패한 경우 클라이언트 측으로 오류를 알릴 수 있도록 구성
+클라이언트 측으로 오류를 알리는 메서드는 현재 미구현
+```java
+    @PostMapping("/send-certification")
+    public ResponseEntity<?> sendCertificationNumber(
+            @Validated @RequestBody EmailCertificationRequest request
+    ) throws MessagingException, NoSuchAlgorithmException {
+        // 비동기 메서드 호출
+        mailSendService.sendEmailForCertification(request.getEmail())
+                .exceptionally(ex -> {
+                    // 인증 코드 발송 간 오류 발생 시, 클라이언트에 오류를 알릴 수 있는 코드 구현(필요 시)
+                    alertClientAboutEmailFailure(ex);
+                    return null;
+                });
+        // 인증 코드 발송 응답은 즉시 반환(비동기)
+        return ResponseEntity.ok(ApiResponse.success("인증 코드가 메일로 발송되었습니다."));
+    }
+
+    private void alertClientAboutEmailFailure(Throwable ex) {
+        // 구현 필요
+    }
+```
+
+
 <br/>
 <br/>
 <br/>
@@ -466,12 +511,8 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
 ### 3. 이메일로 가입된 계정 찾기
 ### 4. 비밀번호 설정
 ### 5. 닉네임 중복 여부 체크
-### 7. 이메일 인증코드 발송
-① CertificationGenerator 로 인증 코드 생성 후, Redis 서버에 "email" : "인증코드" 형식으로 저장(만료시간 180초)
-② JavaMailSender 로 이메일 발송, 메일에 링크 클릭하면 /api/v1/auth/verification-codes/verify 경로로 요청
-### 8. 이메일 인증코드 검증
-① 메일 링크 클릭해서 요청이 들어올 때, 요청 파라미터로 포함된 email 정보로 레디스 서버 조회
-② 요청 파라미터로 함께 넘어온 인증코드가 레디스 서버에서 조회한 것과 일치하면 인증 성공 처리
+
+
 
 ## 추가로 만들어야 하는 부분
 ### 이메일 인증 코드 발송 부분, 5회 초과 시도하면 예외 발생시키기
