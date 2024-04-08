@@ -93,7 +93,7 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isEmpty()) {
-            throw new RegisteredUserNotFoundException();
+            throw new RegisteredUserNotFoundException("가입된 계정을 찾을 수 없습니다.");
         }
 
         User user = userOptional.get();
@@ -102,7 +102,7 @@ public class UserService {
         String currentUserEmail = currentUser.getUsername(); // username 대신 email을 등록하여 인증함
 
         if (!targetUserEmail.equals(currentUserEmail)) {
-            throw new UnauthorizedAccountAttemptException();
+            throw new UnauthorizedAccountAttemptException("회원 탈퇴를 요청한 계정 정보와 로그인 사용자 정보가 일치하지 않습니다.");
         }
 
         userRepository.deleteById(userId);
