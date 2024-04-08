@@ -2,6 +2,7 @@ package login.oauthtest4.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import login.oauthtest4.domain.user.repository.UserRepository;
+import login.oauthtest4.global.jwt.exception.JwtExceptionHandlingFilter;
 import login.oauthtest4.global.jwt.filter.JwtAuthenticationProcessingFilter;
 import login.oauthtest4.global.jwt.service.JwtService;
 import login.oauthtest4.global.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
@@ -69,6 +70,7 @@ public class SecurityConfig {
                 // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
                 .addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class)
                 .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationProcessingFilter.class)
+                .addFilterBefore(jwtExceptionHandlingFilter(), JwtAuthenticationProcessingFilter.class)
                 //== 소셜 로그인 설정 ==//
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
@@ -144,5 +146,11 @@ public class SecurityConfig {
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
         JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository);
         return jwtAuthenticationFilter;
+    }
+
+    @Bean
+    public JwtExceptionHandlingFilter jwtExceptionHandlingFilter() {
+        JwtExceptionHandlingFilter jwtExceptionHandlingFilter = new JwtExceptionHandlingFilter();
+        return jwtExceptionHandlingFilter;
     }
 }
