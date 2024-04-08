@@ -26,9 +26,17 @@ public class AuthRestController {
     ) throws MessagingException, NoSuchAlgorithmException {
         // 비동기 메서드 호출
         mailSendService.sendEmailForCertification(request.getEmail())
-                .thenApply(response -> ResponseEntity.ok(ApiResponse.success(response, "인증 코드가 메일로 발송되었습니다.")))
-                .exceptionally(ex -> ResponseEntity.badRequest().body(ApiResponse.failure("이메일 인증 처리 중 에러 발생")));
+                .exceptionally(ex -> {
+                    // 인증 코드 발생 간 오류 발생 시, 클라이언트에 오류를 알릴 수 있는 코드 구현(필요 시)
+                    alertClientAboutEmailFailure(ex);
+                    return null;
+                });
+        // 인증 코드 발송 응답은 즉시 반환(비동기)
         return ResponseEntity.ok(ApiResponse.success("인증 코드가 메일로 발송되었습니다."));
+    }
+
+    private void alertClientAboutEmailFailure(Throwable ex) {
+        // 구현 필요
     }
 
     @GetMapping("/verify")
