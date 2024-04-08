@@ -35,6 +35,15 @@ public class ApiResponse<T> {
         return new ApiResponse<>(ResponseStatus.FAIL, null, message);
     }
 
+    // 오류 응답을 생성하는 메소드
+    public static <T> ApiResponse<T> error(String message) {
+        return new ApiResponse<>(ResponseStatus.ERROR, null, message);
+    }
+
+    public static <T> ApiResponse<T> error(T data, String message) {
+        return new ApiResponse<>(ResponseStatus.ERROR, data, message);
+    }
+
     // Getter 메소드
     public ResponseStatus getStatus() {
         return status;
