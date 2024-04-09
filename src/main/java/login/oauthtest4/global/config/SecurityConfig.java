@@ -73,6 +73,10 @@ public class SecurityConfig {
                 .addFilterBefore(jwtExceptionHandlingFilter(), JwtAuthenticationProcessingFilter.class)
                 //== 소셜 로그인 설정 ==//
                 .oauth2Login(oauth2 -> oauth2
+                                .authorizationEndpoint(authorizationEndpoint  ->
+                                        authorizationEndpoint
+                                            .baseUri("/api/v1/auth/social/login")
+                        )
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
                         .userInfoEndpoint(userInfo -> userInfo
