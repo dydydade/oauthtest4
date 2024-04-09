@@ -1,6 +1,6 @@
 package login.oauthtest4.domain.user.exception;
 
-import login.oauthtest4.global.auth.dto.ApiResponse;
+import login.oauthtest4.global.auth.verification.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -2,7 +2,7 @@ package login.oauthtest4.domain.user.controller;
 
 import login.oauthtest4.domain.user.dto.*;
 import login.oauthtest4.domain.user.service.UserService;
-import login.oauthtest4.global.auth.dto.ApiResponse;
+import login.oauthtest4.global.auth.verification.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
