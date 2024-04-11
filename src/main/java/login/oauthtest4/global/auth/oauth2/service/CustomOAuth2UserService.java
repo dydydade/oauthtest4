@@ -1,8 +1,8 @@
 package login.oauthtest4.global.auth.oauth2.service;
 
-import login.oauthtest4.domain.user.SocialProfile;
-import login.oauthtest4.domain.user.SocialType;
-import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.user.model.SocialProfile;
+import login.oauthtest4.domain.user.model.SocialType;
+import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.exception.RegisteredUserNotFoundException;
 import login.oauthtest4.domain.user.repository.SocialProfileRepository;
 import login.oauthtest4.domain.user.repository.UserRepository;
@@ -104,8 +104,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         // 리소스 서버에서 넘겨받은 socialEmail 과 앱 계정의 email 이 일치하는 사용자 조회
         // 사용자가 존재하지 않으면, RegisteredUserNotFoundException 던짐
+        // TODO: 이때 소셜 이메일 정보 함께 넘겨줘야 함
         User user = userRepository.findByEmail(socialEmail)
                 .orElseThrow(RegisteredUserNotFoundException::new); // 회원가입 페이지로 보냄
+
+
 
         // app 계정이 존재하는 경우, 연동된 socialProfile 조회
         Optional<SocialProfile> socialProfileOptional = socialProfileRepository.findBySocialEmailAndSocialTypeWithUser(socialEmail, socialType);

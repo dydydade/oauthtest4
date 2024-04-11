@@ -1,4 +1,4 @@
-package login.oauthtest4.domain.user;
+package login.oauthtest4.domain.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;

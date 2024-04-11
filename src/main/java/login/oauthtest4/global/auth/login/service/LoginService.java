@@ -1,6 +1,6 @@
 package login.oauthtest4.global.auth.login.service;
 
-import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;

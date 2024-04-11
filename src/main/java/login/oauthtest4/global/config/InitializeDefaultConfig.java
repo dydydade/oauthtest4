@@ -1,9 +1,9 @@
 package login.oauthtest4.global.config;
 
-import login.oauthtest4.domain.user.Role;
-import login.oauthtest4.domain.user.SocialProfile;
-import login.oauthtest4.domain.user.SocialType;
-import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.user.model.Role;
+import login.oauthtest4.domain.user.model.SocialProfile;
+import login.oauthtest4.domain.user.model.SocialType;
+import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.repository.SocialProfileRepository;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +32,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         User user = User.builder()
                 .id(1L)
                 .username("dydydade")
-                .age(32)
                 .email("dydydade@gmail.com")
-                .city("Seoul")
                 .role(Role.USER)
                 .password(passwordEncoder.encode("1234"))
                 .build();

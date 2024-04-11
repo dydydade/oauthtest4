@@ -1,6 +1,6 @@
 package login.oauthtest4.global.auth.oauth2;
 
-import login.oauthtest4.domain.user.Role;
+import login.oauthtest4.domain.user.model.Role;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;

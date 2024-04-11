@@ -3,7 +3,7 @@ package login.oauthtest4.global.auth.oauth2.handler;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import login.oauthtest4.domain.user.Role;
+import login.oauthtest4.domain.user.model.Role;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
 import login.oauthtest4.global.auth.oauth2.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
