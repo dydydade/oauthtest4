@@ -18,7 +18,7 @@ public class UserExceptionHandler {
 
     @ExceptionHandler(RegisteredUserNotFoundException.class)
     public ResponseEntity<Object> handleRegisteredUserNotFoundException(RegisteredUserNotFoundException ex) {
-        ApiResponse<Object> apiResponse = ApiResponse.error(ex.getMessage());
+        ApiResponse<Object> apiResponse = ApiResponse.failure(ex.getMessage());
         return ResponseEntity.status(NOT_FOUND).body(apiResponse);
     }
 
