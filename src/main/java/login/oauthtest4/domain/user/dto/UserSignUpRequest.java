@@ -1,8 +1,5 @@
 package login.oauthtest4.domain.user.dto;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import login.oauthtest4.domain.user.SocialType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
