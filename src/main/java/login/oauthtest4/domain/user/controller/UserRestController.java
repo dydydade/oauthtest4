@@ -1,5 +1,6 @@
 package login.oauthtest4.domain.user.controller;
 
+import jakarta.validation.Valid;
 import login.oauthtest4.domain.user.dto.*;
 import login.oauthtest4.domain.user.service.UserService;
 import login.oauthtest4.global.auth.verification.dto.ApiResponse;
@@ -30,7 +31,7 @@ public class UserRestController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<?> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
+    public ResponseEntity<?> signUp(@RequestBody @Valid UserSignUpRequest userSignUpRequest) {
         UserSignUpResponse userSignUpResponse = userService.signUp(userSignUpRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
