@@ -1,15 +1,13 @@
-package login.oauthtest4.domain.user;
+package login.oauthtest4.domain.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
-@Getter
 @Entity
+@Getter
 @Builder
 @Table(name = "USERS")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,8 +24,6 @@ public class User {
     private String password; // 비밀번호
     private String nickname; // 닉네임
     private String imageUrl; // 프로필 이미지
-    private int age;
-    private String city; // 사는 도시
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -35,16 +31,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<SocialProfile> socialProfiles;
 
-    private String refreshToken; // 리프레시 토큰
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserRefreshToken> userRefreshTokens; // 리프레시 토큰
 
     // 유저 권한 설정 메소드
     public void authorizeUser() {
         this.role = Role.USER;
-    }
-
-    // 비밀번호 암호화 메소드
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
     }
 
     //== 유저 필드 업데이트 ==//
@@ -52,19 +44,23 @@ public class User {
         this.nickname = updateNickname;
     }
 
-    public void updateAge(int updateAge) {
-        this.age = updateAge;
+    public void updatePassword(String updatePassword) {
+        this.password = updatePassword;
     }
 
-    public void updateCity(String updateCity) {
-        this.city = updateCity;
+    // 연관관계 편의 메소드
+    public void addUserRefreshToken(UserRefreshToken userRefreshToken) {
+        // 현재 User의 RefreshToken 리스트에 추가하고, RefreshToken의 User를 현재 User로 설정
+        if (!this.userRefreshTokens.contains(userRefreshToken)) {
+            this.userRefreshTokens.add(userRefreshToken);
+            userRefreshToken.setUser(this);
+        }
     }
 
-    public void updatePassword(String updatePassword, PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(updatePassword);
-    }
-
-    public void updateRefreshToken(String updateRefreshToken) {
-        this.refreshToken = updateRefreshToken;
+    public void removeUserRefreshToken(UserRefreshToken userRefreshToken) {
+        // 현재 User의 RefreshToken 리스트에서 제거하고, RefreshToken의 User 연결을 끊음
+        if (this.userRefreshTokens.remove(userRefreshToken)) {
+            userRefreshToken.setUser(null);
+        }
     }
 }

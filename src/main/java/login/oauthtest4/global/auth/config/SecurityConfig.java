@@ -2,9 +2,11 @@ package login.oauthtest4.global.auth.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import login.oauthtest4.domain.user.repository.UserRepository;
+import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.exception.JwtExceptionHandlingFilter;
 import login.oauthtest4.global.auth.jwt.filter.JwtAuthenticationProcessingFilter;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
+import login.oauthtest4.global.auth.login.exception.LoginExceptionHandlingFilter;
 import login.oauthtest4.global.auth.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import login.oauthtest4.global.auth.login.handler.LoginFailureHandler;
 import login.oauthtest4.global.auth.login.handler.LoginSuccessHandler;
@@ -25,7 +27,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -41,11 +42,13 @@ public class SecurityConfig {
 
     private final LoginService loginService;
     private final JwtService jwtService;
+    private final UserRefreshTokenService userRefreshTokenService;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -74,6 +77,7 @@ public class SecurityConfig {
                 // 필터 단에서 발생하는 예외를 처리하기 위한 예외 핸들링 필터 등록
                 .addFilterBefore(jwtExceptionHandlingFilter(), JwtAuthenticationProcessingFilter.class)
                 .addFilterBefore(oauth2ExceptionHandlingFilter(), JwtExceptionHandlingFilter.class)
+                .addFilterBefore(loginExceptionHandlingFilter(), OAuth2ExceptionHandlingFilter.class)
 
                 //== 소셜 로그인 설정 ==//
                 .oauth2Login(oauth2 -> oauth2
@@ -97,11 +101,6 @@ public class SecurityConfig {
         return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
-
     /**
      * AuthenticationManager 설정 후 등록
      * PasswordEncoder를 사용하는 AuthenticationProvider 지정 (PasswordEncoder는 위에서 등록한 PasswordEncoder 사용)
@@ -113,7 +112,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setPasswordEncoder(passwordEncoder());
+        provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(loginService);
         return new ProviderManager(provider);
     }
@@ -123,7 +122,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userRepository);
+        return new LoginSuccessHandler(jwtService, userRefreshTokenService);
     }
 
     /**
@@ -152,7 +151,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository);
+        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository, userRefreshTokenService, objectMapper);
         return jwtAuthenticationFilter;
     }
 
@@ -172,5 +171,14 @@ public class SecurityConfig {
     @Bean
     public OAuth2ExceptionHandlingFilter oauth2ExceptionHandlingFilter() {
         return new OAuth2ExceptionHandlingFilter(objectMapper);
+    }
+
+    /**
+     * Filter 단에서 던져지는 Login 관련 예외를 핸들링하기 위한 필터
+     * @return
+     */
+    @Bean
+    public LoginExceptionHandlingFilter loginExceptionHandlingFilter() {
+        return new LoginExceptionHandlingFilter(objectMapper);
     }
 }

@@ -2,10 +2,12 @@ package login.oauthtest4.global.auth.jwt.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.global.auth.jwt.exception.InvalidJsonWebTokenException;
+import login.oauthtest4.global.auth.verification.dto.ApiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +95,7 @@ public class JwtService {
 
         setAccessTokenHeader(response, accessToken);
         setRefreshTokenHeader(response, refreshToken);
+
         log.info("Access Token, Refresh Token 헤더 설정 완료");
     }
 
@@ -151,17 +154,6 @@ public class JwtService {
      */
     public void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
         response.setHeader(refreshHeader, refreshToken);
-    }
-
-    /**
-     * RefreshToken DB 저장(업데이트)
-     */
-    public void updateRefreshToken(String email, String refreshToken) {
-        userRepository.findByEmail(email)
-                .ifPresentOrElse(
-                        user -> user.updateRefreshToken(refreshToken),
-                        () -> { throw new RuntimeException("일치하는 회원이 없습니다."); }
-                );
     }
 
     public boolean isTokenValid(String token) {

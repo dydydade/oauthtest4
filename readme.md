@@ -204,13 +204,13 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                                         Authentication authentication) {
         String email = extractUsername(authentication); // 인증 정보에서 Username(email) 추출
         String accessToken = jwtService.createAccessToken(email); // JwtService의 createAccessToken을 사용하여 AccessToken 발급
-        String refreshToken = jwtService.createRefreshToken(); // JwtService의 createRefreshToken을 사용하여 RefreshToken 발급
+        String userRefreshToken = jwtService.createRefreshToken(); // JwtService의 createRefreshToken을 사용하여 RefreshToken 발급
 
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
+        jwtService.sendAccessAndRefreshToken(response, accessToken, userRefreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
 
         userRepository.findByEmail(email)
                 .ifPresent(user -> {
-                    user.updateRefreshToken(refreshToken);
+                    user.updateRefreshToken(userRefreshToken);
                     userRepository.saveAndFlush(user);
                 });
 
@@ -423,12 +423,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     // TODO : 소셜 로그인 시에도 무조건 토큰 생성하지 말고 JWT 인증 필터처럼 RefreshToken 유/무에 따라 다르게 처리해보기
     private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
         String accessToken = jwtService.createAccessToken(oAuth2User.getEmail());
-        String refreshToken = jwtService.createRefreshToken();
+        String userRefreshToken = jwtService.createRefreshToken();
         response.addHeader(jwtService.getAccessHeader(), "Bearer " + accessToken);
-        response.addHeader(jwtService.getRefreshHeader(), "Bearer " + refreshToken);
+        response.addHeader(jwtService.getRefreshHeader(), "Bearer " + userRefreshToken);
 
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-        jwtService.updateRefreshToken(oAuth2User.getEmail(), refreshToken);
+        jwtService.sendAccessAndRefreshToken(response, accessToken, userRefreshToken);
+        jwtService.updateRefreshToken(oAuth2User.getEmail(), userRefreshToken);
     }
 }
 ```

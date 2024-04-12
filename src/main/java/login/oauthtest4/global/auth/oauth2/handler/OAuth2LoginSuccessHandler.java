@@ -4,7 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.model.Role;
+import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
+import login.oauthtest4.global.auth.login.exception.MissingDeviceIdException;
 import login.oauthtest4.global.auth.oauth2.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
+    private final UserRefreshTokenService userRefreshTokenService;
+    private static final String DEVICE_ID_HEADER_KEY = "Device-ID";
 
     // TODO: 아래 코드 수정 필요(LEMON 앱의 정책에 따라서)
     @Override
@@ -37,7 +41,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                 jwtService.sendAccessAndRefreshToken(response, accessToken, null);
 
             } else {
-                loginSuccess(response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
+                loginSuccess(request, response, oAuth2User); // 로그인에 성공한 경우 access, refresh 토큰 생성
             }
         } catch (Exception e) {
             throw e;
@@ -46,13 +50,19 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     // TODO : 소셜 로그인 시에도 무조건 토큰 생성하지 말고 JWT 인증 필터처럼 RefreshToken 유/무에 따라 다르게 처리해보기
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
+    private void loginSuccess(HttpServletRequest request, HttpServletResponse response, CustomOAuth2User oAuth2User) throws IOException {
+        String deviceId = request.getHeader(DEVICE_ID_HEADER_KEY);
+
+        if (deviceId == null) {
+            throw new MissingDeviceIdException("요청 헤더에 Device-ID 정보가 포함되지 않았습니다.");
+        }
+
         String accessToken = jwtService.createAccessToken(oAuth2User.getEmail());
         String refreshToken = jwtService.createRefreshToken();
         response.addHeader(jwtService.getAccessHeader(), "Bearer " + accessToken);
         response.addHeader(jwtService.getRefreshHeader(), "Bearer " + refreshToken);
 
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-        jwtService.updateRefreshToken(oAuth2User.getEmail(), refreshToken);
+        userRefreshTokenService.findAndUpdateUserRefreshToken(oAuth2User.getEmail(), deviceId, refreshToken);
     }
 }
