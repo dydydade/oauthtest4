@@ -1,13 +1,17 @@
 package login.oauthtest4.global.auth.jwt.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.user.model.User;
+import login.oauthtest4.domain.user.model.UserRefreshToken;
 import login.oauthtest4.domain.user.repository.UserRepository;
+import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
 import login.oauthtest4.global.auth.jwt.util.PasswordUtil;
+import login.oauthtest4.global.auth.verification.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +36,6 @@ import java.util.List;
  * 2. RefreshToken이 없고, AccessToken이 없거나 유효하지 않은 경우 -> 인증 실패 처리, 403 ERROR
  * 3. RefreshToken이 있는 경우 -> DB의 RefreshToken과 비교하여 일치하면 AccessToken 재발급, RefreshToken 재발급(RTR 방식)
  *                              인증 성공 처리는 하지 않고 실패 처리
- *
  */
 @RequiredArgsConstructor
 @Slf4j
@@ -49,6 +52,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final UserRefreshTokenService userRefreshTokenService;
+    private final ObjectMapper objectMapper;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -86,30 +91,24 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     /**
      *  [리프레시 토큰으로 유저 정보 찾기 & 액세스 토큰/리프레시 토큰 재발급 메소드]
-     *  파라미터로 들어온 헤더에서 추출한 리프레시 토큰으로 DB에서 유저를 찾고, 해당 유저가 있다면
-     *  JwtService.createAccessToken()으로 AccessToken 생성,
-     *  reIssueRefreshToken()로 리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드 호출
+     *  파라미터로 들어온 헤더에서 추출한 리프레시 토큰으로 DB에서 리프레스 토큰 엔티티를 찾고,
+     *  해당 리프레시 토큰 엔티티가 있다면 리프레시 토큰 재발급/업데이트(checkRefreshTokenAndUpdate())
+     *  이후 JwtService.createAccessToken()으로 AccessToken 생성,
      *  그 후 JwtService.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
      */
-    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        userRepository.findByRefreshToken(refreshToken)
-                .ifPresent(user -> {
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
-                            reIssuedRefreshToken);
-                });
-    }
+    public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) throws IOException {
+        UserRefreshToken reIssuedUserRefreshToken = userRefreshTokenService.checkRefreshTokenAndUpdate(refreshToken);
+        String reIssuedRefreshToken = reIssuedUserRefreshToken.getRefreshToken();
+        jwtService.sendAccessAndRefreshToken(
+                response,
+                jwtService.createAccessToken(reIssuedUserRefreshToken.getUser().getEmail()),
+                reIssuedRefreshToken);
 
-    /**
-     * [리프레시 토큰 재발급 & DB에 리프레시 토큰 업데이트 메소드]
-     * jwtService.createRefreshToken()으로 리프레시 토큰 재발급 후
-     * DB에 재발급한 리프레시 토큰 업데이트 후 Flush
-     */
-    private String reIssueRefreshToken(User user) {
-        String reIssuedRefreshToken = jwtService.createRefreshToken();
-        user.updateRefreshToken(reIssuedRefreshToken);
-        userRepository.saveAndFlush(user);
-        return reIssuedRefreshToken;
+        ApiResponse<Object> apiResponse = ApiResponse.success("Token 발급 완료");
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("application/json");
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 
     /**
