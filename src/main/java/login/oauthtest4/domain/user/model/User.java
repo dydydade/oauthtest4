@@ -1,6 +1,7 @@
 package login.oauthtest4.domain.user.model;
 
 import jakarta.persistence.*;
+import login.oauthtest4.domain.terms.model.AgreementHistory;
 import lombok.*;
 
 import java.util.List;
@@ -19,7 +20,6 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    private String username; // 유저가 입력한 ID (변경 불가)
     private String email; // 이메일
     private String password; // 비밀번호
     private String nickname; // 닉네임
@@ -33,6 +33,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRefreshToken> userRefreshTokens; // 리프레시 토큰
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<AgreementHistory> termsAgreementHistories;
 
     // 유저 권한 설정 메소드
     public void authorizeUser() {
