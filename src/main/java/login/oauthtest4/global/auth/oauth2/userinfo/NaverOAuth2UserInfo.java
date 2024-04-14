@@ -9,6 +9,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getSocialId() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -19,6 +20,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getNickname() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -30,6 +32,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getImageUrl() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -41,6 +44,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getEmail() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
