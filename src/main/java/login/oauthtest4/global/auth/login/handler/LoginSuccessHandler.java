@@ -5,7 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.login.dto.LoginSuccessResponse;
-import login.oauthtest4.global.auth.login.exception.MissingDeviceIdException;
+import login.oauthtest4.global.exception.filter.MissingDeviceIdException;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
 import login.oauthtest4.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +53,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .email(email)
                 .build();
 
-        final ResultResponse resultResponse = ResultResponse.of(LOGIN_SUCCESS, null);
+        final ResultResponse resultResponse = ResultResponse.of(LOGIN_SUCCESS, loginSuccessResponse);
         response.setStatus(resultResponse.getStatus());
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");

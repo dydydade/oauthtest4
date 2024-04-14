@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.model.Role;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
-import login.oauthtest4.global.auth.login.exception.MissingDeviceIdException;
+import login.oauthtest4.global.exception.filter.MissingDeviceIdException;
 import login.oauthtest4.global.auth.oauth2.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String deviceId = request.getHeader(DEVICE_ID_HEADER_KEY);
 
         if (deviceId == null) {
-            throw new MissingDeviceIdException("요청 헤더에 Device-ID 정보가 포함되지 않았습니다.");
+            throw new MissingDeviceIdException();
         }
 
         String accessToken = jwtService.createAccessToken(oAuth2User.getEmail());

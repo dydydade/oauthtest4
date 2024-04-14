@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.repository.UserRepository;
-import login.oauthtest4.global.auth.jwt.exception.InvalidJsonWebTokenException;
+import login.oauthtest4.global.exception.filter.InvalidJsonWebTokenException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

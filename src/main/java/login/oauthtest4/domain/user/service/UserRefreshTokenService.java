@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.model.UserRefreshToken;
 import login.oauthtest4.domain.user.repository.UserRefreshTokenRepository;
-import login.oauthtest4.global.auth.jwt.exception.InvalidJsonWebTokenException;
+import login.oauthtest4.global.exception.filter.InvalidJsonWebTokenException;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

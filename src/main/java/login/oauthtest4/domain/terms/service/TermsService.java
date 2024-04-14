@@ -1,6 +1,7 @@
 package login.oauthtest4.domain.terms.service;
 
 import jakarta.transaction.Transactional;
+import login.oauthtest4.domain.terms.dto.LatestTermsDto;
 import login.oauthtest4.domain.terms.dto.LatestTermsResponse;
 import login.oauthtest4.domain.terms.dto.TermsCreateRequest;
 import login.oauthtest4.domain.terms.dto.TermsCreateResponse;
@@ -12,7 +13,6 @@ import login.oauthtest4.global.exception.terms.TermsNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,10 +53,10 @@ public class TermsService {
      * ex) 개인정보처리방침(v2.0), 서비스 이용약관(v3.0), 마케팅 활용 동의(v2.2)
      */
     @Transactional
-    public List<LatestTermsResponse> findLatestVersionOfEachTermsType() {
-        return termsRepository.findLatestVersionOfEachTermsType().stream()
+    public LatestTermsResponse findLatestVersionOfEachTermsType() {
+        return new LatestTermsResponse(termsRepository.findLatestVersionOfEachTermsType().stream()
                 .map(terms -> {
-                    return LatestTermsResponse.builder()
+                    return LatestTermsDto.builder()
                             .id(terms.getId())
                             .termsType(terms.getTermsType())
                             .version(terms.getVersion())
@@ -65,7 +65,8 @@ public class TermsService {
                             .effectiveAt(terms.getEffectiveAt())
                             .build();
                 })
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+
     }
 
     /**

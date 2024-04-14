@@ -1,8 +1,8 @@
 package login.oauthtest4.global.auth.verification.service;
 
 import login.oauthtest4.global.auth.verification.dao.CertificationNumberDao;
-import login.oauthtest4.global.auth.verification.exception.EmailNotFoundException;
-import login.oauthtest4.global.auth.verification.exception.InvalidCertificationNumberException;
+import login.oauthtest4.global.exception.auth.EmailNotFoundException;
+import login.oauthtest4.global.exception.auth.InvalidEmailVerificationCodeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +14,7 @@ public class MailVerifyService {
 
     public void verifyEmail(String email, String certificationNumber) {
         if (!isVerify(email, certificationNumber)) {
-            throw new InvalidCertificationNumberException();
+            throw new InvalidEmailVerificationCodeException();
         }
         certificationNumberDao.removeCertificationNumber(email);
     }
