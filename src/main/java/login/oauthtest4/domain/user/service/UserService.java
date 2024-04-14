@@ -1,17 +1,15 @@
 package login.oauthtest4.domain.user.service;
 
-import io.micrometer.common.util.StringUtils;
 import jakarta.transaction.Transactional;
-import login.oauthtest4.domain.user.Role;
-import login.oauthtest4.domain.user.SocialProfile;
-import login.oauthtest4.domain.user.User;
+import login.oauthtest4.domain.terms.service.AgreementHistoryService;
+import login.oauthtest4.domain.terms.service.TermsService;
+import login.oauthtest4.domain.user.model.Role;
+import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.dto.*;
-import login.oauthtest4.domain.user.exception.AlreadySignedUpUserException;
-import login.oauthtest4.domain.user.exception.NicknameAlreadyInUseException;
-import login.oauthtest4.domain.user.exception.RegisteredUserNotFoundException;
-import login.oauthtest4.domain.user.exception.UnauthorizedAccountAttemptException;
 import login.oauthtest4.domain.user.repository.SocialProfileRepository;
 import login.oauthtest4.domain.user.repository.UserRepository;
+import login.oauthtest4.global.exception.user.RegisteredUserNotFoundException;
+import login.oauthtest4.global.exception.user.UnauthorizedAccountAttemptException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,64 +25,32 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final SocialProfileRepository socialProfileRepository;
+    private final TermsService termsService;
+    private final AgreementHistoryService agreementHistoryService;
     private final PasswordEncoder passwordEncoder;
+    private final NormalSignUpStrategy normalSignUpStrategy;
+    private final SocialSignUpStrategy socialSignUpStrategy;
 
     /**
-     * 회원 가입
+     * [일반 회원가입 메서드]
      * @param userSignUpRequest
+     * @return
      */
-    @Transactional
     public UserSignUpResponse signUp(UserSignUpRequest userSignUpRequest) {
-        if (userRepository.findByEmail(userSignUpRequest.getEmail()).isPresent()) {
-            throw new AlreadySignedUpUserException();
-        }
-
-        if (userRepository.findByNickname(userSignUpRequest.getNickname()).isPresent()) {
-            throw new NicknameAlreadyInUseException();
-        }
-
-        User user = User.builder()
-                .email(userSignUpRequest.getEmail())
-                .password(userSignUpRequest.getPassword())
-                .nickname(userSignUpRequest.getNickname())
-                .role(Role.USER)
-                .build();
-
-        user.passwordEncode(passwordEncoder);
-        User savedUser = userRepository.save(user);
-
-        // 회원가입 요청에 소셜 로그인 연계 정보가 함께 넘어온 경우
-        if (userSignUpRequest.getSocialProfileDto() != null) {
-            linkSocialProfile(userSignUpRequest, user);
-        }
-
-        return UserSignUpResponse.builder()
-                .userId(savedUser.getId())
-                .email(savedUser.getEmail())
-                .nickname(savedUser.getNickname())
-                .build();
+        return normalSignUpStrategy.signUp(userSignUpRequest);
     }
 
     /**
-     * 소셜 프로필 연계 메서드
+     * [소셜 회원가입 메서드]
      * @param userSignUpRequest
-     * @param user
+     * @return
      */
-    private void linkSocialProfile(UserSignUpRequest userSignUpRequest, User user) {
-        UserSignUpSocialProfileDto socialProfileDto = userSignUpRequest.getSocialProfileDto();
-
-        SocialProfile socialProfile = SocialProfile.builder()
-                .socialId(socialProfileDto.getSocialId())
-                .socialEmail(socialProfileDto.getSocialEmail())
-                .socialType(socialProfileDto.getSocialType())
-                .user(user)
-                .build();
-
-        socialProfileRepository.save(socialProfile);
+    public UserSignUpResponse socialSignUp(UserSignUpRequest userSignUpRequest) {
+        return socialSignUpStrategy.signUp(userSignUpRequest);
     }
 
     /**
-     * 회원 탈퇴
+     * [회원 탈퇴 메서드]
      * @param userId 탈퇴하려는 계정의 ID
      * @param currentUser 로그인 사용자 정보 (UserDetails)
      */
@@ -93,7 +59,7 @@ public class UserService {
         Optional<User> userOptional = userRepository.findById(userId);
 
         if (userOptional.isEmpty()) {
-            throw new RegisteredUserNotFoundException("가입된 계정을 찾을 수 없습니다.");
+            throw new RegisteredUserNotFoundException();
         }
 
         User user = userOptional.get();
@@ -102,7 +68,7 @@ public class UserService {
         String currentUserEmail = currentUser.getUsername(); // username 대신 email을 등록하여 인증함
 
         if (!targetUserEmail.equals(currentUserEmail)) {
-            throw new UnauthorizedAccountAttemptException("회원 탈퇴를 요청한 계정 정보와 로그인 사용자 정보가 일치하지 않습니다.");
+            throw new UnauthorizedAccountAttemptException();
         }
 
         userRepository.deleteById(userId);
@@ -111,13 +77,34 @@ public class UserService {
                 .build();
     }
 
+    /**
+     * [등록된 email 로 유저를 조회하는 메서드]
+     * @param email
+     * @return
+     */
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(RegisteredUserNotFoundException::new);
+    }
+
+    /**
+     * [등록된 email 로 유저를 조회하고 응답으로 바꿔서 반환하는 메서드]
+     * 응답에 계정이 일반계정인지/소셜ONLY계정인지 구분하는 필드도 포함
+     * @param email
+     * @return
+     */
     public FindUserResponse findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
-        boolean passwordExists = StringUtils.isNotEmpty(user.getPassword());
+        boolean passwordExists = user.getRole().equals(Role.USER); // 비밀번호가 존재하면 일반 계정
         return new FindUserResponse(user.getEmail(), passwordExists);
     }
 
+    /**
+     * [닉네임 중복 체크하는 메서드]
+     * @param nickname
+     * @return
+     */
     public boolean checkNicknameAvailability(String nickname) {
         Optional<User> userOptional = userRepository.findByNickname(nickname);
         if (userOptional.isPresent()) {
@@ -139,7 +126,7 @@ public class UserService {
         }
 
         User user = userOptional.get();
-        user.updatePassword(passwordChangeRequest.getNewPassword(), passwordEncoder);
+        user.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
     }
 }
 

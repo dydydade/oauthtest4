@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FindUserResponse {
-
     private String email;
     private boolean passwordExists;
 }
