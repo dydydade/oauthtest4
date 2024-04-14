@@ -21,59 +21,71 @@ public class UserRestController {
     @GetMapping("/search")
     public ResponseEntity<?> findUserByEmail(@RequestParam String email) {
         FindUserResponse body = userService.findUserByEmail(email);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(body, "회원으로 존재하는 이메일 계정입니다."));
+        ResultResponse result = ResultResponse.of(ResultCode.EMAIL_ALREADY_EXISTS, body);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     /**
-     * 회원 가입
-     *
+     * [일반 회원 가입]
      * @param userSignUpRequest
      * @return
      */
     @PostMapping
     public ResponseEntity<?> signUp(@RequestBody @Valid UserSignUpRequest userSignUpRequest) {
         UserSignUpResponse userSignUpResponse = userService.signUp(userSignUpRequest);
+        ResultResponse result = ResultResponse.of(ResultCode.NORMAL_REGISTER_SUCCESS, userSignUpResponse);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(userSignUpResponse, "회원 가입이 정상적으로 완료되었습니다."));
+    /**
+     * [소셜 회원 가입]
+     * @param userSocialSignUpRequest
+     * @return
+     */
+    @PostMapping("/signup/social")
+    public ResponseEntity<ResultResponse> socialSignUp(@RequestBody @Valid UserSocialSignUpRequest userSocialSignUpRequest) {
+        UserSignUpResponse userSignUpResponse = userService.socialSignUp(userSocialSignUpRequest);
+        ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_REGISTER_SUCCESS, userSignUpResponse);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     /**
      * 회원 탈퇴
-     *
      * @param userId      탈퇴하려는 계정의 ID
      * @param currentUser 로그인 사용자 정보 (UserDetails)
      * @return
      */
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> signOff(
+    public ResponseEntity<ResultResponse> signOff(
             @PathVariable Long userId,
             @AuthenticationPrincipal UserDetails currentUser
     ) {
         UserSignOffResponse userSignOffResponse = userService.signOff(userId, currentUser);
-
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success(userSignOffResponse, "회원 탈퇴가 정상적으로 완료되었습니다."));
+        ResultResponse result = ResultResponse.of(ResultCode.MEMBER_WITHDRAWAL_SUCCESS, userSignOffResponse);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     @GetMapping("/nicknames")
-    public ResponseEntity<?> checkNicknameAvailability(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<ResultResponse> checkNicknameAvailability(@RequestParam("nickname") String nickname) {
         boolean nicknameAvailable = userService.checkNicknameAvailability(nickname);
 
         if (nicknameAvailable) {
-            return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("사용 가능한 닉네임입니다."));
+            ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_AVAILABLE_SUCCESS, nicknameAvailable);
+            return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.failure("이미 사용 중인 닉네임입니다."));
+        throw new NicknameAlreadyInUseException();
     }
 
     @PutMapping("/{userId}/password")
-    public ResponseEntity<?> setUserPassword(
+    public ResponseEntity<ResultResponse> setUserPassword(
             @RequestBody PasswordChangeRequest passwordChangeRequest
     ) {
         verifyTempToken(passwordChangeRequest);
 
         userService.setUserPassword(passwordChangeRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.success("비밀번호 설정을 완료하였습니다."));
+        ResultResponse result = ResultResponse.of(ResultCode.PASSWORD_SET_SUCCESS, null);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     private void verifyTempToken(PasswordChangeRequest passwordChangeRequest) {

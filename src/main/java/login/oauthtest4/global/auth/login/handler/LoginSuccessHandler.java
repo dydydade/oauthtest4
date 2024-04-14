@@ -6,8 +6,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.login.dto.LoginSuccessResponse;
 import login.oauthtest4.global.auth.login.exception.MissingDeviceIdException;
-import login.oauthtest4.global.auth.verification.dto.ApiResponse;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
+import login.oauthtest4.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 
 import java.io.IOException;
+
+import static login.oauthtest4.global.response.ResultCode.LOGIN_SUCCESS;
 
 
 @Slf4j
@@ -51,11 +53,11 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
                 .email(email)
                 .build();
 
-        ApiResponse<Object> apiResponse = ApiResponse.success(loginSuccessResponse, "로그인에 성공하였습니다.");
-        response.setStatus(HttpServletResponse.SC_ACCEPTED);
+        final ResultResponse resultResponse = ResultResponse.of(LOGIN_SUCCESS, null);
+        response.setStatus(resultResponse.getStatus());
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(resultResponse));
 
         log.info("로그인에 성공하였습니다. 이메일 : {}", email);
         log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);

@@ -3,12 +3,12 @@ package login.oauthtest4.global.auth.oauth2.service;
 import login.oauthtest4.domain.user.model.SocialProfile;
 import login.oauthtest4.domain.user.model.SocialType;
 import login.oauthtest4.domain.user.model.User;
-import login.oauthtest4.domain.user.exception.RegisteredUserNotFoundException;
 import login.oauthtest4.domain.user.repository.SocialProfileRepository;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.global.auth.oauth2.OAuthAttributes;
 import login.oauthtest4.global.auth.oauth2.CustomOAuth2User;
 import login.oauthtest4.global.auth.oauth2.userinfo.OAuth2UserInfo;
+import login.oauthtest4.global.exception.user.RegisteredUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -107,7 +107,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         // TODO: 이때 소셜 이메일 정보 함께 넘겨줘야 함
         User user = userRepository.findByEmail(socialEmail)
                 .orElseThrow(RegisteredUserNotFoundException::new); // 회원가입 페이지로 보냄
-
 
 
         // app 계정이 존재하는 경우, 연동된 socialProfile 조회

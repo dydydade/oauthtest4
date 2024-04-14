@@ -11,7 +11,7 @@ import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
 import login.oauthtest4.global.auth.jwt.util.PasswordUtil;
-import login.oauthtest4.global.auth.verification.dto.ApiResponse;
+import login.oauthtest4.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +24,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+
+import static login.oauthtest4.global.response.ResultCode.TOKEN_ISSUANCE_SUCCESS;
 
 /**
  * Jwt 인증 필터
@@ -104,11 +106,11 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 jwtService.createAccessToken(reIssuedUserRefreshToken.getUser().getEmail()),
                 reIssuedRefreshToken);
 
-        ApiResponse<Object> apiResponse = ApiResponse.success("Token 발급 완료");
-        response.setStatus(HttpServletResponse.SC_OK);
+        final ResultResponse resultResponse = ResultResponse.of(TOKEN_ISSUANCE_SUCCESS, null);
+        response.setStatus(resultResponse.getStatus());
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(resultResponse));
     }
 
     /**

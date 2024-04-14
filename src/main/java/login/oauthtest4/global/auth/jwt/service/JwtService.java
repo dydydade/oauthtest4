@@ -2,12 +2,10 @@ package login.oauthtest4.global.auth.jwt.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.global.auth.jwt.exception.InvalidJsonWebTokenException;
-import login.oauthtest4.global.auth.verification.dto.ApiResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
