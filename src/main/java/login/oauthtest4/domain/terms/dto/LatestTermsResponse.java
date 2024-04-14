@@ -1,14 +1,13 @@
 package login.oauthtest4.domain.terms.dto;
 
 
-import jakarta.persistence.*;
-import login.oauthtest4.domain.terms.model.TermsType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -16,16 +15,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class LatestTermsResponse {
 
-    private Long id;
-
-    private String version;             // 버전
-
-    @Enumerated(EnumType.STRING)
-    private TermsType termsType;        // 약관 종류
-
-    private String content;             // 내용
-
-    private boolean mandatory;          // 필수 약관 여부
-
-    private LocalDate effectiveAt;      // 약관 시행 일자
+    @Schema(description = "최신 이용약관 목록")
+    private List<LatestTermsDto> termsDtos;
 }

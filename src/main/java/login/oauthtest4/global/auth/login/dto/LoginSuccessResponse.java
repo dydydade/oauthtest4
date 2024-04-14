@@ -1,6 +1,7 @@
 package login.oauthtest4.global.auth.login.dto;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,5 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginSuccessResponse {
+
+    @Schema(description = "로그인에 성공한 회원 이메일")
     private String email;
 }

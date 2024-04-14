@@ -3,18 +3,16 @@ package login.oauthtest4.global.auth.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
-import login.oauthtest4.global.auth.jwt.exception.JwtExceptionHandlingFilter;
 import login.oauthtest4.global.auth.jwt.filter.JwtAuthenticationProcessingFilter;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
-import login.oauthtest4.global.auth.login.exception.LoginExceptionHandlingFilter;
 import login.oauthtest4.global.auth.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import login.oauthtest4.global.auth.login.handler.LoginFailureHandler;
 import login.oauthtest4.global.auth.login.handler.LoginSuccessHandler;
 import login.oauthtest4.global.auth.login.service.LoginService;
-import login.oauthtest4.global.auth.oauth2.exception.OAuth2ExceptionHandlingFilter;
 import login.oauthtest4.global.auth.oauth2.handler.OAuth2LoginFailureHandler;
 import login.oauthtest4.global.auth.oauth2.handler.OAuth2LoginSuccessHandler;
 import login.oauthtest4.global.auth.oauth2.service.CustomOAuth2UserService;
+import login.oauthtest4.global.exception.filter.GlobalExceptionHandlingFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -64,7 +62,11 @@ public class SecurityConfig {
                         // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능
                         .requestMatchers("/","/sign-up","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll() // 회원가입 요청은 인증 대상 제외
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users/signup/**").permitAll() // 회원가입 요청은 인증 대상 제외
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/search", "/api/v1/users/nicknames").permitAll() // 로그인하기 전 요청은 인증 대상 제외
+                        .requestMatchers(HttpMethod.GET, "/api/v1/terms/latest").permitAll() // 약관 정보 조회 요청은 인증 대상 제외
+                        .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/api-docs/**").permitAll()
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()  // 정적 리소스에 대한 접근 허용
                         .anyRequest().authenticated()
                 )
                 // 원래 스프링 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작
@@ -74,22 +76,20 @@ public class SecurityConfig {
                 .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationProcessingFilter.class)
 
                 // 필터 단에서 발생하는 예외를 처리하기 위한 예외 핸들링 필터 등록
-                .addFilterBefore(jwtExceptionHandlingFilter(), JwtAuthenticationProcessingFilter.class)
-                .addFilterBefore(oauth2ExceptionHandlingFilter(), JwtExceptionHandlingFilter.class)
-                .addFilterBefore(loginExceptionHandlingFilter(), OAuth2ExceptionHandlingFilter.class)
+                .addFilterBefore(globalExceptionHandlingFilter(), JwtAuthenticationProcessingFilter.class);
 
-                //== 소셜 로그인 설정 ==//
-                .oauth2Login(oauth2 -> oauth2
-                                .authorizationEndpoint(authorizationEndpoint  ->
-                                        authorizationEndpoint
-                                            .baseUri("/api/v1/auth/social/login")
-                        )
-                        .successHandler(oAuth2LoginSuccessHandler)
-                        .failureHandler(oAuth2LoginFailureHandler)
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService)
-                        )
-                );
+//                //== 소셜 로그인 설정 ==//
+//                .oauth2Login(oauth2 -> oauth2
+//                                .authorizationEndpoint(authorizationEndpoint  ->
+//                                        authorizationEndpoint
+//                                            .baseUri("/api/v1/auth/social/login")
+//                        )
+//                        .successHandler(oAuth2LoginSuccessHandler)
+//                        .failureHandler(oAuth2LoginFailureHandler)
+//                        .userInfoEndpoint(userInfo -> userInfo
+//                                .userService(customOAuth2UserService)
+//                        )
+//                );
 
         return http.build();
     }
@@ -149,29 +149,11 @@ public class SecurityConfig {
     }
 
     /**
-     * Filter 단에서 던져지는 Jwt 관련 예외를 핸들링하기 위한 필터
+     * Filter 단에서 던져지는 예외를 핸들링하기 위한 Global Exception Handling 필터
      * @return
      */
     @Bean
-    public JwtExceptionHandlingFilter jwtExceptionHandlingFilter() {
-        return new JwtExceptionHandlingFilter(objectMapper);
-    }
-
-    /**
-     * Filter 단에서 던져지는 OAuth2 관련 예외를 핸들링하기 위한 필터
-     * @return
-     */
-    @Bean
-    public OAuth2ExceptionHandlingFilter oauth2ExceptionHandlingFilter() {
-        return new OAuth2ExceptionHandlingFilter(objectMapper);
-    }
-
-    /**
-     * Filter 단에서 던져지는 Login 관련 예외를 핸들링하기 위한 필터
-     * @return
-     */
-    @Bean
-    public LoginExceptionHandlingFilter loginExceptionHandlingFilter() {
-        return new LoginExceptionHandlingFilter(objectMapper);
+    public GlobalExceptionHandlingFilter globalExceptionHandlingFilter() {
+        return new GlobalExceptionHandlingFilter(objectMapper);
     }
 }
