@@ -60,7 +60,7 @@ public class SecurityConfig {
                 // 세션 사용하지 않으므로 STATELESS로 설정
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 //== URL별 권한 관리 옵션 ==//
-                .authorizeRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
                         // 아이콘, css, js 관련
                         // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능
                         .requestMatchers("/","/sign-up","/css/**","/images/**","/js/**","/favicon.ico").permitAll()
@@ -93,12 +93,6 @@ public class SecurityConfig {
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        // 정적 리소스 spring security 대상에서 제외
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
     /**
