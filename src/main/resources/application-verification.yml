@@ -19,5 +19,5 @@ spring:
   data:
     redis:
       mail:
-        host: localhost # 임시방편으로 로컬에서 테스트를 위해 설정
+        host: lemon_redis # 임시방편으로 로컬에서 테스트를 위해 설정
         port: 6379
