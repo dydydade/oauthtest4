@@ -66,4 +66,8 @@ public class User {
             userRefreshToken.setUser(null);
         }
     }
+
+    public boolean isSameUser(String otherEmail) {
+        return this.email.equals(otherEmail);
+    }
 }

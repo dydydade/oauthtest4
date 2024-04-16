@@ -66,7 +66,6 @@ public class TermsService {
                             .build();
                 })
                 .collect(Collectors.toList()));
-
     }
 
     /**

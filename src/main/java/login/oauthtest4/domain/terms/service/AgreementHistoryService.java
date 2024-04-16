@@ -35,6 +35,4 @@ public class AgreementHistoryService {
 
         agreementHistoryRepository.saveAllAndFlush(agreementHistories);
     }
-
-
 }

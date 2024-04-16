@@ -56,18 +56,10 @@ public class UserService {
      */
     @Transactional
     public UserSignOffResponse signOff(Long userId, UserDetails currentUser) {
-        Optional<User> userOptional = userRepository.findById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RegisteredUserNotFoundException());
 
-        if (userOptional.isEmpty()) {
-            throw new RegisteredUserNotFoundException();
-        }
-
-        User user = userOptional.get();
-
-        String targetUserEmail = user.getEmail();
-        String currentUserEmail = currentUser.getUsername(); // username 대신 email을 등록하여 인증함
-
-        if (!targetUserEmail.equals(currentUserEmail)) {
+        if (!user.isSameUser(currentUser.getUsername())) { // username 에 email 저장됨
             throw new UnauthorizedAccountAttemptException();
         }
 
