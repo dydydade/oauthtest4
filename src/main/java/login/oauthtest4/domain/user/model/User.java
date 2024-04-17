@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import login.oauthtest4.domain.terms.model.AgreementHistory;
 import lombok.*;
 
+import java.net.URL;
 import java.util.List;
 
 
@@ -23,7 +24,7 @@ public class User {
     private String email; // 이메일
     private String password; // 비밀번호
     private String nickname; // 닉네임
-    private String imageUrl; // 프로필 이미지
+    private URL imageUrl; // 프로필 이미지
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -49,6 +50,10 @@ public class User {
 
     public void updatePassword(String updatePassword) {
         this.password = updatePassword;
+    }
+
+    public void updateImageUrl(URL updateImageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     // 연관관계 편의 메소드
