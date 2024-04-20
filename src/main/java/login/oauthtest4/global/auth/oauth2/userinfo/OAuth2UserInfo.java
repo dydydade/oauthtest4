@@ -1,5 +1,6 @@
 package login.oauthtest4.global.auth.oauth2.userinfo;
 
+import java.net.URL;
 import java.util.Map;
 
 public abstract class OAuth2UserInfo {
@@ -14,7 +15,7 @@ public abstract class OAuth2UserInfo {
 
     public abstract String getNickname();
 
-    public abstract String getImageUrl();
+    public abstract URL getImageUrl();
 
     public abstract String getEmail();
 }

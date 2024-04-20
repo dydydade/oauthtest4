@@ -1,12 +1,9 @@
 package login.oauthtest4.domain.user.service;
 
 import jakarta.transaction.Transactional;
-import login.oauthtest4.domain.terms.service.AgreementHistoryService;
-import login.oauthtest4.domain.terms.service.TermsService;
 import login.oauthtest4.domain.user.model.Role;
 import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.dto.*;
-import login.oauthtest4.domain.user.repository.SocialProfileRepository;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.global.exception.user.RegisteredUserNotFoundException;
 import login.oauthtest4.global.exception.user.UnauthorizedAccountAttemptException;
@@ -24,9 +21,6 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final SocialProfileRepository socialProfileRepository;
-    private final TermsService termsService;
-    private final AgreementHistoryService agreementHistoryService;
     private final PasswordEncoder passwordEncoder;
     private final NormalSignUpStrategy normalSignUpStrategy;
     private final SocialSignUpStrategy socialSignUpStrategy;
