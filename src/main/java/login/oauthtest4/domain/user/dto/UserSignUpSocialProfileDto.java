@@ -3,11 +3,15 @@ package login.oauthtest4.domain.user.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import login.oauthtest4.domain.user.model.SocialType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserSignUpSocialProfileDto {
 
     @Schema(description = "연동된 소셜 로그인 서비스 종류")

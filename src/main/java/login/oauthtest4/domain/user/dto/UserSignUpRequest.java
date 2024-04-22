@@ -2,12 +2,14 @@ package login.oauthtest4.domain.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@NoArgsConstructor
+@Setter
+@SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UserSignUpRequest {
 
     @Schema(description = "회원가입 요청 이메일")

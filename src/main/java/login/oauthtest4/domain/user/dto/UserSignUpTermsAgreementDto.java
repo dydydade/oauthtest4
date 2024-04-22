@@ -2,13 +2,17 @@ package login.oauthtest4.domain.user.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserSignUpTermsAgreementDto {
 
     @Schema(description = "이용약관 동의 정보 목록")
@@ -16,6 +20,7 @@ public class UserSignUpTermsAgreementDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class TermsAgreement {
 
         @Schema(description = "이용약관 ID")
