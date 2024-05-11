@@ -20,6 +20,7 @@ public enum ErrorCode {
     MISSING_DEVICE_ID(400, "A003", "요청 헤더에 Device-ID 정보가 포함되지 않았습니다."),
     EMAIL_NOT_FOUND(404, "A004", "이메일을 찾지 못했습니다."),
     INVALID_EMAIL_VERIFICATION_CODE(400, "A005", "유효하지 않은 인증코드입니다."),
+    ID_PW_LOGIN_NOT_ALLOWED_FOR_SOCIAL_ACCOUNT(400, "A006", "소셜 계정은 일반 로그인을 할 수 없습니다."),
 
     // Terms
     REQUIRED_TERMS_NOT_AGREED(400, "T001", "요청에 필수 약관 정보를 모두 포함시켜 주세요."),

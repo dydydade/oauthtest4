@@ -9,12 +9,11 @@ import login.oauthtest4.global.auth.login.filter.CustomJsonUsernamePasswordAuthe
 import login.oauthtest4.global.auth.login.handler.LoginFailureHandler;
 import login.oauthtest4.global.auth.login.handler.LoginSuccessHandler;
 import login.oauthtest4.global.auth.login.service.LoginService;
-import login.oauthtest4.global.auth.oauth2.handler.OAuth2LoginFailureHandler;
-import login.oauthtest4.global.auth.oauth2.handler.OAuth2LoginSuccessHandler;
-import login.oauthtest4.global.auth.oauth2.service.CustomOAuth2UserService;
 import login.oauthtest4.global.exception.filter.GlobalExceptionHandlingFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -34,18 +33,16 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
  */
 @Configuration
 @EnableWebSecurity
+@EnableConfigurationProperties(OAuth2ClientProperties.class)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final LoginService loginService;
     private final JwtService jwtService;
     private final UserRefreshTokenService userRefreshTokenService;
-    private final CustomOAuth2UserService customOAuth2UserService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -65,6 +62,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/signup/**").permitAll() // 회원가입 요청은 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/search", "/api/v1/users/nicknames").permitAll() // 로그인하기 전 요청은 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/api/v1/terms/latest").permitAll() // 약관 정보 조회 요청은 인증 대상 제외
+                        .requestMatchers(HttpMethod.GET, "/api/v1/auth/social/**").permitAll() // 소셜 로그인 요청 경로는 인증 대상 제외
+                        .requestMatchers(HttpMethod.GET, "/login/oauth2/**").permitAll() // 소셜 로그인 리다이렉트 경로는 인증 대상 제외
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/api-docs/**").permitAll()
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()  // 정적 리소스에 대한 접근 허용
                         .anyRequest().authenticated()
@@ -77,19 +76,6 @@ public class SecurityConfig {
 
                 // 필터 단에서 발생하는 예외를 처리하기 위한 예외 핸들링 필터 등록
                 .addFilterBefore(globalExceptionHandlingFilter(), JwtAuthenticationProcessingFilter.class);
-
-//                //== 소셜 로그인 설정 ==//
-//                .oauth2Login(oauth2 -> oauth2
-//                                .authorizationEndpoint(authorizationEndpoint  ->
-//                                        authorizationEndpoint
-//                                            .baseUri("/api/v1/auth/social/login")
-//                        )
-//                        .successHandler(oAuth2LoginSuccessHandler)
-//                        .failureHandler(oAuth2LoginFailureHandler)
-//                        .userInfoEndpoint(userInfo -> userInfo
-//                                .userService(customOAuth2UserService)
-//                        )
-//                );
 
         return http.build();
     }

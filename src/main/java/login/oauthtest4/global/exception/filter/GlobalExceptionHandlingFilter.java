@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.global.exception.BusinessException;
 import login.oauthtest4.global.exception.ErrorResponse;
+import login.oauthtest4.global.exception.auth.IdPasswordLoginNotAllowedForSocialAccountException;
 import login.oauthtest4.global.exception.user.RegisteredUserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -39,6 +41,18 @@ public class GlobalExceptionHandlingFilter extends OncePerRequestFilter {
         } catch (RegisteredUserNotFoundException ex) {
             final ErrorResponse errorResponse = ErrorResponse.of(REGISTERED_USER_NOT_FOUND);
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        } catch (IdPasswordLoginNotAllowedForSocialAccountException ex) {
+            final ErrorResponse errorResponse = ErrorResponse.of(ID_PW_LOGIN_NOT_ALLOWED_FOR_SOCIAL_ACCOUNT);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json");
+            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+        } catch (AuthenticationException ex) { // 인증 실패 시 여기서 처리
+            final ErrorResponse errorResponse = ErrorResponse.of(CHECK_EMAIL_OR_PASSWORD);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             response.getWriter().write(objectMapper.writeValueAsString(errorResponse));

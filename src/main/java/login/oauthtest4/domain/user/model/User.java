@@ -75,4 +75,8 @@ public class User {
     public boolean isSameUser(String otherEmail) {
         return this.email.equals(otherEmail);
     }
+
+    public boolean isPasswordExistUser() {
+        return role.equals("ROLE_USER");
+    }
 }

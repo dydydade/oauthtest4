@@ -28,7 +28,7 @@ public class SocialSignUpStrategy implements SignUpStrategy {
     private final SocialProfileRepository socialProfileRepository;
     private final TermsService termsService;
 
-    private static final String TEMP_SOCIAL_PASSWORD = "temp-social-password-lemon157";
+//    private static final String TEMP_SOCIAL_PASSWORD = "temp-social-password-lemon157";
 
     /**
      * [회원가입 메서드]
@@ -43,7 +43,8 @@ public class SocialSignUpStrategy implements SignUpStrategy {
 
         User user = User.builder()
                 .email(userSignUpRequest.getEmail())
-                .password(passwordEncoder.encode(TEMP_SOCIAL_PASSWORD))
+//                .password(passwordEncoder.encode(TEMP_SOCIAL_PASSWORD))
+                .password(passwordEncoder.encode(userSignUpRequest.getPassword()))
                 .nickname(userSignUpRequest.getNickname())
                 .role(Role.SOCIAL)
                 .build();

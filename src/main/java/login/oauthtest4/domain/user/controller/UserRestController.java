@@ -83,6 +83,7 @@ public class UserRestController {
     public ResponseEntity<ResultResponse> socialSignUp(@RequestBody @Valid UserSocialSignUpRequest userSocialSignUpRequest) {
         UserSignUpResponse userSignUpResponse = userService.socialSignUp(userSocialSignUpRequest);
         ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_REGISTER_SUCCESS, userSignUpResponse);
+        // TODO: JWT 액세스 토큰, 리프레시 토큰 함께 보내야 함(소셜 회원가입의 경우, 회원가입 직후 바로 로그인 처리가 이루어지기 때문)
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
