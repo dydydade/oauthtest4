@@ -1,6 +1,5 @@
 package login.oauthtest4.domain.user.service;
 
-import jakarta.transaction.Transactional;
 import login.oauthtest4.domain.terms.service.TermsService;
 import login.oauthtest4.domain.user.dto.UserSignUpRequest;
 import login.oauthtest4.domain.user.dto.UserSignUpResponse;
@@ -12,6 +11,7 @@ import login.oauthtest4.global.exception.user.NicknameAlreadyInUseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -54,8 +54,8 @@ public class NormalSignUpStrategy implements SignUpStrategy {
      * @param userSignUpRequest
      */
     @Override
-    @Transactional
-    public void validateSignUpInfo(UserSignUpRequest userSignUpRequest) {
+    @Transactional(readOnly = true)
+    public void validateSignUpInfo(BaseUserSignUpRequest baseUserSignUpRequest) {
         // 기존 회원과 중복된 이메일인지 검증
         if (userRepository.findByEmail(userSignUpRequest.getEmail()).isPresent()) {
             throw new AlreadySignedUpUserException();

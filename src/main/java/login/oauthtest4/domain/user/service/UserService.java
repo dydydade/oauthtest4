@@ -1,6 +1,5 @@
 package login.oauthtest4.domain.user.service;
 
-import jakarta.transaction.Transactional;
 import login.oauthtest4.domain.user.model.Role;
 import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.dto.*;
@@ -11,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -39,8 +39,9 @@ public class UserService {
      * @param userSignUpRequest
      * @return
      */
-    public UserSignUpResponse socialSignUp(UserSignUpRequest userSignUpRequest) {
-        return socialSignUpStrategy.signUp(userSignUpRequest);
+    @Transactional
+    public UserSignUpResponse socialSignUp(BaseUserSignUpRequest baseUserSignUpRequest) {
+        return socialSignUpStrategy.signUp(baseUserSignUpRequest);
     }
 
     /**
@@ -68,6 +69,7 @@ public class UserService {
      * @param email
      * @return
      */
+    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
@@ -79,6 +81,7 @@ public class UserService {
      * @param email
      * @return
      */
+    @Transactional(readOnly = true)
     public FindUserResponse findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
@@ -91,6 +94,7 @@ public class UserService {
      * @param nickname
      * @return
      */
+    @Transactional(readOnly = true)
     public boolean checkNicknameAvailability(String nickname) {
         Optional<User> userOptional = userRepository.findByNickname(nickname);
         if (userOptional.isPresent()) {
@@ -100,7 +104,7 @@ public class UserService {
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public void setUserPassword(
             PasswordChangeRequest passwordChangeRequest
     ) {

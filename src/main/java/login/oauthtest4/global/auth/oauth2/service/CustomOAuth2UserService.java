@@ -20,6 +20,7 @@ import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -41,6 +42,7 @@ public class CustomOAuth2UserService {
     private static final String FACEBOOK = "facebook";
 
 
+    @Transactional
     public OAuth2UserDto socialLogin(String registrationId, String oauth2AccessTokenStr) {
         // 리소스 서버에 유저 정보를 요청하기 위한 객체 생성
         OAuth2UserRequest userRequest = createUserRequest(registrationId, oauth2AccessTokenStr);
@@ -55,6 +57,7 @@ public class CustomOAuth2UserService {
         return loadUser(registrationId, oAuthAttributes);
     }
 
+    @Transactional
     private OAuth2UserDto loadUser(String registrationId, OAuthAttributes oAuthAttributes) throws OAuth2AuthenticationException {
         // 리소스 서버로부터 넘겨받은 user 정보
         OAuth2UserInfo oauth2UserInfo = oAuthAttributes.getOauth2UserInfo();
@@ -140,12 +143,29 @@ public class CustomOAuth2UserService {
     }
 
     /**
+     * 사용자 계정과 현재 요청한 소셜 연동이 되어있는지 체크
+     * @param user
+     * @param socialEmail
+     * @param socialId
+     * @param socialType
+     */
+    @Transactional
+    private boolean checkIfSocialProfileLinkingIsRequired(User user, String socialEmail, String socialId, SocialType socialType) {
+        // app 계정이 존재하는 경우, 연동된 socialProfile 조회
+        Optional<SocialProfile> socialProfileOptional = socialProfileRepository.findBySocialEmailAndSocialTypeWithUser(socialEmail, socialType);
+
+        // socialProfile 연동이 안 되어있는 경우 true 반환
+        return socialProfileOptional.isEmpty();
+    }
+
+    /**
      * 사용자 계정이 소셜 연동이 되어있는지 체크하고 소셜 연동
      * @param user
      * @param socialEmail
      * @param socialId
      * @param socialType
      */
+    @Transactional
     private void checkAndLinkSocialProfile(User user, String socialEmail, String socialId, SocialType socialType) {
         // app 계정이 존재하는 경우, 연동된 socialProfile 조회
         Optional<SocialProfile> socialProfileOptional = socialProfileRepository.findBySocialEmailAndSocialTypeWithUser(socialEmail, socialType);

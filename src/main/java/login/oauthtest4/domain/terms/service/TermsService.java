@@ -1,6 +1,5 @@
 package login.oauthtest4.domain.terms.service;
 
-import jakarta.transaction.Transactional;
 import login.oauthtest4.domain.terms.dto.LatestTermsDto;
 import login.oauthtest4.domain.terms.dto.LatestTermsResponse;
 import login.oauthtest4.domain.terms.dto.TermsCreateRequest;
@@ -12,6 +11,7 @@ import login.oauthtest4.global.exception.terms.RequiredTermsNotAgreedException;
 import login.oauthtest4.global.exception.terms.TermsNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -52,7 +52,7 @@ public class TermsService {
      * [각 이용약관 타입별 최신 버전만 조회하는 메서드]
      * ex) 개인정보처리방침(v2.0), 서비스 이용약관(v3.0), 마케팅 활용 동의(v2.2)
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public LatestTermsResponse findLatestVersionOfEachTermsType() {
         return new LatestTermsResponse(termsRepository.findLatestVersionOfEachTermsType().stream()
                 .map(terms -> {
@@ -72,7 +72,6 @@ public class TermsService {
      * [사용자가 회원가입 시 모든 필수 약관에 동의했는지 검증하는 메서드]
      * @param termsAgreementDto
      */
-    @Transactional
     public void validateRequiredTermsConsents(UserSignUpTermsAgreementDto termsAgreementDto) {
         Set<Long> requiredTermsIds = this.findRequiredTermsIds();
 
@@ -90,11 +89,12 @@ public class TermsService {
      * [모든 최신 필수 약관 목록을 조회하는 메서드]
      * @return
      */
-    @Transactional
+    @Transactional(readOnly = true)
     public Set<Long> findRequiredTermsIds() {
         return termsRepository.findRequiredTermsIds();
     }
 
+    @Transactional(readOnly = true)
     public Terms findById(Long id) {
         return termsRepository.findById(id)
                 .orElseThrow(() -> new TermsNotFoundException());
