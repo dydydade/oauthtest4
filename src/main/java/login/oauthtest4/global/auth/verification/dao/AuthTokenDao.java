@@ -10,13 +10,13 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthTokenDao {
 
-    private static final long EMAIL_VERIFICATION_LIMIT_IN_SECONDS = 600;
+    private static final long AUTH_TOKEN_EXPIRED_SECONDS = 600;
     private final StringRedisTemplate redisTemplate;
 
     public void saveToken(String token) {
         redisTemplate.opsForValue()
                 .set(this.getTokenKey(token), "1",
-                        Duration.ofSeconds(EMAIL_VERIFICATION_LIMIT_IN_SECONDS));
+                        Duration.ofSeconds(AUTH_TOKEN_EXPIRED_SECONDS));
     }
 
     private String getTokenKey(String token) {
