@@ -31,7 +31,7 @@ public class AuthService {
     public CompletableFuture<EmailCertificationResponse> sendEmailForCertification(String email)
             throws NoSuchAlgorithmException {
         String certificationNumber = generator.createCertificationNumber();
-        String content = String.format("%s/api/v1/auth/verify?certificationNumber=%s&email=%s   링크를 3분 이내에 클릭해주세요.", DOMAIN_NAME, certificationNumber, email);
+        String content = "인증번호: " + certificationNumber;
         certificationNumberDao.saveCertificationNumber(email, certificationNumber);
 
         this.emailSender.sendEmail(email, MAIL_TITLE_CERTIFICATION, content);
