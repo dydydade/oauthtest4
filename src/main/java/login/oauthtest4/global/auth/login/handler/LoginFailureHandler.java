@@ -2,7 +2,7 @@ package login.oauthtest4.global.auth.login.handler;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import login.oauthtest4.global.exception.auth.IdPasswordLoginNotAllowedForSocialAccountException;
+import login.oauthtest4.global.exception.auth.PasswordResetRequiredForSocialAccountException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
@@ -23,8 +23,8 @@ public class LoginFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
         Throwable cause = exception.getCause();
 
-        if (cause instanceof IdPasswordLoginNotAllowedForSocialAccountException) {
-            throw new IdPasswordLoginNotAllowedForSocialAccountException();
+        if (cause instanceof PasswordResetRequiredForSocialAccountException) {
+            throw new PasswordResetRequiredForSocialAccountException();
         }
 
         throw exception;

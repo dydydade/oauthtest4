@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.global.exception.BusinessException;
 import login.oauthtest4.global.exception.ErrorResponse;
-import login.oauthtest4.global.exception.auth.IdPasswordLoginNotAllowedForSocialAccountException;
+import login.oauthtest4.global.exception.auth.PasswordResetRequiredForSocialAccountException;
 import login.oauthtest4.global.exception.user.RegisteredUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.AuthenticationException;
@@ -44,8 +44,8 @@ public class GlobalExceptionHandlingFilter extends OncePerRequestFilter {
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
             response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-        } catch (IdPasswordLoginNotAllowedForSocialAccountException ex) {
-            final ErrorResponse errorResponse = ErrorResponse.of(ID_PW_LOGIN_NOT_ALLOWED_FOR_SOCIAL_ACCOUNT);
+        } catch (PasswordResetRequiredForSocialAccountException ex) {
+            final ErrorResponse errorResponse = ErrorResponse.of(PASSWORD_RESET_REQUIRED_FOR_SOCIAL_ACCOUNT);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.setCharacterEncoding("UTF-8");
             response.setContentType("application/json");
