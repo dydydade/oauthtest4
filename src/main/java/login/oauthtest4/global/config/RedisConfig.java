@@ -1,4 +1,4 @@
-package login.oauthtest4.global.auth.verification.config;
+package login.oauthtest4.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
