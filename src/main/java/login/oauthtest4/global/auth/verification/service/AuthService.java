@@ -21,7 +21,6 @@ import java.util.concurrent.CompletableFuture;
 public class AuthService {
 
     private static final String MAIL_TITLE_CERTIFICATION = "인증번호 발송";
-    private static final String DOMAIN_NAME = "http://localhost:8080";
     private final CertificationNumberDao certificationNumberDao;
     private final CertificationGenerator generator;
     private final EmailSender emailSender;
