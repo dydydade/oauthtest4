@@ -86,7 +86,6 @@ class SocialSignUpStrategyTest {
         userSocialSignUpRequest = UserSocialSignUpRequest.builder()
                 .socialProfileDto(userSignUpSocialProfileDto)
                 .email(email)
-                .password(password)
                 .nickname(nickname)
                 .termsAgreementDto(termsAgreementDto)
                 .build();
@@ -171,7 +170,6 @@ class SocialSignUpStrategyTest {
         UserSocialSignUpRequest request = UserSocialSignUpRequest.builder()
                 .email(userSocialSignUpRequest.getEmail())
                 .nickname(userSocialSignUpRequest.getNickname())
-                .password(userSocialSignUpRequest.getPassword())
                 .termsAgreementDto(userSocialSignUpRequest.getTermsAgreementDto())
                 .socialProfileDto(
                         UserSignUpSocialProfileDto.builder()

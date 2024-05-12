@@ -16,7 +16,7 @@ public class SocialProfile {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    private SocialType socialType; // KAKAO, NAVER, GOOGLE, FACEBOOK
+    private SocialType socialType; // KAKAO, NAVER, GOOGLE, FACEBOOK, APPLE
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
 

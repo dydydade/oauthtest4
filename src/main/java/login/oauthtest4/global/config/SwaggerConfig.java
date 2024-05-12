@@ -12,8 +12,8 @@ import org.springframework.context.annotation.Profile;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "LEMON 서버 회원/인증 API",
-                description = "LEMON 서버 회원/인증 모듈 API 명세서",
+                title = "티키챗 서버 회원/인증 API",
+                description = "티키챗 서버 회원/인증 모듈 API 명세서",
                 version = "v1"
         )
 )
@@ -35,7 +35,6 @@ public class SwaggerConfig {
                         .bearerFormat(SECURITY_JWT_NAME));
 
         return new OpenAPI()
-//                .addSecurityItem(securityRequirement)
                 .components(components);
     }
 }
