@@ -12,5 +12,5 @@ import java.util.Map;
 public class OAuth2UserDto {
     private boolean userExists;
     private UserDto user;
-    private Map<String, Object> additionalData;
+    private Map<String, Object> socialData;
 }

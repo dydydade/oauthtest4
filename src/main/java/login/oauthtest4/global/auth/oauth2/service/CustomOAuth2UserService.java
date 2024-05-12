@@ -81,10 +81,9 @@ public class CustomOAuth2UserService {
             return new OAuth2UserDto(false, null, socialData);
         }
 
-        // 일반 계정으로 가입한 적이 있는 이메일인지 검증
-        if (user.isPasswordExistUser()) {
-            checkAndLinkSocialProfile(user, socialEmail, socialId, socialType);
-        }
+        // 현재 시도하고 있는 소셜 계정으로 추가 연동 필요한지(기존에 연동이 안 된 상태인지) 체크
+        // 연동 필요한 경우 자동으로 연동 후 로그인 처리
+        checkAndLinkSocialProfile(user, socialEmail, socialId, socialType);
 
         // 찾은 유저 정보 반환(프론트에서 인증 성공시키고 홈 화면으로 이동하도록)
         return new OAuth2UserDto(true, new UserDto(user.getId(), user.getEmail(), user.getNickname(), user.getImageUrl()), socialData);
@@ -140,22 +139,6 @@ public class CustomOAuth2UserService {
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(socialType, userNameAttributeName, attributes);
         return extractAttributes;
-    }
-
-    /**
-     * 사용자 계정과 현재 요청한 소셜 연동이 되어있는지 체크
-     * @param user
-     * @param socialEmail
-     * @param socialId
-     * @param socialType
-     */
-    @Transactional
-    private boolean checkIfSocialProfileLinkingIsRequired(User user, String socialEmail, String socialId, SocialType socialType) {
-        // app 계정이 존재하는 경우, 연동된 socialProfile 조회
-        Optional<SocialProfile> socialProfileOptional = socialProfileRepository.findBySocialEmailAndSocialTypeWithUser(socialEmail, socialType);
-
-        // socialProfile 연동이 안 되어있는 경우 true 반환
-        return socialProfileOptional.isEmpty();
     }
 
     /**

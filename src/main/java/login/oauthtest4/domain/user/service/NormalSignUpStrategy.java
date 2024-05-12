@@ -1,7 +1,8 @@
 package login.oauthtest4.domain.user.service;
 
 import login.oauthtest4.domain.terms.service.TermsService;
-import login.oauthtest4.domain.user.dto.UserSignUpRequest;
+import login.oauthtest4.domain.user.dto.BaseUserSignUpRequest;
+import login.oauthtest4.domain.user.dto.UserNormalSignUpRequest;
 import login.oauthtest4.domain.user.dto.UserSignUpResponse;
 import login.oauthtest4.domain.user.model.Role;
 import login.oauthtest4.domain.user.model.User;
@@ -24,26 +25,29 @@ public class NormalSignUpStrategy implements SignUpStrategy {
 
     /**
      * [회원가입 메서드]
-     * @param userSignUpRequest
+     * @param baseUserSignUpRequest
      * @return
      */
     @Override
     @Transactional
-    public UserSignUpResponse signUp(UserSignUpRequest userSignUpRequest) {
+    public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) {
+
+        UserNormalSignUpRequest userNormalSignUpRequest = (UserNormalSignUpRequest) baseUserSignUpRequest;
+
         // 회원가입 정보(이메일, 닉네임 등) 유효성 검증
-        this.validateSignUpInfo(userSignUpRequest);
+        this.validateSignUpInfo(userNormalSignUpRequest);
 
         User user = User.builder()
-                .email(userSignUpRequest.getEmail())
-                .password(passwordEncoder.encode(userSignUpRequest.getPassword()))
-                .nickname(userSignUpRequest.getNickname())
+                .email(userNormalSignUpRequest.getEmail())
+                .password(passwordEncoder.encode(userNormalSignUpRequest.getPassword()))
+                .nickname(userNormalSignUpRequest.getNickname())
                 .role(Role.USER)
                 .build();
 
         User savedUser = userRepository.save(user);
 
         // 회원가입 필수 약관 동의 이력 저장
-        services.saveAgreementHistory(userSignUpRequest, user);
+        services.saveAgreementHistory(userNormalSignUpRequest, user);
 
         // 응답 객체 반환
         return services.toSignUpResponse(savedUser);
@@ -51,22 +55,22 @@ public class NormalSignUpStrategy implements SignUpStrategy {
 
     /**
      * [회원가입 정보(이메일, 닉네임 등) 유효성 검증 메서드]
-     * @param userSignUpRequest
+     * @param baseUserSignUpRequest
      */
     @Override
     @Transactional(readOnly = true)
     public void validateSignUpInfo(BaseUserSignUpRequest baseUserSignUpRequest) {
         // 기존 회원과 중복된 이메일인지 검증
-        if (userRepository.findByEmail(userSignUpRequest.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(baseUserSignUpRequest.getEmail()).isPresent()) {
             throw new AlreadySignedUpUserException();
         }
 
         // 기존 회원과 중복된 닉네임인지 검증
-        if (userRepository.findByNickname(userSignUpRequest.getNickname()).isPresent()) {
+        if (userRepository.findByNickname(baseUserSignUpRequest.getNickname()).isPresent()) {
             throw new NicknameAlreadyInUseException();
         }
 
         // 회원가입 필수 약관 동의 여부 검증
-        termsService.validateRequiredTermsConsents(userSignUpRequest.getTermsAgreementDto());
+        termsService.validateRequiredTermsConsents(baseUserSignUpRequest.getTermsAgreementDto());
     }
 }

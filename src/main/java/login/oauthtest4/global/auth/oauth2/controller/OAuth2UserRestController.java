@@ -10,7 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
+import login.oauthtest4.global.auth.jwt.util.JwtUtils;
 import login.oauthtest4.global.auth.oauth2.dto.OAuth2UserDto;
+import login.oauthtest4.global.auth.oauth2.dto.SocialLoginRequest;
 import login.oauthtest4.global.auth.oauth2.dto.UserDto;
 import login.oauthtest4.global.auth.oauth2.service.CustomOAuth2UserService;
 import login.oauthtest4.global.response.ResultCode;
@@ -39,15 +41,18 @@ public class OAuth2UserRestController {
 
     private final JwtService jwtService;
 
+    private final JwtUtils jwtUtils;
+
     private final UserRefreshTokenService userRefreshTokenService;
     private static final String DEVICE_ID_HEADER_KEY = "Device-ID";
     private static final String STATE = "yongchan-1234";
+
 
     /**
      * [네이버/카카오/구글 소셜 로그인 api] 클라이언트로부터 OAuth2 AccessToken 전달받아
      * 소셜 사용자 정보 조회 후, 응답으로 JWT AccessToken, RefreshToken 반환
      * @param registrationId
-     * @param body
+     * @param socialLoginRequest
      * @param request
      * @param response
      * @return
@@ -61,22 +66,28 @@ public class OAuth2UserRestController {
             @ApiResponse(responseCode = "303", description = "기존에 회원으로 존재하지 않는 소셜 이메일입니다. 소셜 회원가입을 진행해 주세요."),
             @ApiResponse(responseCode = "400", description = "요청 헤더에 Device-ID 정보가 포함되지 않았습니다.\t\n소셜 계정은 일반 로그인을 할 수 없습니다.\t\n이메일 또는 비밀번호를 다시 확인해주세요.")
     })
-    @GetMapping("/api/v1/auth/social/login/{registrationId}")
-    public ResultResponse socialLogin(@PathVariable String registrationId, @RequestBody Map<String, Object> body, HttpServletRequest request, HttpServletResponse response) {
+    @PostMapping("/api/v1/auth/social/login/{registrationId}")
+    public ResponseEntity<Object> socialLogin(@PathVariable String registrationId, @RequestBody SocialLoginRequest socialLoginRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String oauth2AccessTokenStr = (String) body.get("oauth2AccessTokenStr");
+        String deviceId = jwtUtils.extractDeviceIdFromHeader(request);
 
-        OAuth2UserDto oAuth2UserDto = customOAuth2UserService.socialLogin(registrationId, oauth2AccessTokenStr);
-
+        OAuth2UserDto oAuth2UserDto = customOAuth2UserService.socialLogin(registrationId, socialLoginRequest.getOauth2AccessToken());
         UserDto user = oAuth2UserDto.getUser();
 
         if (user == null) {
-            return ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
+            ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
+            return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
         }
 
-        loginSuccess(request, response, oAuth2UserDto);
+        ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_LOGIN_SUCCESS, oAuth2UserDto);
 
-        return ResultResponse.of(ResultCode.SOCIAL_LOGIN_SUCCESS, oAuth2UserDto);
+        String accessToken = jwtService.createAccessToken(oAuth2UserDto.getUser().getEmail());
+        String refreshToken = jwtService.createRefreshToken();
+
+        jwtUtils.setAccessAndRefreshToken(response, accessToken, refreshToken, result);
+        userRefreshTokenService.findAndUpdateUserRefreshToken(oAuth2UserDto.getUser().getEmail(), deviceId, refreshToken);
+
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     /**
@@ -144,7 +155,8 @@ public class OAuth2UserRestController {
                 Map.class
         );
 
-        String redirectUri = "/api/v1/auth/social/login/test/" + registrationId + "?oauth2AccessTokenStr=" + result.getBody().get("access_token");
+        String redirectUri = "/api/v1/auth/social/login/test/" + registrationId + "?oauth2AccessToken" +
+                "=" + result.getBody().get("access_token");
 
         response.sendRedirect(redirectUri);
     }
@@ -157,37 +169,57 @@ public class OAuth2UserRestController {
      * @throws IOException
      */
     @GetMapping("/api/v1/auth/social/login/test/{registrationId}")
-    public ResultResponse login(@PathVariable String registrationId, @RequestParam String oauth2AccessTokenStr, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public ResponseEntity<Object> login(@PathVariable String registrationId, @RequestParam String oauth2AccessToken, HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        OAuth2UserDto oAuth2UserDto = customOAuth2UserService.socialLogin(registrationId, oauth2AccessTokenStr);
+        String deviceId = jwtUtils.extractDeviceIdFromHeader(request);
 
+        OAuth2UserDto oAuth2UserDto = customOAuth2UserService.socialLogin(registrationId, oauth2AccessToken);
         UserDto user = oAuth2UserDto.getUser();
 
-        if (user == null) {
-            return ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
+        if (!oAuth2UserDto.isUserExists()) {
+            ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
+            return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
         }
 
-        loginSuccess(request, response, oAuth2UserDto);
-
-        return ResultResponse.of(ResultCode.SOCIAL_LOGIN_SUCCESS, oAuth2UserDto);
-    }
-
-
-    private void loginSuccess(HttpServletRequest request, HttpServletResponse response, OAuth2UserDto oAuth2UserDto) {
-        String deviceId = request.getHeader(DEVICE_ID_HEADER_KEY);
-
-        if (deviceId == null) {
-            // TODO: 삭제(테스트용)
-            deviceId = "123";
-//            throw new MissingDeviceIdException();
-        }
+        ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_LOGIN_SUCCESS, oAuth2UserDto);
 
         String accessToken = jwtService.createAccessToken(oAuth2UserDto.getUser().getEmail());
         String refreshToken = jwtService.createRefreshToken();
-        response.addHeader(jwtService.getAccessHeader(), "Bearer " + accessToken);
-        response.addHeader(jwtService.getRefreshHeader(), "Bearer " + refreshToken);
 
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        jwtUtils.setAccessAndRefreshToken(response, accessToken, refreshToken, result);
         userRefreshTokenService.findAndUpdateUserRefreshToken(oAuth2UserDto.getUser().getEmail(), deviceId, refreshToken);
+
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
+
+//    /**
+//     * [테스트용 임시 메서드] 클라이언트에서 AccessToken 보내주지 않아도 테스트할 수 있도록
+//     * 백엔드에서 AccessToken 받아오는 메서드
+//     * @param registrationId
+//     * @param response
+//     * @throws IOException
+//     */
+//    @GetMapping("/api/v1/auth/social/link/{registrationId}")
+//    public ResponseEntity<Object> linkSocialProfile(@PathVariable String registrationId, @RequestParam String oauth2AccessToken, HttpServletRequest request, HttpServletResponse response) throws IOException {
+//
+//        String deviceId = jwtUtils.extractDeviceIdFromHeader(request);
+//
+//        OAuth2UserDto oAuth2UserDto = customOAuth2UserService.socialLogin(registrationId, oauth2AccessToken);
+//        UserDto user = oAuth2UserDto.getUser();
+//
+//        if (!oAuth2UserDto.isUserExists()) {
+//            ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
+//            return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+//        }
+//
+//        ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_LOGIN_SUCCESS, oAuth2UserDto);
+//
+//        String accessToken = jwtService.createAccessToken(oAuth2UserDto.getUser().getEmail());
+//        String refreshToken = jwtService.createRefreshToken();
+//
+//        jwtUtils.setAccessAndRefreshToken(response, accessToken, refreshToken, result);
+//        userRefreshTokenService.findAndUpdateUserRefreshToken(oAuth2UserDto.getUser().getEmail(), deviceId, refreshToken);
+//
+//        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+//    }
 }

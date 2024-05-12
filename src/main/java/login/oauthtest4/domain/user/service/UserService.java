@@ -27,16 +27,17 @@ public class UserService {
 
     /**
      * [일반 회원가입 메서드]
-     * @param userSignUpRequest
+     * @param baseUserSignUpRequest
      * @return
      */
-    public UserSignUpResponse signUp(UserSignUpRequest userSignUpRequest) {
-        return normalSignUpStrategy.signUp(userSignUpRequest);
+    @Transactional
+    public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) {
+        return normalSignUpStrategy.signUp(baseUserSignUpRequest);
     }
 
     /**
      * [소셜 회원가입 메서드]
-     * @param userSignUpRequest
+     * @param baseUserSignUpRequest
      * @return
      */
     @Transactional

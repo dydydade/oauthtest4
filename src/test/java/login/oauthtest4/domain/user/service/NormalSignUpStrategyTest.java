@@ -2,7 +2,7 @@ package login.oauthtest4.domain.user.service;
 
 import login.oauthtest4.domain.terms.model.AgreementHistory;
 import login.oauthtest4.domain.terms.service.TermsService;
-import login.oauthtest4.domain.user.dto.UserSignUpRequest;
+import login.oauthtest4.domain.user.dto.UserNormalSignUpRequest;
 import login.oauthtest4.domain.user.dto.UserSignUpResponse;
 import login.oauthtest4.domain.user.dto.UserSignUpTermsAgreementDto;
 import login.oauthtest4.domain.user.model.Role;
@@ -50,7 +50,7 @@ class NormalSignUpStrategyTest {
 
     UserSignUpTermsAgreementDto termsAgreementDto;
 
-    UserSignUpRequest userSignUpRequest;
+    UserNormalSignUpRequest userNormalSignUpRequest;
 
     UserSignUpResponse userSignUpResponse;
 
@@ -67,7 +67,7 @@ class NormalSignUpStrategyTest {
                 .agreements(List.of(new UserSignUpTermsAgreementDto.TermsAgreement(1L, true, "10.226.234.12", "용찬 의 iPhone 14")))
                 .build();
 
-        userSignUpRequest = UserSignUpRequest.builder()
+        userNormalSignUpRequest = UserNormalSignUpRequest.builder()
                 .email(email)
                 .password(password)
                 .nickname(nickname)
@@ -103,7 +103,7 @@ class NormalSignUpStrategyTest {
         when(services.toSignUpResponse(user)).thenReturn(userSignUpResponse);
 
         // when
-        UserSignUpResponse response = signUpStrategy.signUp(userSignUpRequest);
+        UserSignUpResponse response = signUpStrategy.signUp(userNormalSignUpRequest);
 
         // then
         assertThat(response).isEqualTo(userSignUpResponse);
@@ -113,11 +113,11 @@ class NormalSignUpStrategyTest {
     @DisplayName("기존 회원과 중복된 이메일로 회원가입을 시도하면 예외가 발생한다.")
     void duplicateEmailSignUpRequest() {
         // given
-        when(userRepository.findByEmail(userSignUpRequest.getEmail())).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(userNormalSignUpRequest.getEmail())).thenReturn(Optional.of(user));
 
         // when
         // then
-        assertThatThrownBy(() -> signUpStrategy.signUp(userSignUpRequest))
+        assertThatThrownBy(() -> signUpStrategy.signUp(userNormalSignUpRequest))
                 .isInstanceOf(AlreadySignedUpUserException.class);
     }
 
@@ -125,11 +125,11 @@ class NormalSignUpStrategyTest {
     @DisplayName("기존 회원과 중복된 닉네임으로 회원가입을 시도하면 예외가 발생한다.")
     void duplicateNicknameSignUpRequest() {
         // given
-        when(userRepository.findByNickname(userSignUpRequest.getNickname())).thenReturn(Optional.of(user));
+        when(userRepository.findByNickname(userNormalSignUpRequest.getNickname())).thenReturn(Optional.of(user));
 
         // when
         // then
-        assertThatThrownBy(() -> signUpStrategy.signUp(userSignUpRequest))
+        assertThatThrownBy(() -> signUpStrategy.signUp(userNormalSignUpRequest))
                 .isInstanceOf(NicknameAlreadyInUseException.class);
     }
 
@@ -141,7 +141,7 @@ class NormalSignUpStrategyTest {
 
         // when
         // then
-        assertThatThrownBy(() -> signUpStrategy.signUp(userSignUpRequest))
+        assertThatThrownBy(() -> signUpStrategy.signUp(userNormalSignUpRequest))
                 .isInstanceOf(RequiredTermsNotAgreedException.class);
     }
 }

@@ -5,6 +5,7 @@ import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.filter.JwtAuthenticationProcessingFilter;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
+import login.oauthtest4.global.auth.jwt.util.JwtUtils;
 import login.oauthtest4.global.auth.login.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import login.oauthtest4.global.auth.login.handler.LoginFailureHandler;
 import login.oauthtest4.global.auth.login.handler.LoginSuccessHandler;
@@ -39,6 +40,7 @@ public class SecurityConfig {
 
     private final LoginService loginService;
     private final JwtService jwtService;
+    private final JwtUtils jwtUtils;
     private final UserRefreshTokenService userRefreshTokenService;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -101,7 +103,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userRefreshTokenService);
+        return new LoginSuccessHandler(jwtService, jwtUtils, userRefreshTokenService);
     }
 
     /**
@@ -130,7 +132,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository, userRefreshTokenService, objectMapper);
+        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, jwtUtils, userRepository, userRefreshTokenService);
         return jwtAuthenticationFilter;
     }
 

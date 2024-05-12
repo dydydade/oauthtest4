@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import login.oauthtest4.domain.user.dto.*;
 import login.oauthtest4.domain.user.service.UserService;
@@ -46,7 +48,7 @@ public class UserRestController {
 
     /**
      * [일반 회원 가입]
-     * @param userSignUpRequest
+     * @param userNormalSignUpRequest
      * @return
      */
     @PostMapping("/signup/normal")
@@ -59,8 +61,8 @@ public class UserRestController {
             @ApiResponse(responseCode = "404", description = "대상 약관을 찾을 수 없습니다."),
             @ApiResponse(responseCode = "409", description = "같은 이메일로 이미 가입한 계정이 있습니다.\t\n이미 사용 중인 닉네임입니다."),
     })
-    public ResponseEntity<ResultResponse> signUp(@RequestBody @Valid UserSignUpRequest userSignUpRequest) {
-        UserSignUpResponse userSignUpResponse = userService.signUp(userSignUpRequest);
+    public ResponseEntity<ResultResponse> signUp(@RequestBody @Valid UserNormalSignUpRequest userNormalSignUpRequest) {
+        UserSignUpResponse userSignUpResponse = userService.signUp(userNormalSignUpRequest);
         ResultResponse result = ResultResponse.of(ResultCode.NORMAL_REGISTER_SUCCESS, userSignUpResponse);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -80,10 +82,10 @@ public class UserRestController {
             @ApiResponse(responseCode = "404", description = "대상 약관을 찾을 수 없습니다."),
             @ApiResponse(responseCode = "409", description = "같은 이메일로 이미 가입한 계정이 있습니다.\t\n이미 사용 중인 닉네임입니다."),
     })
-    public ResponseEntity<ResultResponse> socialSignUp(@RequestBody @Valid UserSocialSignUpRequest userSocialSignUpRequest) {
+    public ResponseEntity<ResultResponse> socialSignUp(@RequestBody @Valid UserSocialSignUpRequest userSocialSignUpRequest, HttpServletRequest request, HttpServletResponse response) {
         UserSignUpResponse userSignUpResponse = userService.socialSignUp(userSocialSignUpRequest);
         ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_REGISTER_SUCCESS, userSignUpResponse);
-        // TODO: JWT 액세스 토큰, 리프레시 토큰 함께 보내야 함(소셜 회원가입의 경우, 회원가입 직후 바로 로그인 처리가 이루어지기 때문)
+
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
