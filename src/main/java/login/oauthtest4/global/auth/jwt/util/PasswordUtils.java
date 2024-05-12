@@ -2,7 +2,7 @@ package login.oauthtest4.global.auth.jwt.util;
 
 import java.util.Random;
 
-public class PasswordUtil {
+public class PasswordUtils {
 
     public static String generateRandomPassword() {
         int index = 0;

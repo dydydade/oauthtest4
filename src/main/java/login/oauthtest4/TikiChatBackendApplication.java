@@ -4,10 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class Oauthtest4Application {
+public class TikiChatBackendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(Oauthtest4Application.class, args);
+		SpringApplication.run(TikiChatBackendApplication.class, args);
 	}
 
 }
