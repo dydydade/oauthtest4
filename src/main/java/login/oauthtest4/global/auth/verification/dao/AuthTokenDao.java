@@ -10,7 +10,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class AuthTokenDao {
 
-    private static final long EMAIL_VERIFICATION_LIMIT_IN_SECONDS = 180;
+    private static final long EMAIL_VERIFICATION_LIMIT_IN_SECONDS = 600;
     private final StringRedisTemplate redisTemplate;
 
     public void saveToken(String token) {
