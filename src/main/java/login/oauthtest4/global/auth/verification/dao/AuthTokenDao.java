@@ -27,4 +27,8 @@ public class AuthTokenDao {
         Boolean keyExists = redisTemplate.hasKey(this.getTokenKey((token)));
         return keyExists != null && keyExists;
     }
+
+    public void removeToken(String token) {
+        redisTemplate.delete(this.getTokenKey(token));
+    }
 }

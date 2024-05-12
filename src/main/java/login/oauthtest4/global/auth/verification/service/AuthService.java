@@ -7,6 +7,7 @@ import login.oauthtest4.global.auth.verification.dao.CertificationNumberDao;
 import login.oauthtest4.global.component.EmailSender;
 import login.oauthtest4.global.exception.auth.EmailNotFoundException;
 import login.oauthtest4.global.exception.auth.InvalidEmailVerificationCodeException;
+import login.oauthtest4.global.exception.auth.InvalidVerificationTokenException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,14 @@ public class AuthService {
         certificationNumberDao.removeCertificationNumber(email);
 
         return token;
+    }
+
+    public void verifyToken(String token) {
+        if (!this.authTokenDao.hasToken(token)) {
+            throw new InvalidVerificationTokenException();
+        }
+
+        this.authTokenDao.removeToken(token);
     }
 
     private boolean isVerify(String email, String certificationNumber) {
