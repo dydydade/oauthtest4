@@ -47,7 +47,7 @@ public class AuthRestController {
     }
 
     @GetMapping("/verify")
-    @Operation(summary = "이메일 인증코드 검증", description = "이메일 인증코드 검증 API 입니다.")
+    @Operation(summary = "이메일 인증코드 검증", description = "이메일 인증코드 검증 API 입니다. 반환되는 token으로 회원가입/비밀번호 수정 등에 필요한 token전송 하시면 됩니다.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
