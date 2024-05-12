@@ -1,9 +1,9 @@
 package login.oauthtest4.global.auth.login.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
+import login.oauthtest4.global.auth.jwt.util.JwtUtils;
 import login.oauthtest4.global.auth.login.dto.LoginSuccessResponse;
 import login.oauthtest4.global.exception.filter.MissingDeviceIdException;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
@@ -24,8 +24,8 @@ import static login.oauthtest4.global.response.ResultCode.LOGIN_SUCCESS;
 @RequiredArgsConstructor
 public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
     private final JwtService jwtService;
+    private final JwtUtils jwtUtils;
     private final UserRefreshTokenService userRefreshTokenService;
     private static final String DEVICE_ID_HEADER_KEY = "Device-ID";
 
@@ -45,23 +45,20 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         String accessToken = jwtService.createAccessToken(email); // JwtService의 createAccessToken을 사용하여 AccessToken 발급
         String refreshToken = jwtService.createRefreshToken(); // JwtService의 createRefreshToken을 사용하여 RefreshToken 발급
 
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
-
-        userRefreshTokenService.findAndUpdateUserRefreshToken(email, deviceId, refreshToken);
-
         LoginSuccessResponse loginSuccessResponse = LoginSuccessResponse.builder()
                 .email(email)
                 .build();
 
         final ResultResponse resultResponse = ResultResponse.of(LOGIN_SUCCESS, loginSuccessResponse);
-        response.setStatus(resultResponse.getStatus());
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(resultResponse));
 
-        log.info("로그인에 성공하였습니다. 이메일 : {}", email);
-        log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
-        log.info("발급된 AccessToken 만료 기간 : {}", accessTokenExpiration);
+        jwtUtils.sendAccessAndRefreshToken(response, accessToken, refreshToken, resultResponse);
+
+        userRefreshTokenService.findAndUpdateUserRefreshToken(email, deviceId, refreshToken);
+
+
+        log.debug("로그인에 성공하였습니다. 이메일 : {}", email);
+        log.debug("로그인에 성공하였습니다. AccessToken : {}", accessToken);
+        log.debug("발급된 AccessToken 만료 기간 : {}", accessTokenExpiration);
     }
 
     private String extractUsername(Authentication authentication) {

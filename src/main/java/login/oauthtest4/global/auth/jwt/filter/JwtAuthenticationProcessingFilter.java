@@ -10,7 +10,8 @@ import login.oauthtest4.domain.user.model.UserRefreshToken;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
-import login.oauthtest4.global.auth.jwt.util.PasswordUtil;
+import login.oauthtest4.global.auth.jwt.util.JwtUtils;
+import login.oauthtest4.global.auth.jwt.util.PasswordUtils;
 import login.oauthtest4.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,9 +54,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     );
 
     private final JwtService jwtService;
+    private final JwtUtils jwtUtils;
     private final UserRepository userRepository;
     private final UserRefreshTokenService userRefreshTokenService;
-    private final ObjectMapper objectMapper;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -73,7 +74,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         // -> RefreshToken이 요청 헤더에 없거나 유효하지 않다면(서명이 유효하지 않으면) null을 반환
         // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우밖에 없다.
         // 따라서, 위의 경우를 제외하면 추출한 refreshToken은 모두 null
-        String refreshToken = jwtService.extractRefreshToken(request)
+        String refreshToken = jwtUtils.extractRefreshToken(request)
                 .filter(jwtService::isTokenValid)
                 .orElse(null);
 
@@ -101,16 +102,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) throws IOException {
         UserRefreshToken reIssuedUserRefreshToken = userRefreshTokenService.checkRefreshTokenAndUpdate(refreshToken);
         String reIssuedRefreshToken = reIssuedUserRefreshToken.getRefreshToken();
-        jwtService.sendAccessAndRefreshToken(
-                response,
-                jwtService.createAccessToken(reIssuedUserRefreshToken.getUser().getEmail()),
-                reIssuedRefreshToken);
+        String accessToken = jwtService.createAccessToken(reIssuedUserRefreshToken.getUser().getEmail());
 
         final ResultResponse resultResponse = ResultResponse.of(TOKEN_ISSUANCE_SUCCESS, null);
-        response.setStatus(resultResponse.getStatus());
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
-        response.getWriter().write(objectMapper.writeValueAsString(resultResponse));
+        jwtUtils.sendAccessAndRefreshToken(response, accessToken, reIssuedRefreshToken, resultResponse);
     }
 
     /**
@@ -125,7 +120,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                                                   FilterChain filterChain) throws ServletException, IOException {
         log.debug("checkAccessTokenAndAuthentication() 호출");
 
-        jwtService.extractAccessToken(request)
+        jwtUtils.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
                         .ifPresent(email -> userRepository.findByEmail(email)
@@ -152,7 +147,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void saveAuthentication(User myUser) {
         String password = myUser.getPassword();
         if (password == null) { // 소셜 로그인 유저의 비밀번호 임의로 설정 하여 소셜 로그인 유저도 인증 되도록 설정
-            password = PasswordUtil.generateRandomPassword();
+            password = PasswordUtils.generateRandomPassword();
         }
 
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
