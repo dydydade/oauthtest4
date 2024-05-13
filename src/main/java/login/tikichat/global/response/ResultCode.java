@@ -21,7 +21,8 @@ public enum ResultCode {
     EMAIL_VERIFICATION_SUCCESS(200, "A003", "이메일 인증에 성공하였습니다."),
     TOKEN_ISSUANCE_SUCCESS(200, "A004", "토큰 발급을 완료하였습니다."),
     SOCIAL_EMAIL_NOT_REGISTERED(303, "A005", "기존에 회원으로 존재하지 않는 소셜 이메일입니다. 소셜 회원가입을 진행해 주세요."),
-    SOCIAL_LOGIN_SUCCESS(200, "A006", "소셜 로그인에 성공하였습니다."),
+    SOCIAL_PROFILE_LINKING_REQUIRED(303, "A006", "기존 계정에 소셜 계정 추가 연동이 필요합니다."),
+    SOCIAL_LOGIN_SUCCESS(200, "A007", "소셜 로그인에 성공하였습니다."),
 
     // Terms
     TERMS_REGISTRATION_SUCCESS(200, "T001", "이용 약관을 등록하였습니다."),

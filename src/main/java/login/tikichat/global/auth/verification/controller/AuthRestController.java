@@ -3,14 +3,15 @@ package login.tikichat.global.auth.verification.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.MessagingException;
 import login.tikichat.global.auth.verification.dto.EmailCertificationRequest;
+import login.tikichat.global.auth.verification.dto.EmailVerifyResponse;
 import login.tikichat.global.auth.verification.dto.NormalLoginRequest;
-import login.tikichat.global.auth.verification.service.MailSendService;
-import login.tikichat.global.auth.verification.service.MailVerifyService;
+import login.tikichat.global.auth.verification.service.AuthService;
 import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,7 @@ import java.security.NoSuchAlgorithmException;
 @RequestMapping("/api/v1/auth")
 public class AuthRestController {
 
-    private final MailSendService mailSendService;
-    private final MailVerifyService mailVerifyService;
+    private final AuthService authService;
 
     @PostMapping("/send-certification")
     @Operation(summary = "이메일 인증코드 발송", description = "이메일 인증코드 발송 API 입니다.")
@@ -39,27 +39,22 @@ public class AuthRestController {
     })
     public ResponseEntity<ResultResponse> sendCertificationNumber(
             @Validated @RequestBody EmailCertificationRequest request
-    ) throws MessagingException, NoSuchAlgorithmException {
-        // 비동기 메서드 호출
-        mailSendService.sendEmailForCertification(request.getEmail())
-                .exceptionally(ex -> {
-                    // 인증 코드 발생 간 오류 발생 시, 클라이언트에 오류를 알릴 수 있는 코드 구현(필요 시)
-                    alertClientAboutEmailFailure(ex);
-                    return null;
-                });
-        // 인증 코드 발송 응답은 즉시 반환(비동기)
+    ) throws NoSuchAlgorithmException {
+        authService.sendEmailForCertification(request.getEmail());
+
         ResultResponse result = ResultResponse.of(ResultCode.AUTH_CODE_SENT_SUCCESS, null);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
-    private void alertClientAboutEmailFailure(Throwable ex) {
-        // 구현 필요
-    }
-
     @GetMapping("/verify")
-    @Operation(summary = "이메일 인증코드 검증", description = "이메일 인증코드 검증 API 입니다.")
+    @Operation(summary = "이메일 인증코드 검증", description = "이메일 인증코드 검증 API 입니다. 반환되는 token으로 회원가입/비밀번호 수정 등에 필요한 token전송 하시면 됩니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "이메일 인증에 성공하였습니다.", useReturnTypeSchema = true),
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "이메일 인증에 성공하였습니다.",
+                    useReturnTypeSchema = true,
+                    content = {@Content(schema = @Schema(implementation = EmailVerifyResponse.class))}
+            ),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 인증코드입니다.")
     })
     public ResponseEntity<ResultResponse> verifyCertificationNumber(
@@ -68,8 +63,13 @@ public class AuthRestController {
             @Parameter(description = "인증코드")
             @RequestParam(name = "certificationNumber") String certificationNumber
     ) {
-        mailVerifyService.verifyEmail(email, certificationNumber);
-        ResultResponse result = ResultResponse.of(ResultCode.EMAIL_VERIFICATION_SUCCESS, null);
+        final var token = authService.verifyEmail(email, certificationNumber);
+
+        ResultResponse result = ResultResponse.of(
+                ResultCode.EMAIL_VERIFICATION_SUCCESS,
+                new EmailVerifyResponse(token)
+        );
+
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
