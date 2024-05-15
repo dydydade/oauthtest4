@@ -3,6 +3,7 @@ package login.tikichat.global.auth.jwt.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import login.tikichat.global.exception.filter.MissingDeviceIdException;
 import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -111,9 +112,7 @@ public class JwtUtils {
         String deviceId = request.getHeader(DEVICE_ID_HEADER_KEY);
 
         if (deviceId == null) {
-            // TODO: 삭제(테스트용)
-            deviceId = "123";
-//            throw new MissingDeviceIdException();
+            throw new MissingDeviceIdException();
         }
 
         return deviceId;
