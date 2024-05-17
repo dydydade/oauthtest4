@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.service.UserService;
+import login.tikichat.global.auth.verification.service.AuthService;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserRestController {
 
     private final UserService userService;
+    private final AuthService authService;
 
     @GetMapping("/search")
     @Operation(summary = "이메일로 회원 조회", description = "이메일로 회원 정보를 조회하는 API 입니다.")
@@ -135,23 +137,20 @@ public class UserRestController {
         throw new NicknameAlreadyInUseException();
     }
 
-    @PutMapping("/{userId}/password")
-    @SecurityRequirement(name = "JWT")
+    @PutMapping("/{email}/password")
     @Operation(summary = "회원 비밀번호 설정", description = "회원 비밀번호 설정 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "비밀번호 설정을 완료하였습니다.", useReturnTypeSchema = true),
     })
     public ResponseEntity<ResultResponse> setUserPassword(
+            @PathVariable String email,
             @RequestBody PasswordChangeRequest passwordChangeRequest
     ) {
-        verifyTempToken(passwordChangeRequest);
+        authService.verifyToken(passwordChangeRequest.getTempToken());
 
-        userService.setUserPassword(passwordChangeRequest);
+        userService.setUserPassword(email, passwordChangeRequest);
+
         ResultResponse result = ResultResponse.of(ResultCode.PASSWORD_SET_SUCCESS, null);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
-    }
-
-    private void verifyTempToken(PasswordChangeRequest passwordChangeRequest) {
-        // TODO: 이메일 인증 성공 시점에 발급한 임시 토큰 검증
     }
 }

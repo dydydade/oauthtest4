@@ -79,4 +79,8 @@ public class User {
     public boolean isPasswordExistUser() {
         return role.equals(Role.USER);
     }
+
+    public void setRoleAsUser() {
+        this.role = Role.USER;
+    }
 }

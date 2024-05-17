@@ -38,8 +38,8 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         User user = User.builder()
                 .id(1L)
                 .email("dydydade@gmail.com")
-                .role(Role.USER)
-                .password(passwordEncoder.encode("1234"))
+                .role(Role.SOCIAL)
+//                .password(passwordEncoder.encode("1234"))
                 .build();
         SocialProfile naver = SocialProfile.builder()
                 .id(1L)

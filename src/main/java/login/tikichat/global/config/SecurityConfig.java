@@ -1,4 +1,4 @@
-package login.tikichat.global.auth.config;
+package login.tikichat.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import login.tikichat.domain.user.repository.UserRepository;
@@ -63,6 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users/signup/**").permitAll() // 회원가입 요청은 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/api/v1/users/search", "/api/v1/users/nicknames").permitAll() // 로그인하기 전 요청은 인증 대상 제외
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/*/password").permitAll() // 로그인하기 전 요청은 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/api/v1/terms/latest").permitAll() // 약관 정보 조회 요청은 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/social/**").permitAll() // 소셜 로그인 요청 경로는 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/login/oauth2/**").permitAll() // 소셜 로그인 리다이렉트 경로는 인증 대상 제외
