@@ -105,11 +105,11 @@ public class UserService {
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void setUserPassword(
+            String email,
             PasswordChangeRequest passwordChangeRequest
     ) {
-        String email = passwordChangeRequest.getEmail();
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
@@ -117,6 +117,11 @@ public class UserService {
         }
 
         User user = userOptional.get();
+
+        if (user.getRole().equals(Role.SOCIAL)) {
+            user.setRoleAsUser();
+        }
+
         user.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
     }
 }

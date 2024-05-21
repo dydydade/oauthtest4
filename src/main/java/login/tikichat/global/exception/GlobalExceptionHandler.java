@@ -1,5 +1,6 @@
 package login.tikichat.global.exception;
 
+import login.tikichat.global.exception.auth.InvalidVerificationTokenException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +34,13 @@ public class GlobalExceptionHandler {
     protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         final ErrorResponse response = ErrorResponse.of(METHOD_NOT_ALLOWED);
         return new ResponseEntity<>(response, HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler
+    protected ResponseEntity<ErrorResponse> handleInvalidVerificationTokenException(InvalidVerificationTokenException e) {
+        final ErrorCode errorCode = e.getErrorCode();
+        final ErrorResponse response = ErrorResponse.of(errorCode, e.getErrors());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(errorCode.getStatus()));
     }
 
     // @Valid, @Validated 에서 binding error 발생 시 (@RequestBody)

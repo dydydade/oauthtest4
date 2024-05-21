@@ -1,4 +1,4 @@
-package login.tikichat.global.auth.config;
+package login.tikichat.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
