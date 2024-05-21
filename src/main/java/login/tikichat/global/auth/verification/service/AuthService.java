@@ -6,6 +6,7 @@ import login.tikichat.global.auth.verification.CertificationGenerator;
 import login.tikichat.global.auth.verification.dao.CertificationNumberDao;
 import login.tikichat.global.component.EmailSender;
 import login.tikichat.global.exception.auth.EmailNotFoundException;
+import login.tikichat.global.exception.auth.EmailVerificationCodeSendLimitExceededException;
 import login.tikichat.global.exception.auth.InvalidEmailVerificationCodeException;
 import login.tikichat.global.exception.auth.InvalidVerificationTokenException;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class AuthService {
     @Async("async-executor")
     public CompletableFuture<EmailCertificationResponse> sendEmailForCertification(String email)
             throws NoSuchAlgorithmException {
+
         String certificationNumber = generator.createCertificationNumber();
         String content = "인증번호: " + certificationNumber;
         certificationNumberDao.saveCertificationNumber(email, certificationNumber);
@@ -71,5 +73,11 @@ public class AuthService {
 
     private boolean isEmailExists(String email) {
         return certificationNumberDao.hasKey(email);
+    }
+
+    public void validateEmailSendCount(String email) {
+        if (certificationNumberDao.getEmailSendCount(email) >= 5) {
+            throw new EmailVerificationCodeSendLimitExceededException();
+        }
     }
 }
