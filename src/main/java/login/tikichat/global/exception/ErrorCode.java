@@ -19,7 +19,6 @@ public enum ErrorCode {
     CHECK_EMAIL_OR_PASSWORD(400, "A002", "이메일 또는 비밀번호를 다시 확인해주세요."),
     MISSING_DEVICE_ID(400, "A003", "요청 헤더에 Device-ID 정보가 포함되지 않았습니다."),
     EMAIL_NOT_FOUND(404, "A004", "이메일을 찾지 못했습니다."),
-    INVALID_EMAIL_VERIFICATION_CODE(400, "A005", "유효하지 않은 인증코드입니다."),
     PASSWORD_RESET_REQUIRED_FOR_SOCIAL_ACCOUNT(400, "A006", "비밀번호 설정이 필요한 계정입니다. 소셜 계정은 비밀번호 설정 후 ID/PW 로그인이 가능합니다."),
     INVALID_VERIFICATION_AUTH_TOKEN(400, "A007", "유효하지 않은 인증코드입니다."),
     EMAIL_VERIFICATION_CODE_SEND_LIMIT_EXCEEDED(429, "A008", "당일 가능한 이메일 인증코드 발송 횟수가 초과되었습니다."),
