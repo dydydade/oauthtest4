@@ -40,7 +40,11 @@ public class AuthRestController {
     public ResponseEntity<ResultResponse> sendCertificationNumber(
             @Validated @RequestBody EmailCertificationRequest request
     ) throws NoSuchAlgorithmException {
-        authService.sendEmailForCertification(request.getEmail());
+
+        String email = request.getEmail();
+
+        authService.validateEmailSendCount(email);
+        authService.sendEmailForCertification(email);
 
         ResultResponse result = ResultResponse.of(ResultCode.AUTH_CODE_SENT_SUCCESS, null);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
