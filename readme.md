@@ -14,12 +14,12 @@
     /**
      * 회원 가입
      *
-     * @param userSignUpRequest
+     * @param userNormalSignUpRequest
      * @return
      */
     @PostMapping
-    public ResponseEntity<?> signUp(@RequestBody UserSignUpRequest userSignUpRequest) {
-        UserSignUpResponse userSignUpResponse = userService.signUp(userSignUpRequest);
+    public ResponseEntity<?> signUp(@RequestBody UserSignUpRequest userNormalSignUpRequest) {
+        UserSignUpResponse userSignUpResponse = userService.signUp(userNormalSignUpRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(userSignUpResponse, "회원 가입이 정상적으로 완료되었습니다."));

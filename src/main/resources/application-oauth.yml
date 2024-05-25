@@ -6,30 +6,30 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            redirect-uri: https://${HOST}:${PORT}/login/oauth2/code/google
             authorization-grant-type: authorization_code
-            scope: profile, email
+            scope: email, profile
 
           facebook:
             client-id: ${FACEBOOK_CLIENT_ID}
             client-secret: ${FACEBOOK_CLIENT_SECRET}
-            scope: public_profile, email
+            scope: email, public_profile
 
           naver:
             client-id: ${NAVER_CLIENT_ID}
             client-secret: ${NAVER_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/login/oauth2/code/naver
+            redirect-uri: https://${HOST}:${PORT}/login/oauth2/code/naver
             authorization-grant-type: authorization_code
-            scope: name, email, profile_image
+            scope: email, name, profile_image
             client-name: Naver
 
           kakao:
             client-id: ${KAKAO_CLIENT_ID}
             client-secret: ${KAKAO_CLIENT_SECRET}
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: https://${HOST}:${PORT}/login/oauth2/code/kakao
 #            client-authentication-method: POST
             authorization-grant-type: authorization_code
-            scope: profile_nickname, profile_image, account_email
+            scope: account_email, profile_nickname, profile_image
             client-name: Kakao
 
         provider:
@@ -44,3 +44,6 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
+
+      apple:
+        url: https://appleid.apple.com/auth/keys
