@@ -9,6 +9,7 @@ import login.oauthtest4.domain.user.model.User;
 import login.oauthtest4.domain.user.model.UserRefreshToken;
 import login.oauthtest4.domain.user.repository.UserRepository;
 import login.oauthtest4.domain.user.service.UserRefreshTokenService;
+import login.oauthtest4.global.auth.UserDetailInfo;
 import login.oauthtest4.global.auth.jwt.service.JwtService;
 import login.oauthtest4.global.auth.jwt.util.PasswordUtil;
 import login.oauthtest4.global.response.ResultResponse;
@@ -16,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -155,11 +157,13 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             password = PasswordUtil.generateRandomPassword();
         }
 
-        UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .username(myUser.getEmail())
-                .password(password)
-                .roles(myUser.getRole().name())
-                .build();
+        UserDetailInfo userDetailsUser =
+            new UserDetailInfo(
+                    myUser.getId(),
+                    myUser.getEmail(),
+                    password,
+                    List.of(new SimpleGrantedAuthority(myUser.getRole().name()))
+            );
 
         Authentication authentication =
                 new UsernamePasswordAuthenticationToken(userDetailsUser, null,
