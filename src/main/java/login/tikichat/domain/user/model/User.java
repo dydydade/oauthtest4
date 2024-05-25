@@ -21,6 +21,7 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
+    @Column(unique = true)
     private String email; // 이메일
     private String password; // 비밀번호
     private String nickname; // 닉네임
@@ -53,7 +54,7 @@ public class User {
     }
 
     public void updateImageUrl(URL updateImageUrl) {
-        this.imageUrl = imageUrl;
+        this.imageUrl = updateImageUrl;
     }
 
     // 연관관계 편의 메소드
