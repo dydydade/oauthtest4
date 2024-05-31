@@ -1,10 +1,10 @@
-package login.oauthtest4.domain.chatroom.controller;
+package login.tikichat.domain.chatroom.controller;
 
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import login.oauthtest4.domain.chatroom.dto.CreateChatRoomDto;
-import login.oauthtest4.domain.chatroom.service.ChatRootService;
+import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
+import login.tikichat.domain.chatroom.service.ChatRootService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

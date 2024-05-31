@@ -1,7 +1,7 @@
-package login.oauthtest4.domain.category.service;
+package login.tikichat.domain.category.service;
 
-import login.oauthtest4.domain.category.dto.FindCategoryDto;
-import login.oauthtest4.domain.category.repository.CategoryRepository;
+import login.tikichat.domain.category.dto.FindCategoryDto;
+import login.tikichat.domain.category.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

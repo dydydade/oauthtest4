@@ -1,12 +1,12 @@
-package login.oauthtest4.domain.category.controller;
+package login.tikichat.domain.category.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import login.oauthtest4.domain.category.dto.FindCategoryDto;
-import login.oauthtest4.domain.category.service.CategoryService;
+import login.tikichat.domain.category.dto.FindCategoryDto;
+import login.tikichat.domain.category.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

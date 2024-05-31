@@ -1,8 +1,8 @@
-package login.oauthtest4.domain.chatroom.service;
+package login.tikichat.domain.chatroom.service;
 
-import login.oauthtest4.domain.chatroom.dto.CreateChatRoomDto;
-import login.oauthtest4.domain.chatroom.model.ChatRoom;
-import login.oauthtest4.domain.chatroom.repository.ChatRootRepository;
+import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
+import login.tikichat.domain.chatroom.model.ChatRoom;
+import login.tikichat.domain.chatroom.repository.ChatRootRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

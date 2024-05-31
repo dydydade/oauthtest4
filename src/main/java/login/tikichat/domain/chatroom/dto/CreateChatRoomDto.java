@@ -1,4 +1,4 @@
-package login.oauthtest4.domain.chatroom.dto;
+package login.tikichat.domain.chatroom.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;

@@ -1,6 +1,6 @@
-package login.oauthtest4.domain.category.repository;
+package login.tikichat.domain.category.repository;
 
-import login.oauthtest4.domain.category.model.Category;
+import login.tikichat.domain.category.model.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

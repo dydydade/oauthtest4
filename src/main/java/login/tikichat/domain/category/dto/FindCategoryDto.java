@@ -1,4 +1,4 @@
-package login.oauthtest4.domain.category.dto;
+package login.tikichat.domain.category.dto;
 
 import java.util.List;
 
