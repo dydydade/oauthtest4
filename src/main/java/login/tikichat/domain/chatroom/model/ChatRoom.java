@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import login.tikichat.domain.category.model.Category;
+import login.tikichat.domain.category.model.QCategory;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,11 +49,13 @@ public class ChatRoom {
             Long roomManagerUserId,
             String name,
             Integer maxUserCount,
-            List<String> tags
+            List<String> tags,
+            Category category
     ) {
         this.roomManagerUserId = roomManagerUserId;
         this.name = name;
         this.maxUserCount = maxUserCount;
         this.tags = tags;
+        this.category = category;
     }
 }

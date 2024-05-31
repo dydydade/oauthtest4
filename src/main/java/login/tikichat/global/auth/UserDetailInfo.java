@@ -1,12 +1,14 @@
 package login.tikichat.global.auth;
 
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
 
 @Getter
+@ToString
 public class UserDetailInfo extends User {
     private final Long userId;
 

@@ -1,5 +1,6 @@
 package login.tikichat.domain.chatroom.service;
 
+import login.tikichat.domain.category.repository.CategoryRepository;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRootRepository;
@@ -12,17 +13,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ChatRootService {
     private final ChatRootRepository chatRootRepository;
+    private final CategoryRepository categoryRepository;
 
     @Transactional
     public Long createChatRoom(
             Long rootManagerUserId,
             CreateChatRoomDto.CreateChatRoomReq createChatRoomReq
     ) {
+        final var category = this.categoryRepository.findByCode(
+                createChatRoomReq.categoryCode()
+        ).orElseThrow();
+
         final var chatRoot = new ChatRoom(
                 rootManagerUserId,
                 createChatRoomReq.name(),
                 createChatRoomReq.maxUserCount(),
-                createChatRoomReq.tags()
+                createChatRoomReq.tags(),
+                category
         );
 
         this.chatRootRepository.save(chatRoot);

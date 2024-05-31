@@ -5,7 +5,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
 import login.tikichat.domain.chatroom.service.ChatRootService;
+import login.tikichat.global.auth.UserDetailInfo;
+import login.tikichat.global.response.ResultCode;
+import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,12 +26,14 @@ public class ChatRoomController {
     private final ChatRootService chatRootService;
 
     @PostMapping("")
-    public CreateChatRoomDto.CreateChatRoomRes createChatRoom(
-            @RequestBody @Valid CreateChatRoomDto.CreateChatRoomReq createChatRoomReq
+    public ResponseEntity<ResultResponse> createChatRoom(
+            @RequestBody @Valid CreateChatRoomDto.CreateChatRoomReq createChatRoomReq,
+            @AuthenticationPrincipal UserDetailInfo user
     ) {
-        // @TOOD: 인증된 사용자의 userId로 치환 해야 함.
-        return new CreateChatRoomDto.CreateChatRoomRes(
-                this.chatRootService.createChatRoom(1L, createChatRoomReq)
+        ResultResponse result = ResultResponse.of(
+                ResultCode.FIND_USER_INFO_SUCCESS,
+                this.chatRootService.createChatRoom(user.getUserId(), createChatRoomReq)
         );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 }

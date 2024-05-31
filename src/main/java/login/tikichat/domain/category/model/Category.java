@@ -29,4 +29,10 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     Set<ChatRoom> chatRooms = new HashSet<>();
+
+    public Category(String code, String name, Integer orderNum) {
+        this.code = code;
+        this.name = name;
+        this.orderNum = orderNum;
+    }
 }
