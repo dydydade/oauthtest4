@@ -2,6 +2,8 @@ package login.tikichat.global.config;
 
 import login.tikichat.domain.category.model.Category;
 import login.tikichat.domain.category.repository.CategoryRepository;
+import login.tikichat.domain.chatroom.model.ChatRoom;
+import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
 import login.tikichat.domain.terms.model.TermsType;
 import login.tikichat.domain.terms.service.TermsService;
@@ -33,6 +35,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final TermsService termsService;
     private final CategoryRepository categoryRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     /**
      * 앱 계정(User) 및 소셜 연동 정보 저장
@@ -78,9 +81,20 @@ public class InitializeDefaultConfig implements CommandLineRunner {
             new Category("C_1002", "연애", 1)
         );
 
+        List<ChatRoom> chatRooms = List.of(
+                new ChatRoom(
+                        2L,
+                        "테스트 채팅 룸",
+                        10,
+                        List.of("고민"),
+                        categories.get(0)
+                )
+        );
+
         userRepository.save(user);
         userRepository.save(user2);
         categoryRepository.saveAll(categories);
+        chatRoomRepository.saveAll(chatRooms);
 
 //        socialProfileRepository.save(naver);
 //        socialProfileRepository.save(kakao);

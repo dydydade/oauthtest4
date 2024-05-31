@@ -3,7 +3,7 @@ package login.tikichat.domain.chatroom.service;
 import login.tikichat.domain.category.repository.CategoryRepository;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
 import login.tikichat.domain.chatroom.model.ChatRoom;
-import login.tikichat.domain.chatroom.repository.ChatRootRepository;
+import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChatRootService {
-    private final ChatRootRepository chatRootRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final CategoryRepository categoryRepository;
 
     @Transactional
@@ -32,7 +32,7 @@ public class ChatRootService {
                 category
         );
 
-        this.chatRootRepository.save(chatRoot);
+        this.chatRoomRepository.save(chatRoot);
 
         return chatRoot.getId();
     }
