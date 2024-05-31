@@ -22,6 +22,7 @@ public enum ErrorCode {
     PASSWORD_RESET_REQUIRED_FOR_SOCIAL_ACCOUNT(400, "A006", "비밀번호 설정이 필요한 계정입니다. 소셜 계정은 비밀번호 설정 후 ID/PW 로그인이 가능합니다."),
     INVALID_VERIFICATION_AUTH_TOKEN(400, "A007", "유효하지 않은 인증코드입니다."),
     EMAIL_VERIFICATION_CODE_SEND_LIMIT_EXCEEDED(429, "A008", "당일 가능한 이메일 인증코드 발송 횟수가 초과되었습니다."),
+    INVALID_EMAIL_VERIFICATION_CODE(400, "A005", "유효하지 않은 인증코드입니다."),
 
     // Terms
     REQUIRED_TERMS_NOT_AGREED(400, "T001", "요청에 필수 약관 정보를 모두 포함시켜 주세요."),
