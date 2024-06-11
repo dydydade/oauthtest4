@@ -15,7 +15,7 @@ public class UserSocialSignUpRequest extends BaseUserSignUpRequest {
 
     @Schema(description = "소셜 로그인 연동 정보")
     @NotNull(message = "소셜 회원가입 시 소셜 로그인 연동 정보를 반드시 포함하여야 합니다.")
-    private UserSignUpSocialProfileDto socialProfileDto;
+    private UserSocialProfileDto socialProfileDto;
 }
 
 

@@ -192,14 +192,11 @@ public class OAuth2UserRestController {
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
-//    /**
-//     * [테스트용 임시 메서드] 클라이언트에서 AccessToken 보내주지 않아도 테스트할 수 있도록
-//     * 백엔드에서 AccessToken 받아오는 메서드
-//     * @param registrationId
-//     * @param response
-//     * @throws IOException
-//     */
-//    @GetMapping("/api/v1/auth/social/link/{registrationId}")
+
+    /**
+     * 추후 소셜 로그인 추가 연동 시 작성
+     */
+//    @PostMapping("/api/v1/auth/social/link/{registrationId}")
 //    public ResponseEntity<Object> linkSocialProfile(@PathVariable String registrationId, @RequestParam String oauth2AccessToken, HttpServletRequest request, HttpServletResponse response) throws IOException {
 //
 //        String deviceId = jwtUtils.extractDeviceIdFromHeader(request);
