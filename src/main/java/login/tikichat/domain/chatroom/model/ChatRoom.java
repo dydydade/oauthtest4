@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import login.tikichat.domain.attachment.model.Attachment;
 import login.tikichat.domain.category.model.Category;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -47,12 +48,17 @@ public class ChatRoom {
     @JoinColumn(name = "category_code", nullable = false)
     private Category category;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "attachment_id", nullable = false)
+    private Attachment attachment;
+
     public ChatRoom(
             Long roomManagerUserId,
             String name,
             Integer maxUserCount,
             List<String> tags,
-            Category category
+            Category category,
+            Attachment attachment
     ) {
         this.roomManagerUserId = roomManagerUserId;
         this.name = name;
@@ -60,5 +66,6 @@ public class ChatRoom {
         this.tags = tags;
         this.category = category;
         this.currentUserCount = 0;
+        this.attachment = attachment;
     }
 }

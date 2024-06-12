@@ -1,6 +1,8 @@
 package login.tikichat.domain.chatroom.service;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import login.tikichat.domain.attachment.repository.AttachmentRepository;
+import login.tikichat.domain.attachment.service.AttachmentService;
 import login.tikichat.domain.category.dto.FindCategoryDto;
 import login.tikichat.domain.category.repository.CategoryRepository;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
@@ -12,6 +14,9 @@ import login.tikichat.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -19,22 +24,29 @@ import org.springframework.transaction.annotation.Transactional;
 public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final CategoryRepository categoryRepository;
+    private final AttachmentService attachmentService;
+    private final AttachmentRepository attachmentRepository;
 
     @Transactional
     public Long createChatRoom(
             Long rootManagerUserId,
-            CreateChatRoomDto.CreateChatRoomReq createChatRoomReq
-    ) {
+            CreateChatRoomDto.CreateChatRoomReq createChatRoomReq,
+            MultipartFile uploadFile
+    ) throws IOException {
         final var category = this.categoryRepository.findByCode(
                 createChatRoomReq.categoryCode()
         ).orElseThrow();
+
+        final var attachmentId = this.attachmentService.uploadFile(rootManagerUserId, uploadFile);
+        final var attachment = this.attachmentRepository.findById(attachmentId).orElseThrow();
 
         final var chatRoot = new ChatRoom(
                 rootManagerUserId,
                 createChatRoomReq.name(),
                 createChatRoomReq.maxUserCount(),
                 createChatRoomReq.tags(),
-                category
+                category,
+                attachment
         );
 
         this.chatRoomRepository.save(chatRoot);
