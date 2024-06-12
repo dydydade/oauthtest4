@@ -32,6 +32,9 @@ public class ChatRoom {
     @Column(name = "max_user_count", nullable = false)
     private Integer maxUserCount;
 
+    @Column(name = "current_user_count", nullable = false)
+    private Integer currentUserCount;
+
     @Column(name = "tags", columnDefinition = "json", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> tags;
@@ -56,5 +59,6 @@ public class ChatRoom {
         this.maxUserCount = maxUserCount;
         this.tags = tags;
         this.category = category;
+        this.currentUserCount = 0;
     }
 }

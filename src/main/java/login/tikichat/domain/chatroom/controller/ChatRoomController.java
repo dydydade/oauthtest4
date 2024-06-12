@@ -4,7 +4,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
-import login.tikichat.domain.chatroom.service.ChatRootService;
+import login.tikichat.domain.chatroom.dto.FindChatRoomDto;
+import login.tikichat.domain.chatroom.service.ChatRoomService;
 import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
@@ -12,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @SecurityRequirement(name = "JWT")
@@ -23,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/chat-rooms")
 @RequiredArgsConstructor
 public class ChatRoomController {
-    private final ChatRootService chatRootService;
+    private final ChatRoomService chatRoomService;
 
     @PostMapping("")
     public ResponseEntity<ResultResponse> createChatRoom(
@@ -32,7 +35,19 @@ public class ChatRoomController {
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_USER_INFO_SUCCESS,
-                this.chatRootService.createChatRoom(user.getUserId(), createChatRoomReq)
+                this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
+        );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<ResultResponse> findChatRooms(
+            @RequestParam @Valid FindChatRoomDto.FindChatRoomReq findChatRoomReq,
+            @AuthenticationPrincipal UserDetailInfo user
+    ) {
+        ResultResponse result = ResultResponse.of(
+                ResultCode.FIND_USER_INFO_SUCCESS,
+                this.chatRoomService.findChatRooms(findChatRoomReq, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
