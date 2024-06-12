@@ -65,10 +65,4 @@ public class ChatRoomService {
                 )).toList()
         );
     }
-
-    public FindChatRoomDto.FindChatRoomRes findChatRooms(
-            FindChatRoomDto.FindChatRoomReq findChatRoomReq
-    ) {
-        return this.findChatRooms(findChatRoomReq, null);
-    }
 }

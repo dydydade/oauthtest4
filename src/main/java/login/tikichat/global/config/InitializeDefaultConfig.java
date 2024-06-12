@@ -77,8 +77,16 @@ public class InitializeDefaultConfig implements CommandLineRunner {
                 .build();
 
         List<Category> categories = List.of(
-            new Category("C_1001", "게임", 1),
-            new Category("C_1002", "연애", 1)
+            new Category("C_1001", "썸 · 연애", 1),
+            new Category("C_1002", "다이어트 · 헬스", 2),
+            new Category("C_1003", "직장인/취업", 3),
+            new Category("C_1004", "공부/대입", 4),
+            new Category("C_1005", "자기계발/재테크", 5),
+            new Category("C_1006", "가족 · 결혼", 6),
+            new Category("C_1007", "연예인/팬", 7),
+            new Category("C_1008", "드라마 · 영화", 8),
+            new Category("C_1009", "뷰티/패션", 9),
+            new Category("C_1010", "취미", 10)
         );
 
         List<ChatRoom> chatRooms = List.of(

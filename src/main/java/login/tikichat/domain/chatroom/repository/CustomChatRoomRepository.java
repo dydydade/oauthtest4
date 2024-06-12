@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface CustomChatRoomRepository {
     List<ChatRoom> findChatRooms(FindChatRoomDto.FindChatRoomReq findChatRoomReq, Long userId);
+    void addCurrentUserCount(Long id);
+    void subtractCurrentUserCount(Long id);
 }

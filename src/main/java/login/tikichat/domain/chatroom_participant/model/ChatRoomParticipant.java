@@ -16,8 +16,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -46,4 +44,12 @@ public class ChatRoomParticipant {
     @JoinColumn(name = "chat_room_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ChatRoom chatRoom;
+
+    public ChatRoomParticipant(
+            User user,
+            ChatRoom chatRoom
+    ) {
+        this.user = user;
+        this.chatRoom = chatRoom;
+    }
 }
