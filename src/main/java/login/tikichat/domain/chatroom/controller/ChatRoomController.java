@@ -36,22 +36,18 @@ public class ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     @PostMapping(
-            value = "",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+            value = ""
     )
     public ResponseEntity<ResultResponse> createChatRoom(
             @RequestPart(value = "fileUploadReq")
             @Valid
             @Parameter(required = true)
             CreateChatRoomDto.CreateChatRoomReq createChatRoomReq,
-            @AuthenticationPrincipal UserDetailInfo user,
-            @RequestPart(value = "file", required = true)
-            MultipartFile uploadFile
+            @AuthenticationPrincipal UserDetailInfo user
     ) throws IOException {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_USER_INFO_SUCCESS,
-                this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq, uploadFile)
+                this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
