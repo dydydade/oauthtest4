@@ -67,4 +67,16 @@ public class ChatRoomController {
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
+
+    @GetMapping("/ranked")
+    public ResponseEntity<ResultResponse> findRankedChatRooms(
+            @RequestParam @Valid FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
+            @AuthenticationPrincipal UserDetailInfo user
+    ) {
+        ResultResponse result = ResultResponse.of(
+                ResultCode.FIND_CHAT_ROOMS_SUCCESS,
+                this.chatRoomService.findChatRoomsByPopularity(findChatRoomReq, user.getUserId())
+        );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
 }

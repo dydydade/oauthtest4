@@ -77,4 +77,29 @@ public class ChatRoomService {
                 )).toList()
         );
     }
+
+    public FindChatRoomDto.FindChatRoomRes findChatRoomsByPopularity(
+            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
+            Long userId
+    ) {
+        // TODO: 추후 채팅방 인기순으로 상위 N개 조회하여 반환하도록 수정 필요
+        final var chatRooms = this.chatRoomRepository.findAll();
+
+        return new FindChatRoomDto.FindChatRoomRes(
+                chatRooms.stream().map((chatRoom ->
+                        new FindChatRoomDto.FindChatRoomItemRes(
+                                chatRoom.getName(),
+                                chatRoom.getMaxUserCount(),
+                                chatRoom.getCurrentUserCount(),
+                                chatRoom.getTags(),
+                                chatRoom.getRoomManagerUserId(),
+                                new FindCategoryDto.FindCategoryItemRes(
+                                        chatRoom.getCategory().getCode(),
+                                        chatRoom.getCategory().getName(),
+                                        chatRoom.getCategory().getOrderNum()
+                                )
+                        )
+                )).toList()
+        );
+    }
 }

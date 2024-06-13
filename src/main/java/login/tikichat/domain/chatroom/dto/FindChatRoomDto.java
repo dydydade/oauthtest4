@@ -2,7 +2,10 @@ package login.tikichat.domain.chatroom.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import login.tikichat.domain.category.dto.FindCategoryDto;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
@@ -67,5 +70,23 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             List<FindChatRoomItemRes> chatRooms
     ) {
+    }
+
+    public record FindChatRoomByPopularityReq(
+            @NotNull(message = "인기순으로 조회할 채팅방 갯수는 필수 입력값입니다.")
+            @Schema(description = "인기순으로 조회할 채팅방 갯수", requiredMode = Schema.RequiredMode.NOT_REQUIRED, maxLength = 200, minLength = 1)
+            @Min(value = 1, message = "인기순으로 조회할 채팅방은 최소 1개 이상이어야 합니다.")
+            @Max(value = 25, message = "인기순으로 조회할 채팅방은 최대 25개 이하여야 합니다.")
+            Integer popularityRank,
+            @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, defaultValue = "false", description = "현재 팔로잉한 카테고리의 채팅방만 가져오기")
+            Boolean isFetchOnlyFollowedCategoriesRooms
+    ) {
+        public static final int HOME_PAGE_DEFAULT_POPULARITY_RANK = 25;
+
+        public FindChatRoomByPopularityReq() {
+            this(
+                    25,
+                    false);
+        }
     }
 }
