@@ -1,5 +1,6 @@
 package login.tikichat.global.auth.oauth2.service;
 
+import login.tikichat.domain.user.dto.UserSocialProfileDto;
 import login.tikichat.domain.user.model.SocialProfile;
 import login.tikichat.domain.user.model.SocialType;
 import login.tikichat.domain.user.model.User;
@@ -177,5 +178,24 @@ public class CustomOAuth2UserService {
             return SocialType.FACEBOOK;
         }
         return SocialType.GOOGLE;
+    }
+
+
+    /**
+     * [소셜 프로필 연계 메서드]
+     * @param socialProfileDto
+     * @param user
+     */
+    @Transactional
+    public void linkSocialProfile(UserSocialProfileDto socialProfileDto, User user) {
+
+        SocialProfile socialProfile = SocialProfile.builder()
+                .socialId(socialProfileDto.getSocialId())
+                .socialEmail(socialProfileDto.getSocialEmail())
+                .socialType(socialProfileDto.getSocialType())
+                .user(user)
+                .build();
+
+        socialProfileRepository.save(socialProfile);
     }
 }

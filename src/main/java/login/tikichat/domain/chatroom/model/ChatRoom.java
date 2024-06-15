@@ -48,17 +48,12 @@ public class ChatRoom {
     @JoinColumn(name = "category_code", nullable = false)
     private Category category;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "attachment_id", nullable = false)
-    private Attachment attachment;
-
     public ChatRoom(
             Long roomManagerUserId,
             String name,
             Integer maxUserCount,
             List<String> tags,
-            Category category,
-            Attachment attachment
+            Category category
     ) {
         this.roomManagerUserId = roomManagerUserId;
         this.name = name;
@@ -66,6 +61,5 @@ public class ChatRoom {
         this.tags = tags;
         this.category = category;
         this.currentUserCount = 0;
-        this.attachment = attachment;
     }
 }

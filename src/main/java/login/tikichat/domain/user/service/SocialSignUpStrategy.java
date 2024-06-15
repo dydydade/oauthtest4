@@ -7,6 +7,7 @@ import login.tikichat.domain.user.model.SocialProfile;
 import login.tikichat.domain.user.model.User;
 import login.tikichat.domain.user.repository.SocialProfileRepository;
 import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.global.auth.oauth2.service.CustomOAuth2UserService;
 import login.tikichat.global.exception.user.AlreadySignedUpUserException;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import login.tikichat.global.exception.user.SocialEmailMismatchException;
@@ -22,6 +23,7 @@ public class SocialSignUpStrategy implements SignUpStrategy {
     private final UserRepository userRepository;
     private final SocialProfileRepository socialProfileRepository;
     private final TermsService termsService;
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     /**
      * [회원가입 메서드]
@@ -42,8 +44,10 @@ public class SocialSignUpStrategy implements SignUpStrategy {
 
         User savedUser = userRepository.save(user);
 
+        UserSocialProfileDto socialProfileDto = ((UserSocialSignUpRequest) baseUserSignUpRequest).getSocialProfileDto();
+
         // 소셜 계정 연동정보 저장
-        this.linkSocialProfile((UserSocialSignUpRequest) baseUserSignUpRequest, user);
+        customOAuth2UserService.linkSocialProfile(socialProfileDto, user);
 
         // 회원가입 필수 약관 동의 이력 저장
         services.saveAgreementHistory(baseUserSignUpRequest, user);
@@ -79,24 +83,5 @@ public class SocialSignUpStrategy implements SignUpStrategy {
         if (!userSocialSignUpRequest.getEmail().equals(userSocialSignUpRequest.getSocialProfileDto().getSocialEmail())) {
             throw new SocialEmailMismatchException();
         }
-    }
-
-    /**
-     * [소셜 프로필 연계 메서드]
-     * @param userSignUpRequest
-     * @param user
-     */
-    @Transactional
-    private void linkSocialProfile(UserSocialSignUpRequest userSignUpRequest, User user) {
-        UserSignUpSocialProfileDto socialProfileDto = userSignUpRequest.getSocialProfileDto();
-
-        SocialProfile socialProfile = SocialProfile.builder()
-                .socialId(socialProfileDto.getSocialId())
-                .socialEmail(socialProfileDto.getSocialEmail())
-                .socialType(socialProfileDto.getSocialType())
-                .user(user)
-                .build();
-
-        socialProfileRepository.save(socialProfile);
     }
 }

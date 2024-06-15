@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSignUpSocialProfileDto {
+public class UserSocialProfileDto {
 
     @Schema(description = "연동된 소셜 로그인 서비스 종류")
     @NotEmpty

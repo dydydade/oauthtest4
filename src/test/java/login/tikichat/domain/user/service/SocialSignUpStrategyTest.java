@@ -54,7 +54,7 @@ class SocialSignUpStrategyTest {
 
     UserSignUpTermsAgreementDto termsAgreementDto;
 
-    UserSignUpSocialProfileDto userSignUpSocialProfileDto;
+    UserSocialProfileDto userSocialProfileDto;
 
     UserSocialSignUpRequest userSocialSignUpRequest;
 
@@ -77,14 +77,14 @@ class SocialSignUpStrategyTest {
                 .agreements(List.of(new UserSignUpTermsAgreementDto.TermsAgreement(1L, true, "10.226.234.12", "용찬 의 iPhone 14")))
                 .build();
 
-        userSignUpSocialProfileDto = UserSignUpSocialProfileDto.builder()
+        userSocialProfileDto = UserSocialProfileDto.builder()
                 .socialId(socialId)
                 .socialEmail(socialEmail)
                 .socialType(socialType)
                 .build();
 
         userSocialSignUpRequest = UserSocialSignUpRequest.builder()
-                .socialProfileDto(userSignUpSocialProfileDto)
+                .socialProfileDto(userSocialProfileDto)
                 .email(email)
                 .nickname(nickname)
                 .termsAgreementDto(termsAgreementDto)
@@ -172,7 +172,7 @@ class SocialSignUpStrategyTest {
                 .nickname(userSocialSignUpRequest.getNickname())
                 .termsAgreementDto(userSocialSignUpRequest.getTermsAgreementDto())
                 .socialProfileDto(
-                        UserSignUpSocialProfileDto.builder()
+                        UserSocialProfileDto.builder()
                                 .socialEmail(mismatchedSocialEmail)
                                 .build())
                 .build();
