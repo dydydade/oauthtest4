@@ -26,3 +26,9 @@ spring:
 #        show_sql: true
     hibernate:
       ddl-auto: create
+aws:
+  accessKey: ${AWS_ACCESS_KEY}
+  secretKey: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  s3:
+    bucketName: ${AWS_S3_BUCKET}

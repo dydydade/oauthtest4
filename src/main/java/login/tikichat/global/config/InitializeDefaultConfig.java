@@ -1,5 +1,9 @@
 package login.tikichat.global.config;
 
+import login.tikichat.domain.category.model.Category;
+import login.tikichat.domain.category.repository.CategoryRepository;
+import login.tikichat.domain.chatroom.model.ChatRoom;
+import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
 import login.tikichat.domain.terms.model.TermsType;
 import login.tikichat.domain.terms.service.TermsService;
@@ -16,6 +20,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 초기 상태 등록 Config
@@ -29,6 +34,8 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final SocialProfileRepository socialProfileRepository;
     private final PasswordEncoder passwordEncoder;
     private final TermsService termsService;
+    private final CategoryRepository categoryRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
     /**
      * 앱 계정(User) 및 소셜 연동 정보 저장
@@ -40,6 +47,12 @@ public class InitializeDefaultConfig implements CommandLineRunner {
                 .email("dydydade@gmail.com")
                 .role(Role.SOCIAL)
 //                .password(passwordEncoder.encode("1234"))
+                .build();
+        User user2 = User.builder()
+                .id(2L)
+                .email("n4oahdev@gmail.com")
+                .role(Role.USER)
+                .password(passwordEncoder.encode("1234"))
                 .build();
         SocialProfile naver = SocialProfile.builder()
                 .id(1L)
@@ -63,7 +76,34 @@ public class InitializeDefaultConfig implements CommandLineRunner {
                 .user(user)
                 .build();
 
+        List<Category> categories = List.of(
+            new Category("C_1001", "썸 · 연애", 1),
+            new Category("C_1002", "다이어트 · 헬스", 2),
+            new Category("C_1003", "직장인/취업", 3),
+            new Category("C_1004", "공부/대입", 4),
+            new Category("C_1005", "자기계발/재테크", 5),
+            new Category("C_1006", "가족 · 결혼", 6),
+            new Category("C_1007", "연예인/팬", 7),
+            new Category("C_1008", "드라마 · 영화", 8),
+            new Category("C_1009", "뷰티/패션", 9),
+            new Category("C_1010", "취미", 10)
+        );
+
+        List<ChatRoom> chatRooms = List.of(
+                new ChatRoom(
+                        2L,
+                        "테스트 채팅 룸",
+                        10,
+                        List.of("고민"),
+                        categories.get(0)
+                )
+        );
+
         userRepository.save(user);
+        userRepository.save(user2);
+        categoryRepository.saveAll(categories);
+        chatRoomRepository.saveAll(chatRooms);
+
 //        socialProfileRepository.save(naver);
 //        socialProfileRepository.save(kakao);
 //        socialProfileRepository.save(google);
