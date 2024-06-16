@@ -34,7 +34,15 @@ public enum ErrorCode {
     REGISTERED_USER_NOT_FOUND(404, "U003", "가입된 계정을 찾을 수 없습니다."),
     SOCIAL_EMAIL_MISMATCH(400, "U004", "계정의 이메일과 소셜 연동 정보의 이메일이 일치하지 않습니다."),
     UNAUTHORIZED_ACCOUNT_ATTEMPT(403, "U005", "요청한 계정과 로그인 사용자가 일치하지 않습니다."),
-    USER_NOT_LINKED_WITH_SOCIAL(400, "U006", "이미 가입한 계정이 있습니다. 로그인을 통해 소셜 계정과 연동하세요.");
+    USER_NOT_LINKED_WITH_SOCIAL(400, "U006", "이미 가입한 계정이 있습니다. 로그인을 통해 소셜 계정과 연동하세요."),
+    NOT_FOUND_USER(404, "U007", "찾을 수 없는 유저입니다."),
+
+    // Category
+    NOT_FOUND_CATEGORY(404, "CA001", "존재하지 않는 카테고리입니다."),
+
+    // ChatRoom
+    NOT_FOUND_CHAT_ROOM(404, "CR001", "존재하지 않는 채팅방입니다.")
+    ;
 
 
     private int status;

@@ -12,7 +12,6 @@ import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,12 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.List;
 
 @SecurityRequirement(name = "JWT")
 @RestController
@@ -39,15 +33,17 @@ public class ChatRoomController {
             value = ""
     )
     public ResponseEntity<ResultResponse> createChatRoom(
-            @RequestPart(value = "fileUploadReq")
+            @RequestBody
             @Valid
             @Parameter(required = true)
             CreateChatRoomDto.CreateChatRoomReq createChatRoomReq,
             @AuthenticationPrincipal UserDetailInfo user
-    ) throws IOException {
+    ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_USER_INFO_SUCCESS,
-                this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
+                new CreateChatRoomDto.CreateChatRoomRes(
+                        this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
+                )
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }

@@ -4,6 +4,8 @@ import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.chatroom_participant.model.ChatRoomParticipant;
 import login.tikichat.domain.chatroom_participant.repository.ChatRoomParticipantRepository;
 import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.global.exception.BusinessException;
+import login.tikichat.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +20,12 @@ public class ChatRoomParticipantService {
 
     @Transactional
     public void joinChatRoom(Long chatRoomId, Long userId) {
-        final var chatRoom = this.chatRoomRepository.findById(chatRoomId).orElseThrow();
-        final var user = this.userRepository.findById(userId).orElseThrow();
+        final var chatRoom = this.chatRoomRepository.findById(chatRoomId).orElseThrow(
+                () -> new BusinessException(ErrorCode.NOT_FOUND_CHAT_ROOM)
+        );
+        final var user = this.userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(ErrorCode.NOT_FOUND_USER)
+        );
 
         final var chatRoomParticipant = new ChatRoomParticipant(user, chatRoom);
 
@@ -30,8 +36,13 @@ public class ChatRoomParticipantService {
 
     @Transactional
     public void leaveChatRoom(Long chatRoomId, Long userId) {
-        final var chatRoom = this.chatRoomRepository.findById(chatRoomId).orElseThrow();
-        final var user = this.userRepository.findById(userId).orElseThrow();
+        final var chatRoom = this.chatRoomRepository.findById(chatRoomId).orElseThrow(
+                () -> new BusinessException(ErrorCode.NOT_FOUND_CHAT_ROOM)
+        );
+        final var user = this.userRepository.findById(userId).orElseThrow(
+                () -> new BusinessException(ErrorCode.NOT_FOUND_USER)
+        );
+
         final var chatRoomParticipant = this.chatRoomParticipantRepository.findByUserAndChatRoom(user, chatRoom).orElseThrow();
 
         chatRoomRepository.subtractCurrentUserCount(chatRoom.getId());
