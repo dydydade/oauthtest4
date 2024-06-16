@@ -30,7 +30,7 @@ public class AttachmentService {
 
 
     @Transactional
-    public Long uploadChatImage(Long uploaderUserId, Long chatRoomId, MultipartFile multipartFile) throws IOException {
+    public Long uploadChatFile(Long uploaderUserId, Long chatRoomId, MultipartFile multipartFile) throws IOException {
         final var ext = FileUtils.getExtByContentType(multipartFile.getContentType());
         final var uploader = userRepository.findById(uploaderUserId).orElseThrow();
 
@@ -55,23 +55,6 @@ public class AttachmentService {
         chatRoomService.linkAttachment(chatRoomId, attachment);
 
         return attachment.getId();
-    }
-
-    @Transactional
-    public URL setUserProfileImage(Long userId, MultipartFile multipartFile) throws IOException {
-        final var ext = FileUtils.getExtByContentType(multipartFile.getContentType());
-        final var user = userRepository.findById(userId).orElseThrow();
-
-        final var path = "profile/" + FileUtils.getTimePath();  // 프로필 이미지용 디렉토리 구분
-        final var filename = FileUtils.getRandomFilename(ext);
-
-        fileStorage.upload(path + "/" + filename, multipartFile.getInputStream());
-        final var fileUrl = fileUrlGenerator.generatePublicUrl(path + "/" + filename);
-
-        user.updateImageUrl(fileUrl); // 사용자 프로필 이미지 정보 업데이트
-        userRepository.save(user);
-
-        return user.getImageUrl();
     }
 }
 

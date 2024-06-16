@@ -4,19 +4,25 @@ import login.tikichat.domain.user.model.Role;
 import login.tikichat.domain.user.model.User;
 import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.global.component.FileStorage;
+import login.tikichat.global.component.FileUrlGenerator;
 import login.tikichat.global.exception.user.RegisteredUserNotFoundException;
 import login.tikichat.global.exception.user.UnauthorizedAccountAttemptException;
+import login.tikichat.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -24,6 +30,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final NormalSignUpStrategy normalSignUpStrategy;
     private final SocialSignUpStrategy socialSignUpStrategy;
+    private final FileStorage fileStorage;
+    private final FileUrlGenerator fileUrlGenerator;
 
     /**
      * [일반 회원가입 메서드]
@@ -70,7 +78,6 @@ public class UserService {
      * @param email
      * @return
      */
-    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
@@ -82,7 +89,6 @@ public class UserService {
      * @param email
      * @return
      */
-    @Transactional(readOnly = true)
     public FindUserResponse findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
@@ -95,7 +101,6 @@ public class UserService {
      * @param nickname
      * @return
      */
-    @Transactional(readOnly = true)
     public boolean checkNicknameAvailability(String nickname) {
         Optional<User> userOptional = userRepository.findByNickname(nickname);
         if (userOptional.isPresent()) {
@@ -123,6 +128,30 @@ public class UserService {
         }
 
         user.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+    }
+
+    /**
+     * [프로필 사진 설정하는 메서드]
+     * @param userId
+     * @param multipartFile
+     * @return
+     * @throws IOException
+     */
+    @Transactional
+    public URL setUserProfileImage(Long userId, MultipartFile multipartFile) throws IOException {
+        final var ext = FileUtils.getExtByContentType(multipartFile.getContentType());
+        final var user = userRepository.findById(userId).orElseThrow();
+
+        final var path = "profile/" + FileUtils.getTimePath();  // 프로필 이미지용 디렉토리 구분
+        final var filename = FileUtils.getRandomFilename(ext);
+
+        fileStorage.upload(path + "/" + filename, multipartFile.getInputStream());
+        final var fileUrl = fileUrlGenerator.generatePublicUrl(path + "/" + filename);
+
+        user.updateImageUrl(fileUrl); // 사용자 프로필 이미지 정보 업데이트
+        userRepository.save(user);
+
+        return user.getImageUrl();
     }
 }
 
