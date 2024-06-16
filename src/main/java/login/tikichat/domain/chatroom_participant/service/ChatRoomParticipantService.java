@@ -1,5 +1,6 @@
 package login.tikichat.domain.chatroom_participant.service;
 
+import jakarta.persistence.OptimisticLockException;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.chatroom_participant.model.ChatRoomParticipant;
 import login.tikichat.domain.chatroom_participant.repository.ChatRoomParticipantRepository;
@@ -29,7 +30,15 @@ public class ChatRoomParticipantService {
 
         final var chatRoomParticipant = new ChatRoomParticipant(user, chatRoom);
 
-        chatRoomRepository.addCurrentUserCount(chatRoom.getId());
+        if (chatRoom.getCurrentUserCount() + 1 > chatRoom.getMaxUserCount()) {
+            throw new BusinessException(ErrorCode.FULL_PARTICIPANT_CHAT_ROOM);
+        }
+
+        try {
+            chatRoomRepository.addCurrentUserCount(chatRoom.getId());
+        } catch (OptimisticLockException e) {
+            throw new BusinessException(ErrorCode.FULL_PARTICIPANT_CHAT_ROOM);
+        }
 
         this.chatRoomParticipantRepository.save(chatRoomParticipant);
     }

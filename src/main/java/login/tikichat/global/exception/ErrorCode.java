@@ -41,7 +41,10 @@ public enum ErrorCode {
     NOT_FOUND_CATEGORY(404, "CA001", "존재하지 않는 카테고리입니다."),
 
     // ChatRoom
-    NOT_FOUND_CHAT_ROOM(404, "CR001", "존재하지 않는 채팅방입니다.")
+    NOT_FOUND_CHAT_ROOM(404, "CR001", "존재하지 않는 채팅방입니다."),
+
+    // ChatRoom Participant
+    FULL_PARTICIPANT_CHAT_ROOM(409, "CRP001", "채팅방 인원의 정원이 찼습니다.")
     ;
 
 
