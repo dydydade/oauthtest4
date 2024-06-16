@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-@Tag(name = "Terms API", description = "이용약관 관리 API")
+@Tag(name = "Terms API", description = "이용약관 API")
 @RestController
 @RequestMapping("/api/v1/terms")
 @RequiredArgsConstructor

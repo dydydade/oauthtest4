@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.NoSuchAlgorithmException;
 
-@Tag(name = "Auth API", description = "인증 관리 API")
+@Tag(name = "Auth API", description = "인증 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
