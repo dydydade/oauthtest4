@@ -19,23 +19,15 @@ import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.net.URI;
-import java.util.Map;
 
 
 @Tag(name = "Social Login API", description = "소셜 로그인 API")
 @RestController
 @RequiredArgsConstructor
 public class OAuth2UserRestController {
-
-    private final ClientRegistrationRepository clientRegistrationRepository;
 
     private final CustomOAuth2UserService customOAuth2UserService;
 
@@ -75,108 +67,6 @@ public class OAuth2UserRestController {
         UserDto user = oAuth2UserDto.getUser();
 
         if (user == null) {
-            ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
-            return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
-        }
-
-        ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_LOGIN_SUCCESS, oAuth2UserDto);
-
-        String accessToken = jwtService.createAccessToken(oAuth2UserDto.getUser().getEmail());
-        String refreshToken = jwtService.createRefreshToken();
-
-        jwtUtils.setAccessAndRefreshToken(response, accessToken, refreshToken, result);
-        userRefreshTokenService.findAndUpdateUserRefreshToken(oAuth2UserDto.getUser().getEmail(), deviceId, refreshToken);
-
-        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
-    }
-
-    /**
-     * [테스트용 임시 메서드] 클라이언트에서 AccessToken 보내주지 않아도 테스트할 수 있도록
-     * 백엔드에서 AccessToken 받아오는 메서드
-     * @param registrationId
-     * @param response
-     * @throws IOException
-     */
-    @GetMapping("/login/oauth2/{registrationId}")
-    public void redirectToAuthorizationProvider(@PathVariable String registrationId, HttpServletResponse response) throws IOException {
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
-
-        String redirectUri = UriComponentsBuilder.fromUriString(clientRegistration.getProviderDetails().getAuthorizationUri())
-                .queryParam("client_id", clientRegistration.getClientId())
-                .queryParam("redirect_uri", clientRegistration.getRedirectUri())
-                .queryParam("response_type", "code")
-                .queryParam("scope", String.join(" ", clientRegistration.getScopes()))
-                .queryParam("state", STATE)
-                .toUriString();
-
-        response.sendRedirect(redirectUri);
-    }
-
-    /**
-     * [테스트용 임시 메서드] 클라이언트에서 AccessToken 보내주지 않아도 테스트할 수 있도록
-     * 백엔드에서 AccessToken 받아오는 메서드
-     * @param registrationId
-     * @param response
-     * @throws IOException
-     */
-    @GetMapping("/login/oauth2/code/{registrationId}")
-    public void test(@PathVariable String registrationId, @RequestParam String code, @RequestParam String state, HttpServletResponse response) throws IllegalAccessException, IOException {
-        // state 값이 일치하는지 검증합니다.
-        if (!STATE.equals(state)) {
-            throw new IllegalAccessException();
-        }
-
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        URI tokenUri = UriComponentsBuilder.fromUriString(clientRegistration.getProviderDetails().getTokenUri())
-                .build()
-                .toUri();
-
-        String body = UriComponentsBuilder.newInstance()
-                .queryParam("grant_type", "authorization_code")
-                .queryParam("code", code)
-                .queryParam("redirect_uri", clientRegistration.getRedirectUri())
-                .queryParam("client_id", clientRegistration.getClientId())
-                .queryParam("client_secret", clientRegistration.getClientSecret())
-                .build()
-                .toUriString()
-                .substring(1); // Remove the leading '?' from the query string
-
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<Map> result = restTemplate.exchange(
-                tokenUri,
-                HttpMethod.POST,
-                entity,
-                Map.class
-        );
-
-        String redirectUri = "/api/v1/auth/social/login/test/" + registrationId + "?oauth2AccessToken" +
-                "=" + result.getBody().get("access_token");
-
-        response.sendRedirect(redirectUri);
-    }
-
-    /**
-     * [테스트용 임시 메서드] 클라이언트에서 AccessToken 보내주지 않아도 테스트할 수 있도록
-     * 백엔드에서 AccessToken 받아오는 메서드
-     * @param registrationId
-     * @param response
-     * @throws IOException
-     */
-    @GetMapping("/api/v1/auth/social/login/test/{registrationId}")
-    public ResponseEntity<Object> login(@PathVariable String registrationId, @RequestParam String oauth2AccessToken, HttpServletRequest request, HttpServletResponse response) throws IOException {
-
-        String deviceId = jwtUtils.extractDeviceIdFromHeader(request);
-
-        OAuth2UserDto oAuth2UserDto = customOAuth2UserService.socialLogin(registrationId, oauth2AccessToken);
-        UserDto user = oAuth2UserDto.getUser();
-
-        if (!oAuth2UserDto.isUserExists()) {
             ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_EMAIL_NOT_REGISTERED, oAuth2UserDto);
             return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
         }
