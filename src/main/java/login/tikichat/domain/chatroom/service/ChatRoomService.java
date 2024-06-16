@@ -1,5 +1,6 @@
 package login.tikichat.domain.chatroom.service;
 
+import login.tikichat.domain.attachment.model.Attachment;
 import login.tikichat.domain.category.dto.FindCategoryDto;
 import login.tikichat.domain.category.repository.CategoryRepository;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
@@ -9,6 +10,7 @@ import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.chatroom_participant.service.ChatRoomParticipantService;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
+import login.tikichat.global.exception.chatroom.ChatRoomNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,5 +96,15 @@ public class ChatRoomService {
                         )
                 )).toList()
         );
+    }
+
+    public ChatRoom findById(Long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new ChatRoomNotFoundException());
+    }
+
+    @Transactional
+    public void linkAttachment(Long chatRoomId, Attachment attachment) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new ChatRoomNotFoundException());
+        chatRoom.addAttachment(attachment);
     }
 }

@@ -1,21 +1,16 @@
 package login.tikichat.domain.chatroom.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import login.tikichat.domain.attachment.model.Attachment;
 import login.tikichat.domain.category.model.Category;
+import login.tikichat.domain.user.model.UserRefreshToken;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -48,6 +43,9 @@ public class ChatRoom {
     @JoinColumn(name = "category_code", nullable = false)
     private Category category;
 
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    private List<Attachment> attachments = new ArrayList<>();
+
     public ChatRoom(
             Long roomManagerUserId,
             String name,
@@ -61,5 +59,13 @@ public class ChatRoom {
         this.tags = tags;
         this.category = category;
         this.currentUserCount = 0;
+    }
+
+    // 연관관계 편의 메소드
+    public void addAttachment(Attachment attachment) {
+        if (!this.attachments.contains(attachment)) {
+            this.attachments.add(attachment);
+            attachment.setChatRoom(this);
+        }
     }
 }
