@@ -6,10 +6,12 @@ import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.model.QChatRoom;
 import login.tikichat.domain.chatroom.repository.CustomChatRoomRepository;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements CustomChatRoomRepository {
     public ChatRoomRepositoryImpl() {
         super(ChatRoom.class);
@@ -49,7 +51,7 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
         Optional.ofNullable(selectQuery.fetchOne()).orElseThrow();
 
         updateQuery.where(chatRoomQ.id.eq(id));
-        updateQuery.where(chatRoomQ.maxUserCount.loe(chatRoomQ.currentUserCount.add(1)));
+        updateQuery.where(chatRoomQ.maxUserCount.goe(chatRoomQ.currentUserCount.add(1)));
         updateQuery.set(chatRoomQ.currentUserCount, chatRoomQ.currentUserCount.add(1));
 
         if (updateQuery.execute() != 1) {

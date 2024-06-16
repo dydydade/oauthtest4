@@ -7,6 +7,8 @@ import login.tikichat.domain.chatroom.dto.FindChatRoomDto;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.chatroom_participant.service.ChatRoomParticipantService;
+import login.tikichat.global.exception.BusinessException;
+import login.tikichat.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +30,7 @@ public class ChatRoomService {
     ) {
         final var category = this.categoryRepository.findByCode(
                 createChatRoomReq.categoryCode()
-        ).orElseThrow();
+        ).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
 
         final var chatRoot = new ChatRoom(
                 rootManagerUserId,
