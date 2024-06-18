@@ -111,18 +111,14 @@ public class UserService {
         }
     }
 
+    /**
+     * [비밀번호 설정(소셜 계정 → 일반 계정으로 전환) 메서드]
+     * @param email
+     * @param passwordChangeRequest
+     */
     @Transactional
-    public void setUserPassword(
-            String email,
-            PasswordChangeRequest passwordChangeRequest
-    ) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-
-        if (userOptional.isEmpty()) {
-            throw new RegisteredUserNotFoundException();
-        }
-
-        User user = userOptional.get();
+    public void setUserPassword(String email, PasswordChangeRequest passwordChangeRequest) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
 
         if (user.getRole().equals(Role.SOCIAL)) {
             user.setRoleAsUser();
