@@ -12,8 +12,9 @@ public enum ResultCode {
     SOCIAL_REGISTER_SUCCESS(200, "U002", "소셜 회원 가입을 완료하였습니다."),
     MEMBER_WITHDRAWAL_SUCCESS(200, "U003", "회원 탈퇴를 완료하였습니다."),
     NICKNAME_AVAILABLE_SUCCESS(200, "U004", "사용 가능한 닉네임입니다."),
-    FIND_USER_INFO_SUCCESS(200, "U004", "회원 정보 조회에 성공하였습니다."),
-    LOGIN_SUCCESS(200, "U005", "로그인에 성공하였습니다."),
+    FIND_USER_INFO_SUCCESS(200, "U005", "회원 정보 조회에 성공하였습니다."),
+    LOGIN_SUCCESS(200, "U006", "로그인에 성공하였습니다."),
+    NICKNAME_SET_SUCCESS(200, "U007", "닉네임 설정을 완료하였습니다."),
 
     // Auth
     PASSWORD_SET_SUCCESS(200, "A001", "비밀번호 설정을 완료하였습니다."),

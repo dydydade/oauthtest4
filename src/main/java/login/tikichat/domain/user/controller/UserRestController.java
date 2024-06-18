@@ -92,7 +92,7 @@ public class UserRestController {
     }
 
     /**
-     * 회원 탈퇴
+     * [회원 탈퇴]
      * @param userId      탈퇴하려는 계정의 ID
      * @param currentUser 로그인 사용자 정보 (UserDetails)
      * @return
@@ -117,6 +117,11 @@ public class UserRestController {
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
+    /**
+     * [닉네임 사용 가능 여부 조회]
+     * @param nickname
+     * @return
+     */
     @GetMapping("/nicknames")
     @Operation(summary = "닉네임 사용 가능 여부 조회", description = "닉네임 사용 가능 여부 조회 API 입니다.")
     @ApiResponses(value = {
@@ -137,6 +142,12 @@ public class UserRestController {
         throw new NicknameAlreadyInUseException();
     }
 
+    /**
+     * [회원 비밀번호 설정]
+     * @param email
+     * @param passwordChangeRequest
+     * @return
+     */
     @PutMapping("/{email}/password")
     @Operation(summary = "회원 비밀번호 설정", description = "회원 비밀번호 설정 API 입니다.")
     @ApiResponses(value = {
@@ -151,6 +162,28 @@ public class UserRestController {
         userService.setUserPassword(email, passwordChangeRequest);
 
         ResultResponse result = ResultResponse.of(ResultCode.PASSWORD_SET_SUCCESS, null);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    /**
+     * [회원 닉네임 설정]
+     * @param email
+     * @param userNicknameChangeRequest
+     * @return
+     */
+    @PutMapping("/{email}/nickname")
+    @Operation(summary = "회원 닉네임 설정", description = "회원 닉네임 설정 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "닉네임 설정을 완료하였습니다.", useReturnTypeSchema = true),
+    })
+    public ResponseEntity<ResultResponse> setUserNickname(
+            @PathVariable String email,
+            @RequestBody UserNicknameChangeRequest userNicknameChangeRequest
+    ) {
+
+        userService.setUserNickname(email, userNicknameChangeRequest);
+
+        ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_SET_SUCCESS, null);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 }

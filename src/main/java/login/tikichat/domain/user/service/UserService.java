@@ -6,6 +6,7 @@ import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.repository.UserRepository;
 import login.tikichat.global.component.FileStorage;
 import login.tikichat.global.component.FileUrlGenerator;
+import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import login.tikichat.global.exception.user.RegisteredUserNotFoundException;
 import login.tikichat.global.exception.user.UnauthorizedAccountAttemptException;
 import login.tikichat.utils.FileUtils;
@@ -128,6 +129,21 @@ public class UserService {
         }
 
         user.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+    }
+
+    /**
+     * [닉네임 설정 메서드]
+     * @param email
+     * @param request
+     */
+    @Transactional
+    public void setUserNickname(String email, UserNicknameChangeRequest request) {
+        userRepository.findByNickname(request.getNewNickname()).ifPresent(nickname -> {
+            throw new NicknameAlreadyInUseException();
+        });
+
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
+        user.updateNickname(request.getNewNickname());
     }
 
     /**
