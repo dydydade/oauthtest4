@@ -28,8 +28,8 @@ services:
         image: dydydade/tikichat_server:latest
         restart: always
         depends_on:
-            - lemon_db
-            - lemon_redis
+            - tikichat_db
+            - tikichat_redis
         ports:
             - "8080:8080"
         networks:
