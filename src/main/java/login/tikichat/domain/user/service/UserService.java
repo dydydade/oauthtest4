@@ -64,15 +64,14 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RegisteredUserNotFoundException());
 
-        if (!user.isSameUser(currentUser.getUsername())) { // username 에 email 저장됨
-            throw new UnauthorizedAccountAttemptException();
-        }
+        this.verifyUserMatch(currentUser, user);
 
         userRepository.deleteById(userId);
         return UserSignOffResponse.builder()
                 .userId(userId)
                 .build();
     }
+
 
     /**
      * [등록된 email 로 유저를 조회하는 메서드]
@@ -91,8 +90,7 @@ public class UserService {
      * @return
      */
     public FindUserResponse findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(RegisteredUserNotFoundException::new);
+        User user = this.findByEmail(email);
         boolean passwordExists = user.getRole().equals(Role.USER); // 비밀번호가 존재하면 일반 계정
         return new FindUserResponse(user.getEmail(), passwordExists);
     }
@@ -103,12 +101,7 @@ public class UserService {
      * @return
      */
     public boolean checkNicknameAvailability(String nickname) {
-        Optional<User> userOptional = userRepository.findByNickname(nickname);
-        if (userOptional.isPresent()) {
-            return false; // 닉네임이 이미 존재할 경우
-        } else {
-            return true; // 닉네임이 존재하지 않을 경우
-        }
+        return !userRepository.existsByNickname(nickname);
     }
 
     /**
@@ -133,26 +126,27 @@ public class UserService {
      * @param request
      */
     @Transactional
-    public void setUserNickname(String email, UserNicknameChangeRequest request) {
+    public void setUserNickname(String email, UserDetails currentUser, UserNicknameChangeRequest request) {
         userRepository.findByNickname(request.getNewNickname()).ifPresent(nickname -> {
             throw new NicknameAlreadyInUseException();
         });
-
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
+        this.verifyUserMatch(currentUser, user);
         user.updateNickname(request.getNewNickname());
     }
 
     /**
      * [프로필 사진 설정하는 메서드]
-     * @param userId
+     * @param email
      * @param multipartFile
      * @return
      * @throws IOException
      */
     @Transactional
-    public URL setUserProfileImage(Long userId, MultipartFile multipartFile) throws IOException {
+    public URL setUserProfileImage(String email, UserDetails currentUser, MultipartFile multipartFile) throws IOException {
         final var ext = FileUtils.getExtByContentType(multipartFile.getContentType());
-        final var user = userRepository.findById(userId).orElseThrow();
+        final var user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
+        this.verifyUserMatch(currentUser, user);
 
         final var path = "profile/" + FileUtils.getTimePath();  // 프로필 이미지용 디렉토리 구분
         final var filename = FileUtils.getRandomFilename(ext);
@@ -164,6 +158,12 @@ public class UserService {
         userRepository.save(user);
 
         return user.getImageUrl();
+    }
+
+    private static void verifyUserMatch(UserDetails currentUser, User user) {
+        if (!user.isSameUser(currentUser.getUsername())) { // username 에 email 저장됨
+            throw new UnauthorizedAccountAttemptException();
+        }
     }
 }
 

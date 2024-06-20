@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.service.UserService;
+import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.auth.verification.service.AuthService;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import login.tikichat.global.response.ResultCode;
@@ -23,6 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @Tag(name = "User API", description = "사용자 관리 API")
@@ -178,10 +182,29 @@ public class UserRestController {
     })
     public ResponseEntity<ResultResponse> setUserNickname(
             @PathVariable String email,
+            @AuthenticationPrincipal UserDetailInfo user,
             @RequestBody UserNicknameChangeRequest userNicknameChangeRequest
     ) {
+        userService.setUserNickname(email, user, userNicknameChangeRequest);
 
-        userService.setUserNickname(email, userNicknameChangeRequest);
+        ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_SET_SUCCESS, null);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+
+    @PutMapping("/{email}/profile/image")
+    @Operation(summary = "회원 프로필 이미지 설정", description = "회원 프로필 이미지 설정 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 이미지 설정을 완료하였습니다.", useReturnTypeSchema = true),
+    })
+    public ResponseEntity<ResultResponse> setUserProfileImage(
+            @PathVariable String email,
+            @AuthenticationPrincipal UserDetailInfo user,
+            @RequestPart(value = "file", required = true)
+            MultipartFile profileImageFile
+    ) throws IOException {
+
+        userService.setUserProfileImage(email, user, profileImageFile);
 
         ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_SET_SUCCESS, null);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
