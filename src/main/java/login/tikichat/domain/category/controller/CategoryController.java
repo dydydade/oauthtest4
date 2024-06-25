@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@Tag(name = "ChatRoom Category", description = "채팅방 카테고리")
+@Tag(name = "ChatRoom Category API", description = "채팅방 카테고리 API")
 @RequiredArgsConstructor
 @SecurityRequirement(name = "JWT")
 public class CategoryController {

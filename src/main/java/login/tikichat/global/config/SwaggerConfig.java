@@ -15,8 +15,8 @@ import java.util.List;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "티키챗 서버 회원/인증 API",
-                description = "티키챗 서버 회원/인증 모듈 API 명세서",
+                title = "티키챗 서버 API",
+                description = "티키챗 서버 API 명세서",
                 version = "v1"
         )
 )

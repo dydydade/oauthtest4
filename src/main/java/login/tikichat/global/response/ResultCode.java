@@ -26,7 +26,10 @@ public enum ResultCode {
 
     // Terms
     TERMS_REGISTRATION_SUCCESS(200, "T001", "이용 약관을 등록하였습니다."),
-    TERMS_LIST_RETRIEVED_SUCCESS(200, "T002", "최신 이용약관 목록을 조회하였습니다.");
+    TERMS_LIST_RETRIEVED_SUCCESS(200, "T002", "최신 이용약관 목록을 조회하였습니다."),
+
+    // ChatRoom
+    FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다.");
 
     private int status;
     private final String code;
