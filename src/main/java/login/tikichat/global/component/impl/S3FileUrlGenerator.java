@@ -18,9 +18,12 @@ public class S3FileUrlGenerator implements FileUrlGenerator {
     @Value("${aws.s3.bucketName}")
     private String bucketName;
 
+    @Value("${aws.region}")
+    private String region;
+
     @Override
     public URL generatePublicUrl(String path) throws MalformedURLException {
-        String urlString = String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, "your-region", path);
+        String urlString = String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, path);
         return new URL(urlString);
     }
 }
