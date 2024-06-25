@@ -4,19 +4,26 @@ import login.tikichat.domain.user.model.Role;
 import login.tikichat.domain.user.model.User;
 import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.global.component.FileStorage;
+import login.tikichat.global.component.FileUrlGenerator;
+import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import login.tikichat.global.exception.user.RegisteredUserNotFoundException;
 import login.tikichat.global.exception.user.UnauthorizedAccountAttemptException;
+import login.tikichat.utils.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -24,6 +31,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final NormalSignUpStrategy normalSignUpStrategy;
     private final SocialSignUpStrategy socialSignUpStrategy;
+    private final FileStorage fileStorage;
+    private final FileUrlGenerator fileUrlGenerator;
 
     /**
      * [일반 회원가입 메서드]
@@ -55,9 +64,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RegisteredUserNotFoundException());
 
-        if (!user.isSameUser(currentUser.getUsername())) { // username 에 email 저장됨
-            throw new UnauthorizedAccountAttemptException();
-        }
+        this.verifyUserMatch(currentUser, user);
 
         userRepository.deleteById(userId);
         return UserSignOffResponse.builder()
@@ -65,12 +72,12 @@ public class UserService {
                 .build();
     }
 
+
     /**
      * [등록된 email 로 유저를 조회하는 메서드]
      * @param email
      * @return
      */
-    @Transactional(readOnly = true)
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(RegisteredUserNotFoundException::new);
@@ -82,10 +89,8 @@ public class UserService {
      * @param email
      * @return
      */
-    @Transactional(readOnly = true)
     public FindUserResponse findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(RegisteredUserNotFoundException::new);
+        User user = this.findByEmail(email);
         boolean passwordExists = user.getRole().equals(Role.USER); // 비밀번호가 존재하면 일반 계정
         return new FindUserResponse(user.getEmail(), passwordExists);
     }
@@ -95,34 +100,70 @@ public class UserService {
      * @param nickname
      * @return
      */
-    @Transactional(readOnly = true)
     public boolean checkNicknameAvailability(String nickname) {
-        Optional<User> userOptional = userRepository.findByNickname(nickname);
-        if (userOptional.isPresent()) {
-            return false; // 닉네임이 이미 존재할 경우
-        } else {
-            return true; // 닉네임이 존재하지 않을 경우
-        }
+        return !userRepository.existsByNickname(nickname);
     }
 
+    /**
+     * [비밀번호 설정(소셜 계정 → 일반 계정으로 전환) 메서드]
+     * @param email
+     * @param passwordChangeRequest
+     */
     @Transactional
-    public void setUserPassword(
-            String email,
-            PasswordChangeRequest passwordChangeRequest
-    ) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-
-        if (userOptional.isEmpty()) {
-            throw new RegisteredUserNotFoundException();
-        }
-
-        User user = userOptional.get();
+    public void setUserPassword(String email, PasswordChangeRequest passwordChangeRequest) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
 
         if (user.getRole().equals(Role.SOCIAL)) {
             user.setRoleAsUser();
         }
 
         user.updatePassword(passwordEncoder.encode(passwordChangeRequest.getNewPassword()));
+    }
+
+    /**
+     * [닉네임 설정 메서드]
+     * @param email
+     * @param request
+     */
+    @Transactional
+    public void setUserNickname(String email, UserDetails currentUser, UserNicknameChangeRequest request) {
+        userRepository.findByNickname(request.getNewNickname()).ifPresent(nickname -> {
+            throw new NicknameAlreadyInUseException();
+        });
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
+        this.verifyUserMatch(currentUser, user);
+        user.updateNickname(request.getNewNickname());
+    }
+
+    /**
+     * [프로필 사진 설정하는 메서드]
+     * @param email
+     * @param multipartFile
+     * @return
+     * @throws IOException
+     */
+    @Transactional
+    public URL setUserProfileImage(String email, UserDetails currentUser, MultipartFile multipartFile) throws IOException {
+        final var ext = FileUtils.getExtByContentType(multipartFile.getContentType());
+        final var user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
+        this.verifyUserMatch(currentUser, user);
+
+        final var path = "profile/" + FileUtils.getTimePath();  // 프로필 이미지용 디렉토리 구분
+        final var filename = FileUtils.getRandomFilename(ext);
+
+        fileStorage.upload(path + "/" + filename, multipartFile.getInputStream());
+        final var fileUrl = fileUrlGenerator.generatePublicUrl(path + "/" + filename);
+
+        user.updateImageUrl(fileUrl); // 사용자 프로필 이미지 정보 업데이트
+        userRepository.save(user);
+
+        return user.getImageUrl();
+    }
+
+    private static void verifyUserMatch(UserDetails currentUser, User user) {
+        if (!user.isSameUser(currentUser.getUsername())) { // username 에 email 저장됨
+            throw new UnauthorizedAccountAttemptException();
+        }
     }
 }
 

@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.service.UserService;
+import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.auth.verification.service.AuthService;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import login.tikichat.global.response.ResultCode;
@@ -23,6 +24,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 
 @Tag(name = "User API", description = "사용자 관리 API")
@@ -92,7 +96,7 @@ public class UserRestController {
     }
 
     /**
-     * 회원 탈퇴
+     * [회원 탈퇴]
      * @param userId      탈퇴하려는 계정의 ID
      * @param currentUser 로그인 사용자 정보 (UserDetails)
      * @return
@@ -117,6 +121,11 @@ public class UserRestController {
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
+    /**
+     * [닉네임 사용 가능 여부 조회]
+     * @param nickname
+     * @return
+     */
     @GetMapping("/nicknames")
     @Operation(summary = "닉네임 사용 가능 여부 조회", description = "닉네임 사용 가능 여부 조회 API 입니다.")
     @ApiResponses(value = {
@@ -137,6 +146,12 @@ public class UserRestController {
         throw new NicknameAlreadyInUseException();
     }
 
+    /**
+     * [회원 비밀번호 설정]
+     * @param email
+     * @param passwordChangeRequest
+     * @return
+     */
     @PutMapping("/{email}/password")
     @Operation(summary = "회원 비밀번호 설정", description = "회원 비밀번호 설정 API 입니다.")
     @ApiResponses(value = {
@@ -151,6 +166,47 @@ public class UserRestController {
         userService.setUserPassword(email, passwordChangeRequest);
 
         ResultResponse result = ResultResponse.of(ResultCode.PASSWORD_SET_SUCCESS, null);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    /**
+     * [회원 닉네임 설정]
+     * @param email
+     * @param userNicknameChangeRequest
+     * @return
+     */
+    @PutMapping("/{email}/nickname")
+    @Operation(summary = "회원 닉네임 설정", description = "회원 닉네임 설정 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "닉네임 설정을 완료하였습니다.", useReturnTypeSchema = true),
+    })
+    public ResponseEntity<ResultResponse> setUserNickname(
+            @PathVariable String email,
+            @AuthenticationPrincipal UserDetailInfo user,
+            @RequestBody UserNicknameChangeRequest userNicknameChangeRequest
+    ) {
+        userService.setUserNickname(email, user, userNicknameChangeRequest);
+
+        ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_SET_SUCCESS, null);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+
+    @PutMapping("/{email}/profile/image")
+    @Operation(summary = "회원 프로필 이미지 설정", description = "회원 프로필 이미지 설정 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "프로필 이미지 설정을 완료하였습니다.", useReturnTypeSchema = true),
+    })
+    public ResponseEntity<ResultResponse> setUserProfileImage(
+            @PathVariable String email,
+            @AuthenticationPrincipal UserDetailInfo user,
+            @RequestPart(value = "file", required = true)
+            MultipartFile profileImageFile
+    ) throws IOException {
+
+        userService.setUserProfileImage(email, user, profileImageFile);
+
+        ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_SET_SUCCESS, null);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 }
