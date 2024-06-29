@@ -38,7 +38,7 @@ public class SwaggerConfig {
                         .bearerFormat(SECURITY_JWT_NAME));
 
         return new OpenAPI()
-                .components(components);
-//                .servers(List.of(new Server().url("https://tiki-chat.com").description("Production server")));
+                .components(components)
+                .servers(List.of(new Server().url("https://tiki-chat.com").description("Production server")));
     }
 }
