@@ -15,8 +15,8 @@ import java.util.List;
 
 @OpenAPIDefinition(
         info = @Info(
-                title = "티키챗 서버 회원/인증 API",
-                description = "티키챗 서버 회원/인증 모듈 API 명세서",
+                title = "티키챗 서버 API",
+                description = "티키챗 서버 API 명세서",
                 version = "v1"
         )
 )
@@ -38,7 +38,7 @@ public class SwaggerConfig {
                         .bearerFormat(SECURITY_JWT_NAME));
 
         return new OpenAPI()
-                .components(components);
-//                .servers(List.of(new Server().url("https://tiki-chat.com").description("Production server")));
+                .components(components)
+                .servers(List.of(new Server().url("https://tiki-chat.com").description("Production server")));
     }
 }
