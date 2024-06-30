@@ -11,6 +11,7 @@ import login.tikichat.global.auth.login.handler.LoginFailureHandler;
 import login.tikichat.global.auth.login.handler.LoginSuccessHandler;
 import login.tikichat.global.auth.login.service.LoginService;
 import login.tikichat.global.exception.filter.GlobalExceptionHandlingFilter;
+import login.tikichat.global.logger.filter.RequestLoggerFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -73,7 +74,8 @@ public class SecurityConfig {
                 )
                 // 원래 스프링 시큐리티 필터 순서가 LogoutFilter 이후에 로그인 필터 동작
                 // 따라서, LogoutFilter 이후에 우리가 만든 필터 동작하도록 설정
-                // 순서 : LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
+                // 순서 : RequestLoggerFilter -> LogoutFilter -> JwtAuthenticationProcessingFilter -> CustomJsonUsernamePasswordAuthenticationFilter
+                .addFilterBefore(requestLoggerFilter(), LogoutFilter.class)
                 .addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class)
                 .addFilterAfter(customJsonUsernamePasswordAuthenticationFilter(), JwtAuthenticationProcessingFilter.class)
 
@@ -129,6 +131,14 @@ public class SecurityConfig {
         customJsonUsernamePasswordLoginFilter.setAuthenticationSuccessHandler(loginSuccessHandler());
         customJsonUsernamePasswordLoginFilter.setAuthenticationFailureHandler(loginFailureHandler());
         return customJsonUsernamePasswordLoginFilter;
+    }
+
+    /**
+     * 개발용 URI 로그 남기는 필터
+     */
+    @Bean
+    public RequestLoggerFilter requestLoggerFilter() {
+        return new RequestLoggerFilter();
     }
 
     @Bean
