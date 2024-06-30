@@ -21,7 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -51,7 +51,23 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             "/oauth2/authorization/kakao",
             "/oauth2/authorization/naver",
             "/oauth2/authorization/google",
-            "/oauth2/authorization/apple"
+            "/oauth2/authorization/apple",
+            "/",                    // 홈페이지
+            "/sign-up",             // 회원가입 페이지
+            "/css/**",              // CSS 리소스
+            "/images/**",           // 이미지 리소스
+            "/js/**",               // JavaScript 리소스
+            "/favicon.ico",         // 파비콘
+            "/api/v1/users/signup/**",  // 회원가입 API
+            "/api/v1/users/search", // 사용자 검색 API
+            "/api/v1/users/nicknames",  // 닉네임 조회 API
+            "/api/v1/users/*/password", // 비밀번호 변경 API
+            "/api/v1/terms/latest",     // 최신 약관 정보 조회 API
+            "/api/v1/auth/social/**",   // 소셜 로그인 API
+            "/login/oauth2/**",         // 소셜 로그인 리다이렉트
+            "/swagger-ui/**",           // Swagger UI
+            "/swagger-resources/**",    // Swagger 리소스
+            "/api-docs/**"              // API 문서
     );
 
     private final JwtService jwtService;
@@ -60,13 +76,14 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private final UserRefreshTokenService userRefreshTokenService;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+    private AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
         // 요청 URI가 NO_CHECK_URLS 목록에 포함되어 있는지 확인
-        if (NO_CHECK_URLS.stream().anyMatch(requestURI::startsWith)) {
+        if (NO_CHECK_URLS.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI))) {
             filterChain.doFilter(request, response); // 로그인 경로로 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
@@ -119,8 +136,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      */
     public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
-        log.debug("checkAccessTokenAndAuthentication() 호출");
-
         jwtUtils.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
