@@ -97,7 +97,7 @@ public class CustomOAuth2UserService {
      * @return OAuth2UserRequest: 리소스 서버에 사용자 정보를 요청하기 위한 객체
      */
     private OAuth2UserRequest createUserRequest(String registrationId, String oauth2AccessTokenStr) {
-        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId);
+        ClientRegistration clientRegistration = clientRegistrationRepository.findByRegistrationId(registrationId.toLowerCase());
 
         OAuth2AccessToken oAuth2AccessToken = new OAuth2AccessToken(
                 OAuth2AccessToken.TokenType.BEARER,
