@@ -25,7 +25,7 @@ services:
             - tikichat_network
             
     tikichat_server:
-        image: dydydade/tikichat_server:latest
+        image: dydydade/tikichat-server:latest
         restart: always
         depends_on:
             - tikichat_db
