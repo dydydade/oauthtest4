@@ -1,10 +1,8 @@
 package login.tikichat.domain.terms.repository;
 
-import com.querydsl.jpa.impl.JPAQuery;
-import jakarta.persistence.EntityManager;
 import login.tikichat.domain.terms.model.QTerms;
 import login.tikichat.domain.terms.model.Terms;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,25 +12,23 @@ import java.util.stream.Collectors;
 import static com.querydsl.jpa.JPAExpressions.select;
 
 @Repository
-@RequiredArgsConstructor
-public class TermsRepositoryImpl implements TermsRepositoryCustom {
-
-    private final EntityManager entityManager;
-
-    private QTerms terms = QTerms.terms;
-    private QTerms termsSub = new QTerms("termsSub");
+public class TermsRepositoryImpl extends QuerydslRepositorySupport implements TermsRepositoryCustom {
+    public TermsRepositoryImpl() {
+        super(Terms.class);
+    }
 
     @Override
     public List<Terms> findLatestVersionOfEachTermsType() {
-        JPAQuery<Terms> query = new JPAQuery<>(entityManager);
+        final var termsQ = QTerms.terms;
+        final var termsSubQ = new QTerms("termsSubQ");
+        final var query = super.from(termsQ);
 
-        List<Terms> result = query.select(terms)
-                .from(terms)
-                .where(terms.version.eq(
-                        select(termsSub.version.max())
-                                .from(termsSub)
-                                .where(termsSub.termsType.eq(terms.termsType))
-                                .groupBy(termsSub.termsType)
+        List<Terms> result = query
+                .where(termsQ.version.eq(
+                        select(termsSubQ.version.max())
+                                .from(termsSubQ)
+                                .where(termsSubQ.termsType.eq(termsQ.termsType))
+                                .groupBy(termsSubQ.termsType)
                 ))
                 .fetch();
 
@@ -41,16 +37,18 @@ public class TermsRepositoryImpl implements TermsRepositoryCustom {
 
     @Override
     public Set<Long> findRequiredTermsIds() {
-        JPAQuery<Terms> query = new JPAQuery<>(entityManager);
+        final var termsQ = QTerms.terms;
+        final var termsSubQ = new QTerms("termsSubQ");
+        final var query = super.from(termsQ);
 
-        List<Long> result = query.select(terms.id)
-                .from(terms)
-                .where(terms.version.eq(
-                        select(termsSub.version.max())
-                                .from(termsSub)
-                                .where(termsSub.termsType.eq(terms.termsType)
-                                        .and(terms.mandatory.eq(true)))
-                                .groupBy(termsSub.termsType)
+        List<Long> result = query
+                .select(termsQ.id)
+                .where(termsQ.version.eq(
+                        select(termsSubQ.version.max())
+                                .from(termsSubQ)
+                                .where(termsSubQ.termsType.eq(termsQ.termsType)
+                                        .and(termsSubQ.mandatory.eq(true)))
+                                .groupBy(termsSubQ.termsType)
                 ))
                 .fetch();
 

@@ -1,34 +1,29 @@
 package login.tikichat.domain.user.repository;
 
-import com.querydsl.jpa.impl.JPAQuery;
-import jakarta.persistence.EntityManager;
 import login.tikichat.domain.user.model.QUser;
 import login.tikichat.domain.user.model.QUserRefreshToken;
 import login.tikichat.domain.user.model.UserRefreshToken;
-import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-@RequiredArgsConstructor
-public class UserRefreshTokenRepositoryImpl implements UserRefreshTokenRepositoryCustom {
-
-    private final EntityManager entityManager;
-
-    private QUser user = QUser.user;
-
-    private QUserRefreshToken userRefreshToken = QUserRefreshToken.userRefreshToken;
+public class UserRefreshTokenRepositoryImpl extends QuerydslRepositorySupport implements UserRefreshTokenRepositoryCustom {
+    public UserRefreshTokenRepositoryImpl() {
+        super(UserRefreshToken.class);
+    }
 
     @Override
     public Optional<UserRefreshToken> findByRefreshToken(String refreshToken) {
-        JPAQuery<UserRefreshToken> query = new JPAQuery<>(entityManager);
+        final var userRefreshTokenQ = QUserRefreshToken.userRefreshToken;
+        final var userQ = QUser.user;
+        final var query = super.from(userRefreshTokenQ);
 
-        UserRefreshToken result = query.select(userRefreshToken)
-                .from(userRefreshToken)
-                .join(userRefreshToken.user, user)
+        UserRefreshToken result = query
+                .join(userRefreshTokenQ.user, userQ)
                 .fetchJoin()
-                .where(userRefreshToken.refreshToken.eq(refreshToken))
+                .where(userRefreshTokenQ.refreshToken.eq(refreshToken))
                 .fetchOne();
 
         return Optional.ofNullable(result);
@@ -36,14 +31,16 @@ public class UserRefreshTokenRepositoryImpl implements UserRefreshTokenRepositor
 
     @Override
     public Optional<UserRefreshToken> findByUserEmailAndDeviceId(String email, String deviceId) {
-        JPAQuery<UserRefreshToken> query = new JPAQuery<>(entityManager);
+        final var userRefreshTokenQ = QUserRefreshToken.userRefreshToken;
+        final var userQ = QUser.user;
+        final var query = super.from(userRefreshTokenQ);
 
-        UserRefreshToken result = query.select(userRefreshToken)
-                .from(userRefreshToken)
-                .join(userRefreshToken.user, user)
+        UserRefreshToken result = query.select(userRefreshTokenQ)
+                .from(userRefreshTokenQ)
+                .join(userRefreshTokenQ.user, userQ)
                 .fetchJoin()
-                .where(user.email.eq(email)
-                        .and(userRefreshToken.deviceId.eq(deviceId)))
+                .where(userQ.email.eq(email)
+                        .and(userRefreshTokenQ.deviceId.eq(deviceId)))
                 .fetchOne();
 
         return Optional.ofNullable(result);
