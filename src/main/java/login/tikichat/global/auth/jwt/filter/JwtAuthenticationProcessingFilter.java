@@ -21,7 +21,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -76,13 +76,14 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     private final UserRefreshTokenService userRefreshTokenService;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
+    private AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
         // 요청 URI가 NO_CHECK_URLS 목록에 포함되어 있는지 확인
-        if (NO_CHECK_URLS.stream().anyMatch(requestURI::startsWith)) {
+        if (NO_CHECK_URLS.stream().anyMatch(pattern -> pathMatcher.match(pattern, requestURI))) {
             filterChain.doFilter(request, response); // 로그인 경로로 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
