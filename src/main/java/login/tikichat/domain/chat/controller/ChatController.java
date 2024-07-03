@@ -31,7 +31,7 @@ public class ChatController {
             @PathVariable("chatRoomId") Long chatRoomId
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_USER_INFO_SUCCESS,
+                ResultCode.SEND_CHAT_SUCCESS,
                 this.chatService.sendMessage(user.getUserId(), chatRoomId, sendMessageReqDto)
         );
 
@@ -45,7 +45,7 @@ public class ChatController {
             @PathVariable("chatRoomId") Long chatRoomId
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_USER_INFO_SUCCESS,
+                ResultCode.FIND_CHAT_LIST_SUCCESS,
                 this.chatService.findChats(user.getUserId(), chatRoomId, findChatsReq)
         );
 
