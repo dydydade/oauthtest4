@@ -30,7 +30,12 @@ public enum ResultCode {
     TERMS_LIST_RETRIEVED_SUCCESS(200, "T002", "최신 이용약관 목록을 조회하였습니다."),
 
     // ChatRoom
-    FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다.");
+    FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다."),
+
+    // chats
+    SEND_CHAT_SUCCESS(200, "CHAT001", "채팅이 전송되었습니다."),
+    FIND_CHAT_LIST_SUCCESS(200, "CHAT002", "채팅 리스트 조회가 완료 되었습니다.")
+    ;
 
     private int status;
     private final String code;
