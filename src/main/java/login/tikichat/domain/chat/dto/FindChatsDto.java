@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import login.tikichat.domain.chat.constants.ChatReactionType;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,10 +27,19 @@ public class FindChatsDto {
         }
     }
 
+    public record FindChatReactionListRes(
+        List<Long> userIds,
+        ChatReactionType reactionType,
+        Integer count
+    ) {
+
+    }
+
     public record FindChatsItemRes (
             String id,
             String content,
-            Instant createdAt
+            Instant createdAt,
+            List<FindChatReactionListRes> reactions
     ) {
 
     }

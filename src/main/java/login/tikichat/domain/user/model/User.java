@@ -1,6 +1,7 @@
 package login.tikichat.domain.user.model;
 
 import jakarta.persistence.*;
+import login.tikichat.domain.chat.model.ChatReaction;
 import login.tikichat.domain.terms.model.AgreementHistory;
 import lombok.*;
 
@@ -38,6 +39,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<AgreementHistory> termsAgreementHistories;
+
+    @OneToMany(mappedBy = "user")
+    private List<ChatReaction> chatReactions;
 
     // 유저 권한 설정 메소드
     public void authorizeUser() {

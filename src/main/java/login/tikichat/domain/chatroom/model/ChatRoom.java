@@ -3,6 +3,7 @@ package login.tikichat.domain.chatroom.model;
 import jakarta.persistence.*;
 import login.tikichat.domain.attachment.model.Attachment;
 import login.tikichat.domain.category.model.Category;
+import login.tikichat.domain.chat.model.Chat;
 import login.tikichat.domain.user.model.UserRefreshToken;
 import lombok.AccessLevel;
 import lombok.Getter;
