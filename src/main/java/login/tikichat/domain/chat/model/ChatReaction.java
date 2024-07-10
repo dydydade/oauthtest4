@@ -10,6 +10,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import login.tikichat.domain.chat.constants.ChatReactionType;
 import login.tikichat.domain.user.model.User;
 import lombok.AccessLevel;
@@ -23,7 +24,12 @@ import org.hibernate.annotations.OnDeleteAction;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chat_reactions")
+@Table(
+        name = "chat_reactions",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"chat_id", "user_id", "chat_reaction_type"})
+        }
+)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder(access = AccessLevel.PROTECTED)
 public class ChatReaction {

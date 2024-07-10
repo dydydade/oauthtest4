@@ -155,6 +155,14 @@ public class ChatService {
                 new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
         );
 
+        if (this.chatReactionRepository.findByChatIdAndUserIdAndChatReactionType(
+                chat.getId(),
+                user.getId(),
+                chatReactionType
+        ).isPresent()) {
+            throw new BusinessException(ErrorCode.ALREADY_EXISTS_REACTION_CHAT);
+        };
+
         final var chatReaction = new ChatReaction(user, chat, chatReactionType);
 
         chatReactionRepository.save(chatReaction);

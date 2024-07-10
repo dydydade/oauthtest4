@@ -2,6 +2,7 @@ package login.tikichat.global.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
@@ -49,6 +50,7 @@ public enum ErrorCode {
     // Chat
     NOT_CHAT_ROOM_PARTICIPANT(403, "CH001", "채팅방 참가자가 아닙니다."),
     NOT_FOUND_CHAT(404, "CH002", "존재하지 않는 채팅입니다."),
+    ALREADY_EXISTS_REACTION_CHAT(HttpStatus.CONFLICT.value(), "CH003", "이미 동일한 리액션을 한 이력이 있습니다."),
     ;
 
 

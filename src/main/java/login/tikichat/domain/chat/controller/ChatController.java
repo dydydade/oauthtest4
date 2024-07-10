@@ -47,7 +47,8 @@ public class ChatController {
     public void addChatReaction(
             @RequestBody @Valid AddChatReactionDto.AddChatReactionReq addChatReactionReq,
             @AuthenticationPrincipal UserDetailInfo user,
-            @PathVariable("chatId") Long chatId
+            @PathVariable("chatId") Long chatId,
+            @PathVariable("chatRoomId") Long chatRoomId
     ) {
         this.chatService.addChatReaction(
                 chatId,
@@ -60,7 +61,8 @@ public class ChatController {
     public void removeChatReaction(
             @RequestBody @Valid AddChatReactionDto.AddChatReactionReq addChatReactionReq,
             @AuthenticationPrincipal UserDetailInfo user,
-            @PathVariable("chatId") Long chatId
+            @PathVariable("chatId") Long chatId,
+            @PathVariable("chatRoomId") Long chatRoomId
     ) {
         this.chatService.removeChatReaction(
                 chatId,
