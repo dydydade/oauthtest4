@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/chat-rooms/{chatRoomId}/chats")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "JWT")gi
+@SecurityRequirement(name = "JWT")
 public class ChatController {
     private final ChatService chatService;
 

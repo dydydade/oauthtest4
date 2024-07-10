@@ -20,10 +20,10 @@ public class FindChatsDto {
             @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             Long nextCursor
     ) {
-        public FindChatsReq() {
-            this(
-                    20, null
-            );
+        public FindChatsReq {
+            if(take == null) {
+                take = 20;
+            }
         }
     }
 
