@@ -1,5 +1,6 @@
 package login.tikichat.domain.chat.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import login.tikichat.domain.chat.dto.AddChatReactionDto;
 import login.tikichat.domain.chat.dto.FindChatsDto;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/chat-rooms/{chatRoomId}/chats")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "JWT")gi
 public class ChatController {
     private final ChatService chatService;
 
