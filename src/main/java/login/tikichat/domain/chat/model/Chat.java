@@ -2,6 +2,8 @@ package login.tikichat.domain.chat.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -29,7 +31,8 @@ import java.util.Set;
 @Builder(access = AccessLevel.PROTECTED)
 public class Chat {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false, length = 1000)
     private String content;
@@ -38,14 +41,13 @@ public class Chat {
     private Long senderUserId;
 
     @ManyToOne(optional = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
     @CreatedDate
     private Instant createdDate;
 
-    @OneToMany()
+    @OneToMany(mappedBy = "chat")
     private Set<ChatReaction> chatReactions = new HashSet<>();
 
     public static Chat sendMessage(

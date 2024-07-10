@@ -7,7 +7,7 @@ import java.time.Instant;
 
 public class SendMessageDto {
     public record SendMessageResDto(
-        String id,
+        Long id,
         String content,
         Instant createdAt
     ) {

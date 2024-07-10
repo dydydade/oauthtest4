@@ -18,7 +18,7 @@ public class FindChatsDto {
             Integer take,
             @Nullable
             @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-            String nextCursor
+            Long nextCursor
     ) {
         public FindChatsReq() {
             this(
@@ -36,7 +36,7 @@ public class FindChatsDto {
     }
 
     public record FindChatsItemRes (
-            String id,
+            Long id,
             String content,
             Instant createdAt,
             List<FindChatReactionListRes> reactions
@@ -47,7 +47,7 @@ public class FindChatsDto {
     public record FindChatsRes (
             List<FindChatsItemRes> chats,
             @Schema(nullable = true)
-            String nextCursor
+            Long nextCursor
     ) {
     }
 

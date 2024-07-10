@@ -8,7 +8,7 @@ import java.time.Instant;
 @RequiredArgsConstructor
 @Getter
 public class SendChatEventDto {
-    private final String id;
+    private final Long id;
     private final String content;
     private final Long senderUserId;
     private final Long chatRoomId;
