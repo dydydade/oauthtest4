@@ -1,16 +1,18 @@
 package login.tikichat.domain.chat.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
-@RequiredArgsConstructor
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class SendChatEventDto {
-    private final String id;
-    private final String content;
-    private final Long senderUserId;
-    private final Long chatRoomId;
-    private final Instant createdDate;
+    private Long id;
+    private String content;
+    private Long senderUserId;
+    private Long chatRoomId;
+    private Instant createdDate;
 }

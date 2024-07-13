@@ -1,7 +1,5 @@
 package login.tikichat.global.config;
 
-import login.tikichat.domain.chat.pubsub.SendChatConsumer;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +26,14 @@ public class RedisConfig {
         stringRedisTemplate.setConnectionFactory(redisMailConnectionFactory);
         return stringRedisTemplate;
     }
+
+//    @Bean
+//    public RedisTemplate<String, Object> redisTemplate2(RedisConnectionFactory redisMailConnectionFactory) {
+//        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+//        redisTemplate.setConnectionFactory(redisMailConnectionFactory);
+//
+//        return redisTemplate;
+//    }
 
     @Bean
     public ChannelTopic chatChannelTopic() {

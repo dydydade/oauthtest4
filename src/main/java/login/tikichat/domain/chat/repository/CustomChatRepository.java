@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface CustomChatRepository {
-    List<Chat> findChats(Long chatRoomId, Integer take, String nextCursor);
+    List<Chat> findChats(Long chatRoomId, Integer take, Long nextCursor);
 }

@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import login.tikichat.domain.chat.constants.ChatReactionType;
 
 import java.time.Instant;
 import java.util.List;
@@ -17,19 +18,28 @@ public class FindChatsDto {
             Integer take,
             @Nullable
             @Schema(nullable = true, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-            String nextCursor
+            Long nextCursor
     ) {
-        public FindChatsReq() {
-            this(
-                    20, null
-            );
+        public FindChatsReq {
+            if(take == null) {
+                take = 20;
+            }
         }
     }
 
+    public record FindChatReactionListRes(
+        List<Long> userIds,
+        ChatReactionType reactionType,
+        Integer count
+    ) {
+
+    }
+
     public record FindChatsItemRes (
-            String id,
+            Long id,
             String content,
-            Instant createdAt
+            Instant createdAt,
+            List<FindChatReactionListRes> reactions
     ) {
 
     }
@@ -37,7 +47,7 @@ public class FindChatsDto {
     public record FindChatsRes (
             List<FindChatsItemRes> chats,
             @Schema(nullable = true)
-            String nextCursor
+            Long nextCursor
     ) {
     }
 

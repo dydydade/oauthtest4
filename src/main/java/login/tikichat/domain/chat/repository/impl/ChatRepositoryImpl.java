@@ -15,11 +15,11 @@ public class ChatRepositoryImpl extends QuerydslRepositorySupport implements Cus
     }
 
     @Override
-    public List<Chat> findChats(Long chatRoomId, Integer take, String nextCursor) {
+    public List<Chat> findChats(Long chatRoomId, Integer take, Long nextCursor) {
         final var chatQ = QChat.chat;
         final var query = super.from(chatQ);
 
-        query.where(chatQ.chatRoomId.eq(chatRoomId));
+        query.where(chatQ.chatRoom.id.eq(chatRoomId));
         query.limit(take);
         query.orderBy(chatQ.id.desc());
 
