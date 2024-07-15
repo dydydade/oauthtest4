@@ -12,7 +12,7 @@ spring:
 
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://localhost:3306/security?serverTimezone=Asia/Seoul
+    url: jdbc:mariadb://tikichat_db:3306/security?serverTimezone=Asia/Seoul
     username: ${DB_ID}
     password: ${DB_PW}
 
