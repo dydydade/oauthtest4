@@ -43,3 +43,6 @@ out/
 #/src/main/resources/application-swagger.yml
 #/src/main/resources/application-verification.yml
 /src/main/resources/env.properties
+
+### DB 파일 ###
+/master_db/*
