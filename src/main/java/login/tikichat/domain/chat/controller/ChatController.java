@@ -1,6 +1,8 @@
 package login.tikichat.domain.chat.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import login.tikichat.domain.chat.dto.AddChatReactionDto;
 import login.tikichat.domain.chat.dto.FindChatsDto;
@@ -15,21 +17,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@SecurityRequirement(name = "JWT")
 @RestController
+@Tag(name = "Chat API", description = "채팅 API")
 @RequestMapping("/api/v1/chat-rooms/{chatRoomId}/chats")
 @RequiredArgsConstructor
-@SecurityRequirement(name = "JWT")
 public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("")
+    @Operation(summary = "채팅 메세지 보내기", description = "채팅 메세지를 보내는 API입니다.")
     public ResponseEntity<ResultResponse> sendChat(
             @RequestBody @Valid SendMessageDto.SendMessageReqDto sendMessageReqDto,
             @AuthenticationPrincipal UserDetailInfo user,
@@ -44,6 +47,7 @@ public class ChatController {
     }
 
     @PostMapping("/{chatId}/reaction")
+    @Operation(summary = "채팅 반응 보내기", description = "채팅 반응을 보내는 API입니다.")
     public void addChatReaction(
             @RequestBody @Valid AddChatReactionDto.AddChatReactionReq addChatReactionReq,
             @AuthenticationPrincipal UserDetailInfo user,
@@ -58,6 +62,7 @@ public class ChatController {
     }
 
     @DeleteMapping("/{chatId}/reaction")
+    @Operation(summary = "채팅 반응 취소하기", description = "채팅 반응을 취소하는 API입니다.")
     public void removeChatReaction(
             @RequestBody @Valid AddChatReactionDto.AddChatReactionReq addChatReactionReq,
             @AuthenticationPrincipal UserDetailInfo user,
@@ -72,6 +77,7 @@ public class ChatController {
     }
 
     @GetMapping("")
+    @Operation(summary = "채팅방 메세지 목록 조회", description = "채팅방 메세지 목록을 조회하는 API입니다.")
     public ResponseEntity<ResultResponse> getChats(
             @Valid FindChatsDto.FindChatsReq findChatsReq,
             @AuthenticationPrincipal UserDetailInfo user,
