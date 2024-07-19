@@ -2,6 +2,9 @@ package login.tikichat.global.config;
 
 import login.tikichat.domain.category.model.Category;
 import login.tikichat.domain.category.repository.CategoryRepository;
+import login.tikichat.domain.chat.model.Chat;
+import login.tikichat.domain.chat.model.ChatReaction;
+import login.tikichat.domain.chat.repository.ChatRepository;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
@@ -19,8 +22,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 초기 상태 등록 Config
@@ -36,6 +42,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final TermsService termsService;
     private final CategoryRepository categoryRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRepository chatRepository;
 
     /**
      * 앱 계정(User) 및 소셜 연동 정보 저장
@@ -89,14 +96,24 @@ public class InitializeDefaultConfig implements CommandLineRunner {
             new Category("C_1010", "취미", 10)
         );
 
+        ChatRoom chatRoom = new ChatRoom(
+                1L,
+                "테스트 채팅 룸",
+                10,
+                List.of("고민"),
+                categories.get(0)
+        );
+
+        ChatRoom chatRoom2 = new ChatRoom(
+                2L,
+                "테스트 채팅 룸",
+                10,
+                List.of("고민"),
+                categories.get(0)
+        );
+
         List<ChatRoom> chatRooms = List.of(
-                new ChatRoom(
-                        2L,
-                        "테스트 채팅 룸",
-                        10,
-                        List.of("고민"),
-                        categories.get(0)
-                )
+                chatRoom
         );
 
         userRepository.save(user);
@@ -104,10 +121,25 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         categoryRepository.saveAll(categories);
         chatRoomRepository.saveAll(chatRooms);
 
-//        socialProfileRepository.save(naver);
-//        socialProfileRepository.save(kakao);
-//        socialProfileRepository.save(google);
+        Instant now = Instant.now();
+        Instant end = now.truncatedTo(ChronoUnit.DAYS);
+        Instant start = end.minus(1, ChronoUnit.DAYS);
 
+        chatRoomRepository.save(chatRoom);
+        chatRoomRepository.save(chatRoom2);
+        ChatReaction chatReaction1 = new ChatReaction();
+
+        Chat chat = new Chat(1L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat2 = new Chat(2L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat3 = new Chat(3L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat4 = new Chat(4L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat5 = new Chat(5L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+
+        chatRepository.save(chat);
+        chatRepository.save(chat2);
+        chatRepository.save(chat3);
+        chatRepository.save(chat4);
+        chatRepository.save(chat5);
 
         // 이용약관 저장
         TermsCreateRequest termsOfService = TermsCreateRequest.builder()
