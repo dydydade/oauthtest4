@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter

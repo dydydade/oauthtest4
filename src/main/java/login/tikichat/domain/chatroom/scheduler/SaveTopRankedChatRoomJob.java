@@ -7,15 +7,19 @@ import login.tikichat.domain.top_ranked_chatroom.repository.TopRankedChatRoomRep
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,11 +42,16 @@ public class SaveTopRankedChatRoomJob {
     private static final int CHUNK_SIZE = 1000;
 
     @Bean
-    public Job saveTopRankedChatRoomsJob(@Qualifier("processChatData") Step processChatData, @Qualifier("saveTopRankedChatRooms") Step saveTopRankedChatRooms) {
+    public Job saveTopRankedChatRoomsJob(
+            @Qualifier("processChatData") Step processChatData,
+            @Qualifier("saveTopRankedChatRooms") Step saveTopRankedChatRooms,
+            @Qualifier("cleanupOldTopRankedChatRooms") Step cleanupOldTopRankedChatRooms
+    ) {
         return new JobBuilder("saveTopRankedChatRoomsJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .start(processChatData)
                 .next(saveTopRankedChatRooms)
+                .next(cleanupOldTopRankedChatRooms)
                 .build();
     }
 
@@ -76,6 +85,21 @@ public class SaveTopRankedChatRoomJob {
                 .build();
     }
 
+    @Bean(name = "cleanupOldTopRankedChatRooms")
+    public Step cleanupOldTopRankedChatRoomsStep() {
+        return new StepBuilder("cleanupOldChatRoomsStep", jobRepository)
+                .tasklet(new Tasklet() {
+                    @Override
+                    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+                        Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
+                        topRankedChatRoomRepository.deleteAllOlderThanCutoffDays(sevenDaysAgo);
+                        return RepeatStatus.FINISHED;
+                    }
+                }, transactionManager)
+                .build();
+    }
+
+    // step 1
     @Bean
     public RepositoryItemReader<Chat> recentChatsReader() {
         Instant now = Instant.now();
@@ -92,26 +116,31 @@ public class SaveTopRankedChatRoomJob {
                 .build();
     }
 
+    // step 1
     @Bean
     public ItemProcessor<Chat, ChatRoomStatsDto> chatToStatsProcessor() {
         return new ChatToStatsProcessor();
     }
 
+    // step 1
     @Bean
     public ItemWriter<ChatRoomStatsDto> chatStatsWriter() {
         return new ChatStatsWriter();
     }
 
+    // step 2
     @Bean
     public ItemReader<ChatRoomStatsDto> chatStatsReader() {
         return new ChatStatsReader();
     }
 
+    // step 2
     @Bean
     public ItemProcessor<ChatRoomStatsDto, TopRankedChatRoom> statsToTopRankedRoomsProcessor() {
         return new StatsToTopRankedRoomsProcessor();
     }
 
+    // step 2
     @Bean
     public ItemWriter<TopRankedChatRoom> topRankedChatRoomWriter() {
         return new TopRankedChatRoomWriter(topRankedChatRoomRepository);
