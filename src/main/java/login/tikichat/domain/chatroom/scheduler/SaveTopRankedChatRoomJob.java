@@ -8,7 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
+import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.job.flow.JobExecutionDecider;
+import org.springframework.batch.core.job.flow.support.SimpleFlow;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -43,16 +46,33 @@ public class SaveTopRankedChatRoomJob {
 
     @Bean
     public Job saveTopRankedChatRoomsJob(
+            @Qualifier("saveTopRankedChatRoomsFlow") SimpleFlow saveTopRankedChatRoomsFlow
+    ) {
+        return new JobBuilder("saveTopRankedChatRoomsJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .start(saveTopRankedChatRoomsFlow)
+                .end()
+                .build();
+    }
+
+    @Bean(name = "saveTopRankedChatRoomsFlow")
+    public SimpleFlow saveTopRankedChatRoomsFlow(
             @Qualifier("processChatData") Step processChatData,
             @Qualifier("saveTopRankedChatRooms") Step saveTopRankedChatRooms,
             @Qualifier("cleanupOldTopRankedChatRooms") Step cleanupOldTopRankedChatRooms
     ) {
-        return new JobBuilder("saveTopRankedChatRoomsJob", jobRepository)
-                .incrementer(new RunIdIncrementer())
-                .start(processChatData)
+        FlowBuilder<SimpleFlow> flowBuilder = new FlowBuilder<>("checkExecutionStatus");
+        return flowBuilder
+                .start(decider()).on("NOT_EXECUTED_YET_TODAY").to(processChatData)
                 .next(saveTopRankedChatRooms)
                 .next(cleanupOldTopRankedChatRooms)
+                .from(decider()).on("COMPLETED_TODAY").stop()
                 .build();
+    }
+
+    @Bean
+    public JobExecutionDecider decider() {
+        return new CheckExecutionStatusDecider(topRankedChatRoomRepository);
     }
 
     @Bean(name = "processChatData")
