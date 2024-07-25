@@ -1,0 +1,40 @@
+services:
+    tikichat_db:
+        image: mariadb:10.6 # mariadb 10.6 버전 이미지 사용
+        restart: always
+        environment:
+            - MARIADB_DATABASE=security
+            - MARIADB_ROOT_PASSWORD=cos1234
+            - MARIADB_ROOT_HOST=%
+            - MARIADB_USER=cos
+            - MARIADB_PASSWORD=cos1234
+        volumes:
+            - ./master_db/data:/var/lib/mysql # 각종 log와 index 등이 volume에 저장되는 디렉토리
+            - ./master_db/config/:/etc/mysql/conf.d # 이전에 나왔던 ./master/config/my.cnf 를 써줌으로써 설정을 reference 해 줍니다.
+        ports:
+            - "3308:3306"
+        networks:
+            - tikichat_network
+    
+    tikichat_redis:
+        image: redis:7.0.0
+        restart: always
+        ports:
+            - "6380:6379"
+        networks:
+            - tikichat_network
+            
+    tikichat_server:
+        image: dydydade/tikichat-server:latest
+        restart: always
+        depends_on:
+            - tikichat_db
+            - tikichat_redis
+        ports:
+            - "8080:8080"
+        networks:
+            - tikichat_network
+
+networks:
+    tikichat_network:
+        driver: bridge

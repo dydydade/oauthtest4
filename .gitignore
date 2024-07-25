@@ -37,5 +37,12 @@ out/
 .vscode/
 
 ### 서버 설정 파일 ###
-/src/main/resources/application-jwt.yml
-/src/main/resources/application-oauth.yml
+#/src/main/resources/application.yml
+#/src/main/resources/application-jwt.yml
+#/src/main/resources/application-oauth.yml
+#/src/main/resources/application-swagger.yml
+#/src/main/resources/application-verification.yml
+/src/main/resources/env.properties
+
+### DB 파일 ###
+/master_db/*
