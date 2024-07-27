@@ -1,5 +1,6 @@
-package login.tikichat.domain.chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.batch;
 
+import login.tikichat.domain.top_ranked_chatroom.dto.ChatRoomStatsDto;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.configuration.annotation.StepScope;

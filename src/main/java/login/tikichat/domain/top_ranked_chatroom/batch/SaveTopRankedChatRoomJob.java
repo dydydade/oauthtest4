@@ -1,7 +1,8 @@
-package login.tikichat.domain.chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.batch;
 
 import login.tikichat.domain.chat.model.Chat;
 import login.tikichat.domain.chat.repository.ChatRepository;
+import login.tikichat.domain.top_ranked_chatroom.dto.ChatRoomStatsDto;
 import login.tikichat.domain.top_ranked_chatroom.model.TopRankedChatRoom;
 import login.tikichat.domain.top_ranked_chatroom.repository.TopRankedChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -119,7 +120,6 @@ public class SaveTopRankedChatRoomJob {
                 .build();
     }
 
-    // step 1
     @Bean
     public RepositoryItemReader<Chat> recentChatsReader() {
         Instant now = Instant.now();
@@ -136,31 +136,26 @@ public class SaveTopRankedChatRoomJob {
                 .build();
     }
 
-    // step 1
     @Bean
     public ItemProcessor<Chat, ChatRoomStatsDto> chatToStatsProcessor() {
         return new ChatToStatsProcessor();
     }
 
-    // step 1
     @Bean
     public ItemWriter<ChatRoomStatsDto> chatStatsWriter() {
         return new ChatStatsWriter();
     }
 
-    // step 2
     @Bean
     public ItemReader<ChatRoomStatsDto> chatStatsReader() {
         return new ChatStatsReader();
     }
 
-    // step 2
     @Bean
     public ItemProcessor<ChatRoomStatsDto, TopRankedChatRoom> statsToTopRankedRoomsProcessor() {
         return new StatsToTopRankedRoomsProcessor();
     }
 
-    // step 2
     @Bean
     public ItemWriter<TopRankedChatRoom> topRankedChatRoomWriter() {
         return new TopRankedChatRoomWriter(topRankedChatRoomRepository);

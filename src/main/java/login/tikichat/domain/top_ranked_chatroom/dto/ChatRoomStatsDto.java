@@ -1,4 +1,4 @@
-package login.tikichat.domain.chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

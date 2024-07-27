@@ -1,6 +1,7 @@
-package login.tikichat.domain.chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.batch;
 
 import jakarta.validation.constraints.NotNull;
+import login.tikichat.domain.top_ranked_chatroom.dto.ChatRoomStatsDto;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.scope.context.StepSynchronizationManager;
 import org.springframework.batch.item.Chunk;

@@ -1,4 +1,4 @@
-package login.tikichat.domain.chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.batch;
 
 import login.tikichat.domain.top_ranked_chatroom.model.TopRankedChatRoom;
 import login.tikichat.domain.top_ranked_chatroom.repository.TopRankedChatRoomRepository;

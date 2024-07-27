@@ -16,4 +16,6 @@ public interface TopRankedChatRoomRepository extends JpaRepository<TopRankedChat
     @Modifying
     @Query("DELETE FROM TopRankedChatRoom t WHERE t.reportDate < :cutoffDate")
     void deleteAllOlderThanCutoffDays(Instant cutoffDate);
+
+    boolean existsByReportDateBetween(Instant startOfDay, Instant endOfDay);
 }
