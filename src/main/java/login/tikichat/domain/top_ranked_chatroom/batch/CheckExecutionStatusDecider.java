@@ -1,4 +1,4 @@
-package login.tikichat.domain.chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.batch;
 
 import login.tikichat.domain.top_ranked_chatroom.repository.TopRankedChatRoomRepository;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +7,10 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.job.flow.FlowExecutionStatus;
 import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Component
 @RequiredArgsConstructor
@@ -19,13 +23,13 @@ public class CheckExecutionStatusDecider implements JobExecutionDecider {
         if (checkJobExecutionStatus()) {
             return new FlowExecutionStatus("COMPLETED_TODAY");
         }
-
         return new FlowExecutionStatus("NOT_EXECUTED_YET_TODAY");
     }
 
-
-    public boolean checkJobExecutionStatus() {
-        // TODO: 당일 Job 이 이미 실행되어 집계값(TopRankedChatRoom 엔티티)가 저장되었는지 체크
-        return true;
+    private boolean checkJobExecutionStatus() {
+        LocalDate today = LocalDate.now();
+        Instant startOfDay = today.atStartOfDay(ZoneId.systemDefault()).toInstant();
+        Instant endOfDay = today.plusDays(1).atStartOfDay(ZoneId.systemDefault()).toInstant();
+        return repository.existsByReportDateBetween(startOfDay, endOfDay);
     }
 }
