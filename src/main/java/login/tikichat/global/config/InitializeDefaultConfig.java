@@ -96,24 +96,14 @@ public class InitializeDefaultConfig implements CommandLineRunner {
             new Category("C_1010", "취미", 10)
         );
 
-        ChatRoom chatRoom = new ChatRoom(
-                1L,
-                "테스트 채팅 룸",
-                10,
-                List.of("고민"),
-                categories.get(0)
-        );
-
-        ChatRoom chatRoom2 = new ChatRoom(
-                2L,
-                "테스트 채팅 룸",
-                10,
-                List.of("고민"),
-                categories.get(0)
-        );
+        ChatRoom chatRoom = new ChatRoom(1L, "테스트 채팅 룸1", 10, List.of("고민"), categories.get(0));
+        ChatRoom chatRoom2 = new ChatRoom(2L, "테스트 채팅 룸2", 10, List.of("고민"), categories.get(0));
+        ChatRoom chatRoom3 = new ChatRoom(3L, "테스트 채팅 룸3", 10, List.of("고민"), categories.get(1));
+        ChatRoom chatRoom4 = new ChatRoom(4L, "테스트 채팅 룸4", 10, List.of("고민"), categories.get(2));
+        ChatRoom chatRoom5 = new ChatRoom(5L, "테스트 채팅 룸5", 10, List.of("고민"), categories.get(3));
 
         List<ChatRoom> chatRooms = List.of(
-                chatRoom
+                chatRoom, chatRoom2, chatRoom3, chatRoom4, chatRoom5
         );
 
         userRepository.save(user);
@@ -125,8 +115,6 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         Instant end = now.truncatedTo(ChronoUnit.DAYS);
         Instant start = end.minus(1, ChronoUnit.DAYS);
 
-        chatRoomRepository.save(chatRoom);
-        chatRoomRepository.save(chatRoom2);
         ChatReaction chatReaction1 = new ChatReaction();
 
         Chat chat = new Chat(1L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
@@ -134,12 +122,16 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         Chat chat3 = new Chat(3L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
         Chat chat4 = new Chat(4L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
         Chat chat5 = new Chat(5L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat6 = new Chat(6L, "asdf", 2L, chatRoom3, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat7 = new Chat(7L, "asdf", 2L, chatRoom4, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat8 = new Chat(8L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat9 = new Chat(9L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
 
-        chatRepository.save(chat);
-        chatRepository.save(chat2);
-        chatRepository.save(chat3);
-        chatRepository.save(chat4);
-        chatRepository.save(chat5);
+        List<Chat> chats = List.of(
+                chat, chat2, chat3, chat4, chat5, chat6, chat7, chat8, chat9
+        );
+
+        chatRepository.saveAll(chats);
 
         // 이용약관 저장
         TermsCreateRequest termsOfService = TermsCreateRequest.builder()
