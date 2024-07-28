@@ -1,10 +1,10 @@
-package login.tikichat.domain.top_ranked_chatroom.batch;
+package login.tikichat.domain.top_ranked_chatroom.message_count.batch;
 
 import login.tikichat.domain.chat.model.Chat;
 import login.tikichat.domain.chat.repository.ChatRepository;
-import login.tikichat.domain.top_ranked_chatroom.dto.ChatRoomStatsDto;
-import login.tikichat.domain.top_ranked_chatroom.model.TopRankedChatRoom;
-import login.tikichat.domain.top_ranked_chatroom.repository.TopRankedChatRoomRepository;
+import login.tikichat.domain.top_ranked_chatroom.message_count.dto.ChatRoomMessageCountStatsDto;
+import login.tikichat.domain.top_ranked_chatroom.message_count.model.MessageCountRankedChatRoom;
+import login.tikichat.domain.top_ranked_chatroom.message_count.repository.MessageCountRankedChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -36,52 +36,52 @@ import java.util.Collections;
 
 @Configuration
 @RequiredArgsConstructor
-public class SaveTopRankedChatRoomJob {
+public class SaveMessageCountRankedChatRoomJob {
 
     private final JobRepository jobRepository;
     private final PlatformTransactionManager transactionManager;
     private final ChatRepository chatRepository;
-    private final TopRankedChatRoomRepository topRankedChatRoomRepository;
+    private final MessageCountRankedChatRoomRepository messageCountRankedChatRoomRepository;
     private static final int TOP_RANKED_CHAT_ROOM_COUNT = 25;
     private static final int CHUNK_SIZE = 1000;
 
-    @Bean
-    public Job saveTopRankedChatRoomsJob(
-            @Qualifier("saveTopRankedChatRoomsFlow") SimpleFlow saveTopRankedChatRoomsFlow
+    @Bean(name = "saveMessageCountRankedChatRoomsJob")
+    public Job saveMessageCountRankedChatRoomsJob(
+            @Qualifier("saveMessageCountRankedChatRoomsFlow") SimpleFlow saveMessageCountRankedChatRoomsFlow
     ) {
-        return new JobBuilder("saveTopRankedChatRoomsJob", jobRepository)
+        return new JobBuilder("saveMessageCountRankedChatRoomsJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
-                .start(saveTopRankedChatRoomsFlow)
+                .start(saveMessageCountRankedChatRoomsFlow)
                 .end()
                 .build();
     }
 
-    @Bean(name = "saveTopRankedChatRoomsFlow")
-    public SimpleFlow saveTopRankedChatRoomsFlow(
+    @Bean(name = "saveMessageCountRankedChatRoomsFlow")
+    public SimpleFlow saveMessageCountRankedChatRoomsFlow(
             @Qualifier("processChatData") Step processChatData,
-            @Qualifier("saveTopRankedChatRooms") Step saveTopRankedChatRooms,
-            @Qualifier("cleanupOldTopRankedChatRooms") Step cleanupOldTopRankedChatRooms
+            @Qualifier("saveMessageCountRankedChatRooms") Step saveMessageCountRankedChatRooms,
+            @Qualifier("cleanupOldMessageCountRankedChatRooms") Step cleanupOldMessageCountRankedChatRooms
     ) {
         FlowBuilder<SimpleFlow> flowBuilder = new FlowBuilder<>("checkExecutionStatus");
         return flowBuilder
-                .start(decider()).on("NOT_EXECUTED_YET_TODAY").to(processChatData)
-                .next(saveTopRankedChatRooms)
-                .next(cleanupOldTopRankedChatRooms)
-                .from(decider()).on("COMPLETED_TODAY").stop()
+                .start(messageCountDecider()).on("NOT_EXECUTED_YET_TODAY").to(processChatData)
+                .next(saveMessageCountRankedChatRooms)
+                .next(cleanupOldMessageCountRankedChatRooms)
+                .from(messageCountDecider()).on("COMPLETED_TODAY").stop()
                 .build();
     }
 
     @Bean
-    public JobExecutionDecider decider() {
-        return new CheckExecutionStatusDecider(topRankedChatRoomRepository);
+    public CheckMessageCountExecutionStatusDecider messageCountDecider() {
+        return new CheckMessageCountExecutionStatusDecider(messageCountRankedChatRoomRepository);
     }
 
     @Bean(name = "processChatData")
     public Step processChatData(RepositoryItemReader<Chat> reader,
-                      ItemProcessor<Chat, ChatRoomStatsDto> processor,
-                      ItemWriter<ChatRoomStatsDto> writer) {
+                      ItemProcessor<Chat, ChatRoomMessageCountStatsDto> processor,
+                      ItemWriter<ChatRoomMessageCountStatsDto> writer) {
         return new StepBuilder("processChatData", jobRepository)
-                .<Chat, ChatRoomStatsDto>chunk(CHUNK_SIZE, transactionManager)
+                .<Chat, ChatRoomMessageCountStatsDto>chunk(CHUNK_SIZE, transactionManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
@@ -91,12 +91,12 @@ public class SaveTopRankedChatRoomJob {
                 .build();
     }
 
-    @Bean(name = "saveTopRankedChatRooms")
-    public Step saveTopRankedChatRooms(ItemReader<ChatRoomStatsDto> reader,
-                      ItemProcessor<ChatRoomStatsDto, TopRankedChatRoom> processor,
-                      ItemWriter<TopRankedChatRoom> writer) {
-        return new StepBuilder("saveTopRankedChatRooms", jobRepository)
-                .<ChatRoomStatsDto, TopRankedChatRoom>chunk(TOP_RANKED_CHAT_ROOM_COUNT, transactionManager)
+    @Bean(name = "saveMessageCountRankedChatRooms")
+    public Step saveMessageCountRankedChatRooms(ItemReader<ChatRoomMessageCountStatsDto> reader,
+                      ItemProcessor<ChatRoomMessageCountStatsDto, MessageCountRankedChatRoom> processor,
+                      ItemWriter<MessageCountRankedChatRoom> writer) {
+        return new StepBuilder("saveMessageCountRankedChatRooms", jobRepository)
+                .<ChatRoomMessageCountStatsDto, MessageCountRankedChatRoom>chunk(TOP_RANKED_CHAT_ROOM_COUNT, transactionManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)
@@ -106,14 +106,14 @@ public class SaveTopRankedChatRoomJob {
                 .build();
     }
 
-    @Bean(name = "cleanupOldTopRankedChatRooms")
-    public Step cleanupOldTopRankedChatRoomsStep() {
-        return new StepBuilder("cleanupOldChatRoomsStep", jobRepository)
+    @Bean(name = "cleanupOldMessageCountRankedChatRooms")
+    public Step cleanupOldMessageCountRankedChatRooms() {
+        return new StepBuilder("cleanupOldMessageCountRankedChatRooms", jobRepository)
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
                         Instant sevenDaysAgo = Instant.now().minus(7, ChronoUnit.DAYS);
-                        topRankedChatRoomRepository.deleteAllOlderThanCutoffDays(sevenDaysAgo);
+                        messageCountRankedChatRoomRepository.deleteAllOlderThanCutoffDays(sevenDaysAgo);
                         return RepeatStatus.FINISHED;
                     }
                 }, transactionManager)
@@ -137,27 +137,27 @@ public class SaveTopRankedChatRoomJob {
     }
 
     @Bean
-    public ItemProcessor<Chat, ChatRoomStatsDto> chatToStatsProcessor() {
-        return new ChatToStatsProcessor();
+    public ItemProcessor<Chat, ChatRoomMessageCountStatsDto> chatToMessageStatsProcessor() {
+        return new ChatToMessageStatsProcessor();
     }
 
     @Bean
-    public ItemWriter<ChatRoomStatsDto> chatStatsWriter() {
-        return new ChatStatsWriter();
+    public ItemWriter<ChatRoomMessageCountStatsDto> chatRoomMessageStatsWriter() {
+        return new ChatRoomMessageStatsWriter();
     }
 
     @Bean
-    public ItemReader<ChatRoomStatsDto> chatStatsReader() {
-        return new ChatStatsReader();
+    public ItemReader<ChatRoomMessageCountStatsDto> chatRoomMessageStatsReader() {
+        return new ChatRoomMessageStatsReader();
     }
 
     @Bean
-    public ItemProcessor<ChatRoomStatsDto, TopRankedChatRoom> statsToTopRankedRoomsProcessor() {
-        return new StatsToTopRankedRoomsProcessor();
+    public ItemProcessor<ChatRoomMessageCountStatsDto, MessageCountRankedChatRoom> statsToMessageCountRankedRoomsProcessor() {
+        return new StatsToMessageCountRankedRoomsProcessor();
     }
 
     @Bean
-    public ItemWriter<TopRankedChatRoom> topRankedChatRoomWriter() {
-        return new TopRankedChatRoomWriter(topRankedChatRoomRepository);
+    public ItemWriter<MessageCountRankedChatRoom> messageCountRankedChatRoomWriter() {
+        return new MessageCountRankedChatRoomWriter(messageCountRankedChatRoomRepository);
     }
 }
