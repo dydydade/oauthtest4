@@ -1,4 +1,4 @@
-package login.tikichat.domain.top_ranked_chatroom.scheduler;
+package login.tikichat.domain.top_ranked_chatroom.member_count.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -16,17 +16,17 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableScheduling
 @RequiredArgsConstructor
-public class ChatRoomBatchScheduler {
+public class ChatRoomMemberCountRankedBatchScheduler {
 
     private final JobLauncher jobLauncher;
 
-    private final Job saveTopRankedChatRoomJob;
+    private final Job saveMemberCountRankedChatRoomsJob;
 
     @Scheduled(cron = "0 0 * * * ?")
     public void perform() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters params = new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
                 .toJobParameters();
-        jobLauncher.run(saveTopRankedChatRoomJob, params);
+        jobLauncher.run(saveMemberCountRankedChatRoomsJob, params);
     }
 }

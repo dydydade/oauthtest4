@@ -1,6 +1,6 @@
-package login.tikichat.domain.top_ranked_chatroom.batch;
+package login.tikichat.domain.top_ranked_chatroom.member_count.batch;
 
-import login.tikichat.domain.top_ranked_chatroom.repository.TopRankedChatRoomRepository;
+import login.tikichat.domain.top_ranked_chatroom.member_count.repository.MemberCountRankedChatRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
@@ -14,9 +14,9 @@ import java.time.ZoneId;
 
 @Component
 @RequiredArgsConstructor
-public class CheckExecutionStatusDecider implements JobExecutionDecider {
+public class CheckMemberCountExecutionStatusDecider implements JobExecutionDecider {
 
-    private final TopRankedChatRoomRepository repository;
+    private final MemberCountRankedChatRoomRepository repository;
 
     @Override
     public FlowExecutionStatus decide(JobExecution jobExecution, StepExecution stepExecution) {
