@@ -78,6 +78,10 @@ public class FindChatRoomDto {
             @Min(value = 1, message = "인기순으로 조회할 채팅방은 최소 1개 이상이어야 합니다.")
             @Max(value = 25, message = "인기순으로 조회할 채팅방은 최대 25개 이하여야 합니다.")
             Integer popularityRank,
+
+            @Schema(description = "인기순으로 조회할 카테고리", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String categoryCode,
+
             @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, defaultValue = "false", description = "현재 팔로잉한 카테고리의 채팅방만 가져오기")
             Boolean isFetchOnlyFollowedCategoriesRooms
     ) {
@@ -85,7 +89,8 @@ public class FindChatRoomDto {
 
         public FindChatRoomByPopularityReq() {
             this(
-                    25,
+                    HOME_PAGE_DEFAULT_POPULARITY_RANK,
+                    null,
                     false);
         }
     }

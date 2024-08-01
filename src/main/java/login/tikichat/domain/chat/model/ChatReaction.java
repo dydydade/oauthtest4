@@ -23,7 +23,7 @@ import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(
         name = "chat_reactions",
         uniqueConstraints = {

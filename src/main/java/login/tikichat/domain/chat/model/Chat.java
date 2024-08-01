@@ -27,7 +27,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "chats")
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Builder(access = AccessLevel.PROTECTED)
 public class Chat {
     @Id
