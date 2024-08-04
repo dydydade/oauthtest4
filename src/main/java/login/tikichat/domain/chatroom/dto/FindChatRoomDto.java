@@ -59,9 +59,10 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             List<String> tags,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            Long roomManagerUserId,
+            Long hostId,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             FindCategoryDto.FindCategoryItemRes category
+            // TODO: orderNum 추가해도 될지 검토
     ) {
 
     }
