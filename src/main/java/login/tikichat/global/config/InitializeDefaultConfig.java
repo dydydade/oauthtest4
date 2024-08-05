@@ -7,6 +7,7 @@ import login.tikichat.domain.chat.model.ChatReaction;
 import login.tikichat.domain.chat.repository.ChatRepository;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
+import login.tikichat.domain.host.model.Host;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
 import login.tikichat.domain.terms.model.TermsType;
 import login.tikichat.domain.terms.service.TermsService;
@@ -96,11 +97,13 @@ public class InitializeDefaultConfig implements CommandLineRunner {
             new Category("C_1010", "취미", 10)
         );
 
-        ChatRoom chatRoom = new ChatRoom(1L, "테스트 채팅 룸1", 10, List.of("고민"), categories.get(0));
-        ChatRoom chatRoom2 = new ChatRoom(2L, "테스트 채팅 룸2", 10, List.of("고민"), categories.get(0));
-        ChatRoom chatRoom3 = new ChatRoom(3L, "테스트 채팅 룸3", 10, List.of("고민"), categories.get(1));
-        ChatRoom chatRoom4 = new ChatRoom(4L, "테스트 채팅 룸4", 10, List.of("고민"), categories.get(2));
-        ChatRoom chatRoom5 = new ChatRoom(5L, "테스트 채팅 룸5", 10, List.of("고민"), categories.get(3));
+        Host host = new Host(user, null, null, true);
+
+        ChatRoom chatRoom = new ChatRoom(host, "테스트 채팅 룸1", 10, List.of("고민"), categories.get(0));
+        ChatRoom chatRoom2 = new ChatRoom(host, "테스트 채팅 룸2", 10, List.of("고민"), categories.get(0));
+        ChatRoom chatRoom3 = new ChatRoom(host, "테스트 채팅 룸3", 10, List.of("고민"), categories.get(1));
+        ChatRoom chatRoom4 = new ChatRoom(host, "테스트 채팅 룸4", 10, List.of("고민"), categories.get(2));
+        ChatRoom chatRoom5 = new ChatRoom(host, "테스트 채팅 룸5", 10, List.of("고민"), categories.get(3));
 
         List<ChatRoom> chatRooms = List.of(
                 chatRoom, chatRoom2, chatRoom3, chatRoom4, chatRoom5
