@@ -26,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -134,21 +136,25 @@ public class ChatRoomService {
     }
 
     private FindChatRoomDto.FindChatRoomRes convertToFindChatRoomRes(List<ChatRoom> chatRooms) {
-        return new FindChatRoomDto.FindChatRoomRes(
-                chatRooms.stream().map((chatRoom ->
-                        new FindChatRoomDto.FindChatRoomItemRes(
-                                chatRoom.getName(),
-                                chatRoom.getMaxUserCount(),
-                                chatRoom.getCurrentUserCount(),
-                                chatRoom.getTags(),
-                                chatRoom.getHost().getUser().getId(),
-                                new FindCategoryDto.FindCategoryItemRes(
-                                        chatRoom.getCategory().getCode(),
-                                        chatRoom.getCategory().getName(),
-                                        chatRoom.getCategory().getOrderNum()
-                                )
-                        )
-                )).toList()
-        );
+        List<FindChatRoomDto.FindChatRoomItemRes> chatRoomItems = IntStream.range(0, chatRooms.size())
+                .mapToObj(index -> {
+                    ChatRoom chatRoom = chatRooms.get(index);
+                    return new FindChatRoomDto.FindChatRoomItemRes(
+                            chatRoom.getName(),
+                            chatRoom.getMaxUserCount(),
+                            chatRoom.getCurrentUserCount(),
+                            chatRoom.getTags(),
+                            chatRoom.getHost().getUser().getId(),
+                            new FindCategoryDto.FindCategoryItemRes(
+                                    chatRoom.getCategory().getCode(),
+                                    chatRoom.getCategory().getName(),
+                                    chatRoom.getCategory().getOrderNum()
+                            ),
+                            index + 1
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new FindChatRoomDto.FindChatRoomRes(chatRoomItems);
     }
 }
