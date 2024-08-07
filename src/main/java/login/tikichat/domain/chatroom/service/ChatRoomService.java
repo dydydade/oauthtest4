@@ -43,7 +43,7 @@ public class ChatRoomService {
 
 
     @Transactional
-    public Long createChatRoom(
+    public CreateChatRoomDto.CreateChatRoomRes createChatRoom(
             Long hostId,
             CreateChatRoomDto.CreateChatRoomReq createChatRoomReq
     ) {
@@ -75,7 +75,10 @@ public class ChatRoomService {
 
         this.chatRoomParticipantService.joinChatRoom(chatRoom.getId(), host.getUser().getId());
 
-        return chatRoom.getId();
+        return new CreateChatRoomDto.CreateChatRoomRes(
+                chatRoom.getId(),
+                host.getId()
+        );
     }
 
     public FindChatRoomDto.FindChatRoomRes findChatRooms(

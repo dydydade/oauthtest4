@@ -38,9 +38,7 @@ public class ChatRoomController {
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_USER_INFO_SUCCESS,
-                new CreateChatRoomDto.CreateChatRoomRes(
-                        this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
-                )
+                this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -48,7 +46,10 @@ public class ChatRoomController {
     @GetMapping("")
     @Operation(summary = "채팅방 조회(키워드)", description = "검색 키워드를 통해 해당하는 채팅방을 조회하는 API 입니다.")
     public ResponseEntity<ResultResponse> findChatRooms(
-            @RequestParam @Valid FindChatRoomDto.FindChatRoomReq findChatRoomReq,
+            @RequestBody
+            @Valid
+            @Parameter(required = true)
+            FindChatRoomDto.FindChatRoomReq findChatRoomReq,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
