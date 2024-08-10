@@ -1,5 +1,9 @@
 package login.tikichat.domain.user.service;
 
+import login.tikichat.domain.host.model.Follower;
+import login.tikichat.domain.host.repository.FollowerRepository;
+import login.tikichat.domain.host.model.Host;
+import login.tikichat.domain.host.repository.HostRepository;
 import login.tikichat.domain.terms.service.TermsService;
 import login.tikichat.domain.user.dto.BaseUserSignUpRequest;
 import login.tikichat.domain.user.dto.UserNormalSignUpRequest;
@@ -22,6 +26,8 @@ public class NormalSignUpStrategy implements SignUpStrategy {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TermsService termsService;
+    private final HostRepository hostRepository;
+    private final FollowerRepository followerRepository;
 
     /**
      * [회원가입 메서드]
@@ -45,6 +51,16 @@ public class NormalSignUpStrategy implements SignUpStrategy {
                 .build();
 
         User savedUser = userRepository.save(user);
+
+        // TODO: 여기에 Host, Follower 생성하는 게 맞는지 검증
+        Host host = Host.builder()
+                .user(savedUser)
+                .build();
+        Follower follower = Follower.builder()
+                .user(savedUser)
+                .build();
+        hostRepository.save(host);
+        followerRepository.save(follower);
 
         // 회원가입 필수 약관 동의 이력 저장
         services.saveAgreementHistory(userNormalSignUpRequest, user);

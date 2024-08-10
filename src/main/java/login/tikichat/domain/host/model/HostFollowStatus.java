@@ -1,7 +1,6 @@
 package login.tikichat.domain.host.model;
 
 import jakarta.persistence.*;
-import login.tikichat.domain.follower.model.Follower;
 import lombok.*;
 
 import java.time.Instant;
@@ -12,7 +11,7 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class HostSubscription {
+public class HostFollowStatus {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "host_follower_id")
@@ -26,6 +25,6 @@ public class HostSubscription {
     @JoinColumn(name = "follower_id", nullable = false)
     private Follower follower;
 
-    @Column(name = "subscribe_date", nullable = false)
-    private Instant subscribeDate;
+    @Column(name = "follow_date", nullable = false)
+    private Instant followDate;
 }

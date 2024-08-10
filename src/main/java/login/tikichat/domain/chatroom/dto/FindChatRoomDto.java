@@ -63,8 +63,9 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             FindCategoryDto.FindCategoryItemRes category,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            Integer orderNum
-            // TODO: 채팅방 종료 상태(status) 여기에 추가할지, 아니면 Res 객체를 따로 생성할지 검토
+            Integer orderNum,
+            @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+            Boolean isRoomClosed
     ) {
 
     }

@@ -15,12 +15,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -48,7 +45,7 @@ public class Chat {
     private Instant createdDate;
 
     @OneToMany(mappedBy = "chat")
-    private Set<ChatReaction> chatReactions = new HashSet<>();
+    private Set<ChatReaction> chatReactions;
 
     public static Chat sendMessage(
             Long senderUserId,

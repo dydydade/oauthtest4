@@ -36,9 +36,8 @@ public class ChatRoom {
 
     // Host: 채팅방 개설자
     @ManyToOne(optional = false)
-    @JoinColumn(name = "host", nullable = false)
+    @JoinColumn(name = "host_id", nullable = false)
     private Host host;
-
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_code", nullable = false)
@@ -47,7 +46,7 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<Attachment> attachments = new ArrayList<>();
 
-    // TODO: 채팅방 종료 상태 필드 추가 필요 (호스트 페이지에 종료된 채팅방 별도 표시 목적)
+    private boolean isRoomClosed;
 
     public ChatRoom(
             Host host,
@@ -62,6 +61,12 @@ public class ChatRoom {
         this.tags = tags;
         this.category = category;
         this.currentUserCount = 0;
+        this.isRoomClosed = false;
+    }
+
+    public void close() {
+        this.isRoomClosed = true;
+        this.currentUserCount = 0;
     }
 
     // 연관관계 편의 메소드
@@ -71,7 +76,6 @@ public class ChatRoom {
             attachment.setChatRoom(this);
         }
     }
-
 
     // Host와의 연관관계 설정 편의 메서드
     public void setHost(Host host) {
