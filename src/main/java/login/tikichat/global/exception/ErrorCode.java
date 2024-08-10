@@ -53,7 +53,13 @@ public enum ErrorCode {
     ALREADY_EXISTS_REACTION_CHAT(HttpStatus.CONFLICT.value(), "CH003", "이미 동일한 리액션을 한 이력이 있습니다."),
 
     // Host
-    NOT_FOUND_HOST(404, "H001", "존재하지 않는 호스트입니다.")
+    NOT_FOUND_HOST(404, "H001", "존재하지 않는 호스트입니다."),
+
+    // Follower
+    NOT_FOUND_FOLLOWER(404, "F001", "존재하지 않는 팔로워입니다."),
+
+    // HostSubscription
+    NOT_FOUND_HOST_FOLLOW_STATUS(404, "HS001", "팔로우 정보가 존재하지 않습니다.")
     ;
 
 

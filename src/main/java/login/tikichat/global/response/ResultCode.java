@@ -32,9 +32,16 @@ public enum ResultCode {
     // ChatRoom
     FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다."),
 
-    // chats
+    // Chat
     SEND_CHAT_SUCCESS(200, "CHAT001", "채팅이 전송되었습니다."),
-    FIND_CHAT_LIST_SUCCESS(200, "CHAT002", "채팅 리스트 조회가 완료 되었습니다.")
+    FIND_CHAT_LIST_SUCCESS(200, "CHAT002", "채팅 리스트 조회가 완료 되었습니다."),
+
+    // Host
+    FIND_FOLLOWED_HOSTS_INFO_SUCCESS(200, "H001", "내가 팔로우한 호스트 목록을 조회하였습니다."),
+    FIND_HOST_PROFILE_SUCCESS(200, "H002", "호스트 프로필 정보를 조회하였습니다."),
+    SUBSCRIBE_HOST_SUCCESS(200, "H003", "호스트를 팔로우하였습니다."),
+    UNSUBSCRIBE_HOST_SUCCESS(200, "H004", "호스트 팔로우를 취소하였습니다."),
+
     ;
 
     private int status;
