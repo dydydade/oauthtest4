@@ -35,7 +35,7 @@ public class HostService {
     private final UserRepository userRepository;
 
     @Transactional
-    public HostFollowDto.HostFollowRes subscribe(Long hostId, Long userId) {
+    public HostFollowDto.HostFollowRes follow(Long hostId, Long userId) {
         final var host = hostRepository.findById(hostId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOST));
         final var follower = followerRepository.findByUserId(userId)
                 .orElseGet(() -> {
@@ -63,7 +63,7 @@ public class HostService {
     }
 
     @Transactional
-    public HostFollowDto.HostFollowRes unsubscribe(Long hostId, Long userId) {
+    public HostFollowDto.HostFollowRes unfollow(Long hostId, Long userId) {
         final var host = hostRepository.findById(hostId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOST));
         final var follower = followerRepository.findByUserId(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_FOLLOWER));

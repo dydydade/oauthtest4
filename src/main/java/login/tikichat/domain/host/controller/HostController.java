@@ -49,26 +49,26 @@ public class HostController {
 
     @PostMapping("/{hostId}/follow")
     @Operation(summary = "호스트 팔로우", description = "호스트를 팔로우하는 API 입니다.")
-    public ResponseEntity<ResultResponse> subscribeTargetHost(
+    public ResponseEntity<ResultResponse> followTargetHost(
             @PathVariable("hostId") Long hostId,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.HOST_FOLLOWED,
-                hostService.subscribe(hostId, user.getUserId())
+                hostService.follow(hostId, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     @DeleteMapping("/{hostId}/follow")
     @Operation(summary = "호스트 팔로우 취소", description = "호스트 팔로우를 취소하는 API 입니다.")
-    public ResponseEntity<ResultResponse> unsubscribeTargetHost(
+    public ResponseEntity<ResultResponse> unfollowTargetHost(
             @PathVariable("hostId") Long hostId,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.HOST_UNFOLLOWED,
-                hostService.unsubscribe(hostId, user.getUserId())
+                hostService.unfollow(hostId, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
