@@ -39,23 +39,11 @@ public class SocialSignUpStrategy implements SignUpStrategy {
         // 회원가입 정보(이메일, 닉네임 등) 유효성 검증
         this.validateSignUpInfo(baseUserSignUpRequest);
 
-        User user = User.builder()
-                .email(baseUserSignUpRequest.getEmail())
-                .nickname(baseUserSignUpRequest.getNickname())
-                .role(Role.SOCIAL)
-                .build();
+        User user = createUserEntity(baseUserSignUpRequest);
 
-        User savedUser = userRepository.save(user);
-
-        // TODO: 여기에 Host, Follower 생성하는 게 맞는지 검증
-        Host host = Host.builder()
-                .user(savedUser)
-                .build();
-        Follower follower = Follower.builder()
-                .user(savedUser)
-                .build();
-        hostRepository.save(host);
-        followerRepository.save(follower);
+        // 호스트, 팔로워 정보 저장
+        createHostEntity(user);
+        createFollowerEntity(user);
 
         UserSocialProfileDto socialProfileDto = ((UserSocialSignUpRequest) baseUserSignUpRequest).getSocialProfileDto();
 
@@ -66,7 +54,31 @@ public class SocialSignUpStrategy implements SignUpStrategy {
         services.saveAgreementHistory(baseUserSignUpRequest, user);
 
         // 응답 객체 반환
-        return services.toSignUpResponse(savedUser);
+        return services.toSignUpResponse(user);
+    }
+
+    private User createUserEntity(BaseUserSignUpRequest request) {
+        User user = User.builder()
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .role(Role.SOCIAL)
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    private void createFollowerEntity(User savedUser) {
+        Follower follower = Follower.builder()
+                .user(savedUser)
+                .build();
+        followerRepository.save(follower);
+    }
+
+    private void createHostEntity(User savedUser) {
+        Host host = Host.builder()
+                .user(savedUser)
+                .build();
+        hostRepository.save(host);
     }
 
     /**

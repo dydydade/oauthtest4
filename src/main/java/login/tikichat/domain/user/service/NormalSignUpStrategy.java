@@ -14,7 +14,6 @@ import login.tikichat.domain.user.repository.UserRepository;
 import login.tikichat.global.exception.user.AlreadySignedUpUserException;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class NormalSignUpStrategy implements SignUpStrategy {
 
     private final CommonSignUpServices services;
-    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TermsService termsService;
     private final HostRepository hostRepository;
@@ -37,36 +35,46 @@ public class NormalSignUpStrategy implements SignUpStrategy {
     @Override
     @Transactional
     public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) {
-
         UserNormalSignUpRequest userNormalSignUpRequest = (UserNormalSignUpRequest) baseUserSignUpRequest;
 
         // 회원가입 정보(이메일, 닉네임 등) 유효성 검증
         this.validateSignUpInfo(userNormalSignUpRequest);
 
-        User user = User.builder()
-                .email(userNormalSignUpRequest.getEmail())
-                .password(passwordEncoder.encode(userNormalSignUpRequest.getPassword()))
-                .nickname(userNormalSignUpRequest.getNickname())
-                .role(Role.USER)
-                .build();
+        User user = createUserEntity(baseUserSignUpRequest);
 
-        User savedUser = userRepository.save(user);
-
-        // TODO: 여기에 Host, Follower 생성하는 게 맞는지 검증
-        Host host = Host.builder()
-                .user(savedUser)
-                .build();
-        Follower follower = Follower.builder()
-                .user(savedUser)
-                .build();
-        hostRepository.save(host);
-        followerRepository.save(follower);
+        // 호스트, 팔로워 정보 저장
+        createHostEntity(user);
+        createFollowerEntity(user);
 
         // 회원가입 필수 약관 동의 이력 저장
         services.saveAgreementHistory(userNormalSignUpRequest, user);
 
         // 응답 객체 반환
-        return services.toSignUpResponse(savedUser);
+        return services.toSignUpResponse(user);
+    }
+
+    private User createUserEntity(BaseUserSignUpRequest request) {
+        User user = User.builder()
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .role(Role.SOCIAL)
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    private void createFollowerEntity(User savedUser) {
+        Follower follower = Follower.builder()
+                .user(savedUser)
+                .build();
+        followerRepository.save(follower);
+    }
+
+    private void createHostEntity(User savedUser) {
+        Host host = Host.builder()
+                .user(savedUser)
+                .build();
+        hostRepository.save(host);
     }
 
     /**
