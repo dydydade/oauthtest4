@@ -8,6 +8,7 @@ import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,13 +24,14 @@ public class HostController {
     private final HostService hostService;
 
     @GetMapping("")
-    @Operation(summary = "내가 팔로우한 호스트 목록 조회", description = "내가 팔로우하고 있는 호스트 목록을 조회하는 API 입니다.")
+    @Operation(summary = "팔로워가 팔로우한 호스트 목록 조회", description = "팔로워가 팔로우하고 있는 호스트 목록을 조회하는 API 입니다. followerId 파라미터를 넘기지 않으면 인증된 사용자(나)가 팔로우하고 있는 호스트 명단이 조회됩니다.")
     public ResponseEntity<ResultResponse> findFollowedHosts(
+            @Param("followerId") Long followerId,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FOLLOWED_HOSTS_FOUND,
-                this.hostService.findFollowedHosts(user.getUserId())
+                followerId != null ? this.hostService.findTargetFollowerHosts(followerId) : this.hostService.findMyFollowedHosts(user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -82,19 +84,6 @@ public class HostController {
         ResultResponse result = ResultResponse.of(
                 ResultCode.TARGET_HOST_FOLLOWERS_FOUND,
                 this.hostService.findTargetHostFollowers(hostId)
-        );
-        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
-    }
-
-    @GetMapping("/{followerId}/hosts")
-    @Operation(summary = "호스트 목록 조회", description = "대상 팔로워가 팔로우한 호스트 목록을 조회하는 API 입니다.")
-    public ResponseEntity<ResultResponse> findTargetFollowerHosts(
-            @PathVariable("followerId") Long followerId,
-            @AuthenticationPrincipal UserDetailInfo user
-    ) {
-        ResultResponse result = ResultResponse.of(
-                ResultCode.TARGET_FOLLOWER_HOSTS_FOUND,
-                this.hostService.findTargetFollowerHosts(followerId)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }

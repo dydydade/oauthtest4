@@ -4,6 +4,7 @@ import login.tikichat.domain.host.model.HostFollowStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -11,4 +12,6 @@ import java.util.Optional;
 public interface HostFollowStatusRepository extends JpaRepository<HostFollowStatus, Long>, CustomHostFollowStatusRepository {
     long countByHostId(Long hostId);
     Optional<HostFollowStatus> findByHostIdAndFollowerId(Long hostId, Long followerId);
+
+    List<HostFollowStatus> findByFollowerId(Long followerId);
 }

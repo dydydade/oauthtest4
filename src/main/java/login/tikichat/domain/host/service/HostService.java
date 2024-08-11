@@ -90,14 +90,14 @@ public class HostService {
     }
 
     @Transactional(readOnly = true)
-    public FindHostDto.FindHostRes findFollowedHosts(Long followerUserId) {
+    public FindHostDto.FindHostRes findMyFollowedHosts(Long followerUserId) {
         List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerUserId(followerUserId).stream()
                 .map(HostFollowStatus::getHost)
                 .map(host -> FindHostDto.FindHostItemRes.builder()
                         .hostId(host.getId())
                         .hostNickname(host.getHostNickname())
                         .hostProfileImageUrl(host.getHostProfileImageUrl())
-                        .isOnline(host.isOnline())
+                        .isOnline(host.isHostOnline())
                         .build())
                 .toList();
 
@@ -105,8 +105,8 @@ public class HostService {
     }
 
     @Transactional(readOnly = true)
-    public FindHostDto.FindHostRes findTargetFollowerHosts(Long followerUserId) {
-        List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerUserId(followerUserId).stream()
+    public FindHostDto.FindHostRes findTargetFollowerHosts(Long followerId) {
+        List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerId(followerId).stream()
                 .map(HostFollowStatus::getHost)
                 .map(host -> FindHostDto.FindHostItemRes.builder()
                         .hostId(host.getId())
