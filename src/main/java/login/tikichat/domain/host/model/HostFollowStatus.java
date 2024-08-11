@@ -6,7 +6,17 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "host_follow_status")
+@Table(
+        name = "host_follow_status",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {
+                                "host_id",
+                                "follower_id"
+                        }
+                )
+        }
+)
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
