@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import login.tikichat.domain.user.model.User;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,5 +25,5 @@ public class Follower {
     private User user;
 
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
-    private List<HostFollowStatus> hostFollowStatuses;
+    private List<HostFollowStatus> hostFollowStatuses = new ArrayList<>();
 }
