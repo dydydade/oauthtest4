@@ -8,6 +8,7 @@ import login.tikichat.domain.terms.model.AgreementHistory;
 import lombok.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -36,16 +37,16 @@ public class User {
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<SocialProfile> socialProfiles;
+    private List<SocialProfile> socialProfiles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserRefreshToken> userRefreshTokens; // 리프레시 토큰
+    private List<UserRefreshToken> userRefreshTokens = new ArrayList<>(); // 리프레시 토큰
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<AgreementHistory> termsAgreementHistories;
+    private List<AgreementHistory> termsAgreementHistories = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<ChatReaction> chatReactions;
+    private List<ChatReaction> chatReactions = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Host host;

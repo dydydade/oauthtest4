@@ -6,6 +6,7 @@ import login.tikichat.domain.user.model.User;
 import lombok.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -27,10 +28,10 @@ public class Host {
     private User user;
 
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
-    private List<ChatRoom> chatRooms;
+    private List<ChatRoom> chatRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
-    private List<HostFollowStatus> hostFollowStatuses;
+    private List<HostFollowStatus> hostFollowStatuses = new ArrayList<>();
 
     // TODO: 실제 호스트 접속 정보 반환하도록 수정(추후)
     private boolean isOnline;
