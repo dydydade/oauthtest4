@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "host_subscription")
+@Table(name = "host_follow_status")
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

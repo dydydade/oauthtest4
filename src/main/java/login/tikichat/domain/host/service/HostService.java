@@ -27,7 +27,7 @@ import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
-public class HostFollowStatusService {
+public class HostService {
 
     private final HostFollowStatusRepository hostFollowStatusRepository;
     private final HostRepository hostRepository;
@@ -37,7 +37,6 @@ public class HostFollowStatusService {
     @Transactional
     public HostFollowDto.HostFollowRes subscribe(Long hostId, Long userId) {
         final var host = hostRepository.findById(hostId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_HOST));
-        // TODO: 아래 코드는 특정 호스트를 구독하는 시점에 신규 Follower 를 생성 / 회원가입 시점에 Follower 를 생성할지 고민 필요
         final var follower = followerRepository.findByUserId(userId)
                 .orElseGet(() -> {
                     User user = this.userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
@@ -47,6 +46,10 @@ public class HostFollowStatusService {
                     followerRepository.save(newFollower);
                     return newFollower;
                 });
+
+        if (hostFollowStatusRepository.findByHostIdAndFollowerId(hostId, follower.getId()).isPresent()) {
+            throw new BusinessException(ErrorCode.ALREADY_FOLLOWING_HOST);
+        }
 
         final var hostSubscription = HostFollowStatus.builder()
                 .host(host)
@@ -102,6 +105,21 @@ public class HostFollowStatusService {
     }
 
     @Transactional(readOnly = true)
+    public FindHostDto.FindHostRes findTargetFollowerHosts(Long followerUserId) {
+        List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerUserId(followerUserId).stream()
+                .map(HostFollowStatus::getHost)
+                .map(host -> FindHostDto.FindHostItemRes.builder()
+                        .hostId(host.getId())
+                        .hostNickname(host.getHostNickname())
+                        .hostProfileImageUrl(host.getHostProfileImageUrl())
+                        .isOnline(host.isHostOnline())
+                        .build())
+                .toList();
+
+        return new FindHostDto.FindHostRes(hostItems);
+    }
+
+    @Transactional(readOnly = true)
     public FindFollowerDto.FindFollowerRes findTargetHostFollowers(Long hostUserId) {
         List<FindFollowerDto.FindFollowerItemRes> followerItems = hostFollowStatusRepository.findByHostUserId(hostUserId).stream()
                 .map(HostFollowStatus::getFollower)
@@ -114,7 +132,6 @@ public class HostFollowStatusService {
 
         return new FindFollowerDto.FindFollowerRes(followerItems);
     }
-
 
     @Transactional(readOnly = true)
     public boolean existsByHostIdAndFollowerUserId(Long hostId, Long userId) {

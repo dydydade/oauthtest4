@@ -3,7 +3,7 @@ package login.tikichat.domain.host.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import login.tikichat.domain.host.service.HostFollowStatusService;
+import login.tikichat.domain.host.service.HostService;
 import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class HostController {
 
-    private final HostFollowStatusService hostFollowStatusService;
+    private final HostService hostService;
 
     @GetMapping("")
     @Operation(summary = "내가 팔로우한 호스트 목록 조회", description = "내가 팔로우하고 있는 호스트 목록을 조회하는 API 입니다.")
@@ -28,8 +28,8 @@ public class HostController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_FOLLOWED_HOSTS_INFO_SUCCESS,
-                this.hostFollowStatusService.findFollowedHosts(user.getUserId())
+                ResultCode.FOLLOWED_HOSTS_FOUND,
+                this.hostService.findFollowedHosts(user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -41,8 +41,8 @@ public class HostController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_HOST_PROFILE_SUCCESS,
-                this.hostFollowStatusService.getHostProfile(hostId, user.getUserId())
+                ResultCode.HOST_PROFILE_FOUND,
+                this.hostService.getHostProfile(hostId, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -54,8 +54,8 @@ public class HostController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.SUBSCRIBE_HOST_SUCCESS,
-                hostFollowStatusService.subscribe(hostId, user.getUserId())
+                ResultCode.HOST_FOLLOWED,
+                hostService.subscribe(hostId, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -67,8 +67,8 @@ public class HostController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.UNSUBSCRIBE_HOST_SUCCESS,
-                hostFollowStatusService.unsubscribe(hostId, user.getUserId())
+                ResultCode.HOST_UNFOLLOWED,
+                hostService.unsubscribe(hostId, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -80,10 +80,22 @@ public class HostController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_FOLLOWED_HOSTS_INFO_SUCCESS,
-                this.hostFollowStatusService.findTargetHostFollowers(hostId)
+                ResultCode.TARGET_HOST_FOLLOWERS_FOUND,
+                this.hostService.findTargetHostFollowers(hostId)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
+    @GetMapping("/{followerId}/hosts")
+    @Operation(summary = "호스트 목록 조회", description = "대상 팔로워가 팔로우한 호스트 목록을 조회하는 API 입니다.")
+    public ResponseEntity<ResultResponse> findTargetFollowerHosts(
+            @PathVariable("followerId") Long followerId,
+            @AuthenticationPrincipal UserDetailInfo user
+    ) {
+        ResultResponse result = ResultResponse.of(
+                ResultCode.TARGET_FOLLOWER_HOSTS_FOUND,
+                this.hostService.findTargetFollowerHosts(followerId)
+        );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
 }

@@ -58,8 +58,9 @@ public enum ErrorCode {
     // Follower
     NOT_FOUND_FOLLOWER(404, "F001", "존재하지 않는 팔로워입니다."),
 
-    // HostSubscription
-    NOT_FOUND_HOST_FOLLOW_STATUS(404, "HS001", "팔로우 정보가 존재하지 않습니다.")
+    // HostFollowStatus
+    NOT_FOUND_HOST_FOLLOW_STATUS(404, "HF001", "팔로우 정보가 존재하지 않습니다."),
+    ALREADY_FOLLOWING_HOST(409, "HF002", "이미 팔로우 중인 호스트입니다.")
     ;
 
 
