@@ -153,7 +153,8 @@ public class ChatRoomService {
                                     chatRoom.getCategory().getName(),
                                     chatRoom.getCategory().getOrderNum()
                             ),
-                            index + 1
+                            index + 1,
+                            chatRoom.isRoomClosed()
                     );
                 })
                 .collect(Collectors.toList());
