@@ -3,7 +3,7 @@ package login.tikichat.domain.chatroom.model;
 import jakarta.persistence.*;
 import login.tikichat.domain.attachment.model.Attachment;
 import login.tikichat.domain.category.model.Category;
-import lombok.AccessLevel;
+import login.tikichat.domain.host.model.Host;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(name = "chat_rooms")
 public class ChatRoom {
     @Id
@@ -34,9 +34,10 @@ public class ChatRoom {
     @JdbcTypeCode(SqlTypes.JSON)
     private List<String> tags;
 
-    // 방장 userId
-    @Column(name = "room_manager_user_id", nullable = false)
-    private Long roomManagerUserId;
+    // Host: 채팅방 개설자
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "host_id", nullable = false)
+    private Host host;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_code", nullable = false)
@@ -45,18 +46,26 @@ public class ChatRoom {
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<Attachment> attachments = new ArrayList<>();
 
+    private boolean isRoomClosed;
+
     public ChatRoom(
-            Long roomManagerUserId,
+            Host host,
             String name,
             Integer maxUserCount,
             List<String> tags,
             Category category
     ) {
-        this.roomManagerUserId = roomManagerUserId;
+        this.host = host;
         this.name = name;
         this.maxUserCount = maxUserCount;
         this.tags = tags;
         this.category = category;
+        this.currentUserCount = 0;
+        this.isRoomClosed = false;
+    }
+
+    public void close() {
+        this.isRoomClosed = true;
         this.currentUserCount = 0;
     }
 
@@ -65,6 +74,17 @@ public class ChatRoom {
         if (!this.attachments.contains(attachment)) {
             this.attachments.add(attachment);
             attachment.setChatRoom(this);
+        }
+    }
+
+    // Host와의 연관관계 설정 편의 메서드
+    public void setHost(Host host) {
+        // 새로운 User 설정
+        this.host = host;
+
+        // 새로운 Host 의 ChatRoom 리스트에 현재 ChatRoom 이 없다면 추가
+        if (host != null && !host.getChatRooms().contains(this)) {
+            host.getChatRooms().add(this);
         }
     }
 }

@@ -2,8 +2,12 @@ package login.tikichat.global.config;
 
 import login.tikichat.domain.category.model.Category;
 import login.tikichat.domain.category.repository.CategoryRepository;
+import login.tikichat.domain.chat.model.Chat;
+import login.tikichat.domain.chat.model.ChatReaction;
+import login.tikichat.domain.chat.repository.ChatRepository;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
+import login.tikichat.domain.host.model.Host;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
 import login.tikichat.domain.terms.model.TermsType;
 import login.tikichat.domain.terms.service.TermsService;
@@ -19,8 +23,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 초기 상태 등록 Config
@@ -36,6 +43,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final TermsService termsService;
     private final CategoryRepository categoryRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRepository chatRepository;
 
     /**
      * 앱 계정(User) 및 소셜 연동 정보 저장
@@ -89,14 +97,16 @@ public class InitializeDefaultConfig implements CommandLineRunner {
             new Category("C_1010", "취미", 10)
         );
 
+        Host host = new Host(user, null, null, true);
+
+        ChatRoom chatRoom = new ChatRoom(host, "테스트 채팅 룸1", 10, List.of("고민"), categories.get(0));
+        ChatRoom chatRoom2 = new ChatRoom(host, "테스트 채팅 룸2", 10, List.of("고민"), categories.get(0));
+        ChatRoom chatRoom3 = new ChatRoom(host, "테스트 채팅 룸3", 10, List.of("고민"), categories.get(1));
+        ChatRoom chatRoom4 = new ChatRoom(host, "테스트 채팅 룸4", 10, List.of("고민"), categories.get(2));
+        ChatRoom chatRoom5 = new ChatRoom(host, "테스트 채팅 룸5", 10, List.of("고민"), categories.get(3));
+
         List<ChatRoom> chatRooms = List.of(
-                new ChatRoom(
-                        2L,
-                        "테스트 채팅 룸",
-                        10,
-                        List.of("고민"),
-                        categories.get(0)
-                )
+                chatRoom, chatRoom2, chatRoom3, chatRoom4, chatRoom5
         );
 
         userRepository.save(user);
@@ -104,10 +114,27 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         categoryRepository.saveAll(categories);
         chatRoomRepository.saveAll(chatRooms);
 
-//        socialProfileRepository.save(naver);
-//        socialProfileRepository.save(kakao);
-//        socialProfileRepository.save(google);
+        Instant now = Instant.now();
+        Instant end = now.truncatedTo(ChronoUnit.DAYS);
+        Instant start = end.minus(1, ChronoUnit.DAYS);
 
+        ChatReaction chatReaction1 = new ChatReaction();
+
+        Chat chat = new Chat(1L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat2 = new Chat(2L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat3 = new Chat(3L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat4 = new Chat(4L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat5 = new Chat(5L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat6 = new Chat(6L, "asdf", 2L, chatRoom3, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat7 = new Chat(7L, "asdf", 2L, chatRoom4, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat8 = new Chat(8L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat9 = new Chat(9L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+
+        List<Chat> chats = List.of(
+                chat, chat2, chat3, chat4, chat5, chat6, chat7, chat8, chat9
+        );
+
+        chatRepository.saveAll(chats);
 
         // 이용약관 저장
         TermsCreateRequest termsOfService = TermsCreateRequest.builder()

@@ -34,7 +34,8 @@ public class CreateChatRoomDto {
     }
 
     public record CreateChatRoomRes(
-        Long id
+        Long id,
+        Long hostId
     ) {
 
     }

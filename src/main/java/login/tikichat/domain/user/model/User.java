@@ -2,17 +2,20 @@ package login.tikichat.domain.user.model;
 
 import jakarta.persistence.*;
 import login.tikichat.domain.chat.model.ChatReaction;
+import login.tikichat.domain.host.model.Follower;
+import login.tikichat.domain.host.model.Host;
 import login.tikichat.domain.terms.model.AgreementHistory;
 import lombok.*;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 
 @Entity
 @Getter
 @Builder
-@Table(name = "USERS")
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class User {
@@ -26,22 +29,30 @@ public class User {
     private String email; // 이메일
     private String password; // 비밀번호
     private String nickname; // 닉네임
+    // TODO: 현재 UI상 description 등록/수정하는 페이지가 없음. 추가되는 대로 작업 필요
+    private String description; // 사용자가 직접 설정한 상세설명(자기소개 등)
     private URL imageUrl; // 프로필 이미지
 
     @Enumerated(EnumType.STRING)
     private Role role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<SocialProfile> socialProfiles;
+    private List<SocialProfile> socialProfiles = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserRefreshToken> userRefreshTokens; // 리프레시 토큰
+    private List<UserRefreshToken> userRefreshTokens = new ArrayList<>(); // 리프레시 토큰
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<AgreementHistory> termsAgreementHistories;
+    private List<AgreementHistory> termsAgreementHistories = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
-    private List<ChatReaction> chatReactions;
+    private List<ChatReaction> chatReactions = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Host host;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Follower follower;
 
     // 유저 권한 설정 메소드
     public void authorizeUser() {
