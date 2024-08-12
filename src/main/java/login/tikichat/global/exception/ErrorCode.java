@@ -51,6 +51,16 @@ public enum ErrorCode {
     NOT_CHAT_ROOM_PARTICIPANT(403, "CH001", "채팅방 참가자가 아닙니다."),
     NOT_FOUND_CHAT(404, "CH002", "존재하지 않는 채팅입니다."),
     ALREADY_EXISTS_REACTION_CHAT(HttpStatus.CONFLICT.value(), "CH003", "이미 동일한 리액션을 한 이력이 있습니다."),
+
+    // Host
+    NOT_FOUND_HOST(404, "H001", "존재하지 않는 호스트입니다."),
+
+    // Follower
+    NOT_FOUND_FOLLOWER(404, "F001", "존재하지 않는 팔로워입니다."),
+
+    // HostFollowStatus
+    NOT_FOUND_HOST_FOLLOW_STATUS(404, "HF001", "팔로우 정보가 존재하지 않습니다."),
+    ALREADY_FOLLOWING_HOST(409, "HF002", "이미 팔로우 중인 호스트입니다.")
     ;
 
 

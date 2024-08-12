@@ -8,10 +8,14 @@ import login.tikichat.domain.chatroom.dto.FindChatRoomDto;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.chatroom_participant.service.ChatRoomParticipantService;
+import login.tikichat.domain.host.model.Host;
+import login.tikichat.domain.host.repository.HostRepository;
 import login.tikichat.domain.top_ranked_chatroom.member_count.model.MemberCountRankedChatRoom;
 import login.tikichat.domain.top_ranked_chatroom.member_count.repository.MemberCountRankedChatRoomRepository;
 import login.tikichat.domain.top_ranked_chatroom.message_count.model.MessageCountRankedChatRoom;
 import login.tikichat.domain.top_ranked_chatroom.message_count.repository.MessageCountRankedChatRoomRepository;
+import login.tikichat.domain.user.model.User;
+import login.tikichat.domain.user.repository.UserRepository;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
 import login.tikichat.global.exception.chatroom.ChatRoomNotFoundException;
@@ -22,6 +26,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,30 +38,47 @@ public class ChatRoomService {
     private final ChatRoomParticipantService chatRoomParticipantService;
     private final MessageCountRankedChatRoomRepository messageCountRankedChatRoomRepository;
     private final MemberCountRankedChatRoomRepository memberCountRankedChatRoomRepository;
+    private final HostRepository hostRepository;
+    private final UserRepository userRepository;
 
 
     @Transactional
-    public Long createChatRoom(
-            Long rootManagerUserId,
+    public CreateChatRoomDto.CreateChatRoomRes createChatRoom(
+            Long hostId,
             CreateChatRoomDto.CreateChatRoomReq createChatRoomReq
     ) {
         final var category = this.categoryRepository.findByCode(
                 createChatRoomReq.categoryCode()
         ).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
 
-        final var chatRoot = new ChatRoom(
-                rootManagerUserId,
+        User user = this.userRepository.findById(hostId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+
+        final var host = this.hostRepository.findById(hostId)
+                .orElse(Host.builder()
+                        .user(user)
+                        .isOnline(true)
+                        .build());
+
+        this.hostRepository.save(host);
+
+        final var chatRoom = new ChatRoom(
+                host,
                 createChatRoomReq.name(),
                 createChatRoomReq.maxUserCount(),
                 createChatRoomReq.tags(),
                 category
         );
 
-        this.chatRoomRepository.save(chatRoot);
+        chatRoom.setHost(host);
 
-        this.chatRoomParticipantService.joinChatRoom(chatRoot.getId(), rootManagerUserId);
+        this.chatRoomRepository.save(chatRoom);
 
-        return chatRoot.getId();
+        this.chatRoomParticipantService.joinChatRoom(chatRoom.getId(), host.getUser().getId());
+
+        return new CreateChatRoomDto.CreateChatRoomRes(
+                chatRoom.getId(),
+                host.getId()
+        );
     }
 
     public FindChatRoomDto.FindChatRoomRes findChatRooms(
@@ -116,21 +139,26 @@ public class ChatRoomService {
     }
 
     private FindChatRoomDto.FindChatRoomRes convertToFindChatRoomRes(List<ChatRoom> chatRooms) {
-        return new FindChatRoomDto.FindChatRoomRes(
-                chatRooms.stream().map((chatRoom ->
-                        new FindChatRoomDto.FindChatRoomItemRes(
-                                chatRoom.getName(),
-                                chatRoom.getMaxUserCount(),
-                                chatRoom.getCurrentUserCount(),
-                                chatRoom.getTags(),
-                                chatRoom.getRoomManagerUserId(),
-                                new FindCategoryDto.FindCategoryItemRes(
-                                        chatRoom.getCategory().getCode(),
-                                        chatRoom.getCategory().getName(),
-                                        chatRoom.getCategory().getOrderNum()
-                                )
-                        )
-                )).toList()
-        );
+        List<FindChatRoomDto.FindChatRoomItemRes> chatRoomItems = IntStream.range(0, chatRooms.size())
+                .mapToObj(index -> {
+                    ChatRoom chatRoom = chatRooms.get(index);
+                    return new FindChatRoomDto.FindChatRoomItemRes(
+                            chatRoom.getName(),
+                            chatRoom.getMaxUserCount(),
+                            chatRoom.getCurrentUserCount(),
+                            chatRoom.getTags(),
+                            chatRoom.getHost().getUser().getId(),
+                            new FindCategoryDto.FindCategoryItemRes(
+                                    chatRoom.getCategory().getCode(),
+                                    chatRoom.getCategory().getName(),
+                                    chatRoom.getCategory().getOrderNum()
+                            ),
+                            index + 1,
+                            chatRoom.isRoomClosed()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new FindChatRoomDto.FindChatRoomRes(chatRoomItems);
     }
 }

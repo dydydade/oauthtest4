@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import login.tikichat.domain.category.dto.FindCategoryDto;
+import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
@@ -25,7 +25,6 @@ public class FindChatRoomDto {
     }
 
     public record FindChatRoomReq(
-            @NotEmpty
             @Schema(description = "채팅방 검색 키워드", requiredMode = Schema.RequiredMode.NOT_REQUIRED, maxLength = 200, minLength = 1)
             @Length(max = 200, min = 1)
             @Nullable
@@ -49,6 +48,7 @@ public class FindChatRoomDto {
         }
     }
 
+    @Builder
     public record FindChatRoomItemRes(
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             String name,
@@ -59,13 +59,18 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             List<String> tags,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            Long roomManagerUserId,
+            Long hostId,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            FindCategoryDto.FindCategoryItemRes category
+            FindCategoryDto.FindCategoryItemRes category,
+            @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+            Integer orderNum,
+            @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+            Boolean isRoomClosed
     ) {
 
     }
 
+    @Builder
     public record FindChatRoomRes(
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             List<FindChatRoomItemRes> chatRooms
