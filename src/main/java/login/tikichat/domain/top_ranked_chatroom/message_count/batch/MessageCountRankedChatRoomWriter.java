@@ -20,8 +20,6 @@ public class MessageCountRankedChatRoomWriter implements ItemWriter<MessageCount
 
     @Override
     public void write(Chunk<? extends MessageCountRankedChatRoom> items) {
-        ExecutionContext context = StepSynchronizationManager.getContext().getStepExecution().getJobExecution().getExecutionContext();
-        ConcurrentHashMap<Long, Integer> chatRoomStatsMap = (ConcurrentHashMap<Long, Integer>) context.get("chatRoomStatsMap");
         items.forEach(messageCountRankedChatRoomRepository::save);
     }
 }
