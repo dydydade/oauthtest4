@@ -42,7 +42,6 @@ public class SaveMessageCountRankedChatRoomJob {
     private final PlatformTransactionManager transactionManager;
     private final ChatRepository chatRepository;
     private final MessageCountRankedChatRoomRepository messageCountRankedChatRoomRepository;
-    private static final int TOP_RANKED_CHAT_ROOM_COUNT = 25;
     private static final int CHUNK_SIZE = 1000;
 
     @Bean(name = "saveMessageCountRankedChatRoomsJob")
@@ -96,7 +95,7 @@ public class SaveMessageCountRankedChatRoomJob {
                       ItemProcessor<ChatRoomMessageCountStatsDto, MessageCountRankedChatRoom> processor,
                       ItemWriter<MessageCountRankedChatRoom> writer) {
         return new StepBuilder("saveMessageCountRankedChatRooms", jobRepository)
-                .<ChatRoomMessageCountStatsDto, MessageCountRankedChatRoom>chunk(TOP_RANKED_CHAT_ROOM_COUNT, transactionManager)
+                .<ChatRoomMessageCountStatsDto, MessageCountRankedChatRoom>chunk(CHUNK_SIZE, transactionManager)
                 .reader(reader)
                 .processor(processor)
                 .writer(writer)

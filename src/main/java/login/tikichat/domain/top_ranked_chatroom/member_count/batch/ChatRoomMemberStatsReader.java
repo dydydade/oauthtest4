@@ -17,7 +17,6 @@ import java.util.stream.IntStream;
 public class ChatRoomMemberStatsReader implements ItemReader<ChatRoomMemberCountStatsDto> {
 
     private Iterator<ChatRoomMemberCountStatsDto> iterator;
-    private static final int TOP_RANKED_CHAT_ROOM_COUNT = 25;
 
     private void initialize() {
         ExecutionContext context = StepSynchronizationManager.getContext().getStepExecution().getJobExecution().getExecutionContext();
@@ -27,9 +26,8 @@ public class ChatRoomMemberStatsReader implements ItemReader<ChatRoomMemberCount
             updateInnerCategoryRankings(chatRoomStatsMap);
             updateTotalRankings(chatRoomStatsMap);
 
-            List<ChatRoomMemberCountStatsDto> sortedChatRooms = chatRoomStatsMap.entrySet()
+            List<ChatRoomMemberCountStatsDto> sortedChatRooms = chatRoomStatsMap.values()
                     .stream()
-                    .map(Map.Entry::getValue)
                     .toList();
 
             iterator = sortedChatRooms.iterator();
@@ -70,7 +68,6 @@ public class ChatRoomMemberStatsReader implements ItemReader<ChatRoomMemberCount
                         e -> e.getValue().stream()
                                 .sorted(Comparator.comparingInt(ChatRoomMemberCountStatsDto::getMemberCount).reversed()
                                         .thenComparing(ChatRoomMemberCountStatsDto::getChatRoomName))
-                                .limit(TOP_RANKED_CHAT_ROOM_COUNT)
                                 .collect(Collectors.toList())
                 ));
 
