@@ -62,7 +62,10 @@ public class ChatRoomController {
     @GetMapping("/ranked/message-count")
     @Operation(summary = "채팅방 조회(메세지수 순)", description = "[홈 화면용] 메세지수 순으로 채팅방을 조회하는 API 입니다.")
     public ResponseEntity<ResultResponse> findMessageCountRankedChatRooms(
-            @ModelAttribute @Valid FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
+            @RequestBody
+            @Valid
+            @Parameter(required = true)
+            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
@@ -75,7 +78,10 @@ public class ChatRoomController {
     @GetMapping("/ranked/member-count")
     @Operation(summary = "채팅방 조회(멤버수 순)", description = "[홈 화면용] 멤버수 순으로 채팅방을 조회하는 API 입니다.")
     public ResponseEntity<ResultResponse> findMemberCountRankedChatRooms(
-            @ModelAttribute @Valid FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
+            @RequestBody
+            @Valid
+            @Parameter(required = true)
+            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(

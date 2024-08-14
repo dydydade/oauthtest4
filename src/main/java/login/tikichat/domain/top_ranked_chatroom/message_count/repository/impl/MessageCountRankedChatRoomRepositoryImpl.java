@@ -37,10 +37,10 @@ public class MessageCountRankedChatRoomRepositoryImpl extends QuerydslRepository
         if (categoryCode != null && !categoryCode.isBlank()) {
             query
                     .where(messageCountRankedChatRoomQ.categoryCode.eq(categoryCode))
-                    .orderBy(messageCountRankedChatRoomQ.innerCategoryRank.desc());
+                    .orderBy(messageCountRankedChatRoomQ.innerCategoryRank.asc());
         } else {
             query
-                    .orderBy(messageCountRankedChatRoomQ.totalRank.desc());
+                    .orderBy(messageCountRankedChatRoomQ.totalRank.asc());
         }
 
         return query

@@ -115,7 +115,7 @@ public class ChatRoomService {
     }
 
     private List<MessageCountRankedChatRoom> findMessageCountChatRooms(FindChatRoomDto.FindChatRoomByPopularityReq request) {
-        Pageable limit = PageRequest.of(0, request.popularityRank());
+        Pageable limit = PageRequest.of(request.pageNumber(), request.pageSize());
         return messageCountRankedChatRoomRepository.findMessageCountChatRooms(request.categoryCode(), limit);
     }
 
@@ -134,7 +134,7 @@ public class ChatRoomService {
     }
 
     private List<MemberCountRankedChatRoom> findMemberCountChatRooms(FindChatRoomDto.FindChatRoomByPopularityReq request) {
-        Pageable limit = PageRequest.of(0, request.popularityRank());
+        Pageable limit = PageRequest.of(request.pageNumber(), request.pageSize());
         return memberCountRankedChatRoomRepository.findMemberCountChatRooms(request.categoryCode(), limit);
     }
 
