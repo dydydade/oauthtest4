@@ -1,6 +1,7 @@
 package login.tikichat.domain.chat.service;
 
 import login.tikichat.domain.chat.constants.ChatReactionType;
+import login.tikichat.domain.chat.dto.ModifyReactionChatEventDto;
 import login.tikichat.domain.chat.model.ChatReaction;
 import login.tikichat.domain.chat.pubsub.SendChatProducer;
 import login.tikichat.domain.chat.dto.FindChatsDto;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,7 +141,7 @@ public class ChatService {
     }
 
     @Transactional
-    public void addChatReaction(Long chatId,
+    public Long addChatReaction(Long chatId,
                                 Long userId,
                                 ChatReactionType chatReactionType
     ) {
@@ -166,6 +168,18 @@ public class ChatService {
         final var chatReaction = new ChatReaction(user, chat, chatReactionType);
 
         chatReactionRepository.save(chatReaction);
+
+        this.sendChatProducer.modifyReaction(
+                new ModifyReactionChatEventDto(
+                        chat.getId(),
+                        chatReaction.getChat().getId(),
+                        chatReaction.getUser().getId(),
+                        chatReaction.getChatReactionType(),
+                        true
+                )
+        );
+
+        return chatReaction.getId();
     }
 
     @Transactional

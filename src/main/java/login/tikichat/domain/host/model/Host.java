@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @Builder
 @Table(name = "host")
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Host {
@@ -59,5 +60,16 @@ public class Host {
             this.chatRooms.add(chatRoom);
             chatRoom.setHost(this);
         }
+    }
+
+    public Host(User user,
+                List<ChatRoom> chatRooms,
+                List<HostFollowStatus> hostFollowStatuses,
+                Boolean isOnline
+    ) {
+        this.user = user;
+        this.chatRooms = chatRooms;
+        this.hostFollowStatuses = hostFollowStatuses;
+        this.isOnline = isOnline;
     }
 }

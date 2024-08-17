@@ -8,6 +8,7 @@ import login.tikichat.domain.chat.repository.ChatRepository;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.host.model.Host;
+import login.tikichat.domain.host.repository.HostRepository;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
 import login.tikichat.domain.terms.model.TermsType;
 import login.tikichat.domain.terms.service.TermsService;
@@ -44,6 +45,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
+    private final HostRepository hostRepository;
 
     /**
      * 앱 계정(User) 및 소셜 연동 정보 저장
@@ -98,6 +100,10 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         );
 
         Host host = new Host(user, null, null, true);
+
+        host.setId(1L);
+
+        this.hostRepository.save(host);
 
         ChatRoom chatRoom = new ChatRoom(host, "테스트 채팅 룸1", 10, List.of("고민"), categories.get(0));
         ChatRoom chatRoom2 = new ChatRoom(host, "테스트 채팅 룸2", 10, List.of("고민"), categories.get(0));
