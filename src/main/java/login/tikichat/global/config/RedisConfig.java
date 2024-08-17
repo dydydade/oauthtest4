@@ -42,6 +42,6 @@ public class RedisConfig {
 
     @Bean
     public ChannelTopic chatReactionChannelTopic() {
-        return new ChannelTopic("chat");
+        return new ChannelTopic("chat_reaction");
     }
 }
