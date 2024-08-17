@@ -70,7 +70,7 @@ public class ChatRoomController {
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_CHAT_ROOMS_SUCCESS,
-                this.chatRoomService.findMessageCountRankedChatRooms(findChatRoomReq, user.getUserId())
+                this.chatRoomService.findMessageCountRankedChatRooms(findChatRoomReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
@@ -86,7 +86,7 @@ public class ChatRoomController {
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_CHAT_ROOMS_SUCCESS,
-                this.chatRoomService.findMemberCountRankedChatRooms(findChatRoomReq, user.getUserId())
+                this.chatRoomService.findMemberCountRankedChatRooms(findChatRoomReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
