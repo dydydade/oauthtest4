@@ -199,6 +199,22 @@ public class ChatService {
                 new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
         );
 
+        final var chatReaction = this.chatReactionRepository.findByChatIdAndUserIdAndChatReactionType(
+                chatId,
+                userId,
+                chatReactionType
+        ).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CHAT));
+
+        this.sendChatProducer.modifyReaction(
+                new ModifyReactionChatEventDto(
+                        chat.getId(),
+                        chatReaction.getChat().getId(),
+                        chatReaction.getUser().getId(),
+                        chatReaction.getChatReactionType(),
+                        false
+                )
+        );
+
         this.chatReactionRepository.deleteByChatIdAndUserIdAndChatReactionType(
                 chatId,
                 userId,
