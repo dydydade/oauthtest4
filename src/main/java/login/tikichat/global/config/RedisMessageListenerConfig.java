@@ -1,5 +1,6 @@
 package login.tikichat.global.config;
 
+import login.tikichat.domain.chat.pubsub.ModifyReactionChatConsumer;
 import login.tikichat.domain.chat.pubsub.SendChatConsumer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,9 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @RequiredArgsConstructor
 public class RedisMessageListenerConfig {
     private final ChannelTopic chatChannelTopic;
+    private final ChannelTopic chatReactionChannelTopic;
     private final SendChatConsumer sendChatConsumer;
+    private final ModifyReactionChatConsumer modifyReactionChatConsumer;
 
     @Bean
     public RedisMessageListenerContainer redisMessageListener(RedisConnectionFactory connectionFactory){
@@ -20,6 +23,7 @@ public class RedisMessageListenerConfig {
         container.setConnectionFactory(connectionFactory);
 
         container.addMessageListener(sendChatConsumer, chatChannelTopic);
+        container.addMessageListener(modifyReactionChatConsumer, chatReactionChannelTopic);
 
         return container;
     }
