@@ -8,6 +8,7 @@ import login.tikichat.domain.chat.repository.ChatRepository;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.host.model.Host;
+import login.tikichat.domain.host.repository.HostRepository;
 import login.tikichat.domain.terms.dto.TermsCreateRequest;
 import login.tikichat.domain.terms.model.TermsType;
 import login.tikichat.domain.terms.service.TermsService;
@@ -25,8 +26,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 /**
@@ -44,17 +46,31 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final CategoryRepository categoryRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
+    private final HostRepository hostRepository;
+
+    private static final int CHAT_ROOM_COUNT = 1000;
+    private static final int CHAT_COUNT = 30000;
 
     /**
-     * 앱 계정(User) 및 소셜 연동 정보 저장
+     * 각종 엔티티들 임시 초기화 수행(개발계 테스트용)
      */
     @Override
     public void run(String... args) throws Exception {
+        User user = initializeUser();
+        initializeSocialProfile(user);
+        List<Category> categories = initializeCategories();
+        Host host = initializeHost(user);
+        List<ChatRoom> chatRooms = initializeChatRooms(categories, host);
+        ChatReaction chatReaction1 = initializeChatReaction();
+        initializeChats(chatRooms, chatReaction1);
+        initializeTerms();
+    }
+
+    private User initializeUser() {
         User user = User.builder()
                 .id(1L)
                 .email("dydydade@gmail.com")
                 .role(Role.SOCIAL)
-//                .password(passwordEncoder.encode("1234"))
                 .build();
         User user2 = User.builder()
                 .id(2L)
@@ -62,6 +78,13 @@ public class InitializeDefaultConfig implements CommandLineRunner {
                 .role(Role.USER)
                 .password(passwordEncoder.encode("1234"))
                 .build();
+
+        userRepository.save(user);
+        userRepository.save(user2);
+        return user;
+    }
+
+    private void initializeSocialProfile(User user) {
         SocialProfile naver = SocialProfile.builder()
                 .id(1L)
                 .socialEmail("xx5882@naver.com")
@@ -83,59 +106,85 @@ public class InitializeDefaultConfig implements CommandLineRunner {
                 .socialId("sub")
                 .user(user)
                 .build();
+    }
 
+    private List<Category> initializeCategories() {
         List<Category> categories = List.of(
-            new Category("C_1001", "썸 · 연애", 1),
-            new Category("C_1002", "다이어트 · 헬스", 2),
-            new Category("C_1003", "직장인/취업", 3),
-            new Category("C_1004", "공부/대입", 4),
-            new Category("C_1005", "자기계발/재테크", 5),
-            new Category("C_1006", "가족 · 결혼", 6),
-            new Category("C_1007", "연예인/팬", 7),
-            new Category("C_1008", "드라마 · 영화", 8),
-            new Category("C_1009", "뷰티/패션", 9),
-            new Category("C_1010", "취미", 10)
+                new Category("C_1001", "썸 · 연애", 1),
+                new Category("C_1002", "다이어트 · 헬스", 2),
+                new Category("C_1003", "직장인/취업", 3),
+                new Category("C_1004", "공부/대입", 4),
+                new Category("C_1005", "자기계발/재테크", 5),
+                new Category("C_1006", "가족 · 결혼", 6),
+                new Category("C_1007", "연예인/팬", 7),
+                new Category("C_1008", "드라마 · 영화", 8),
+                new Category("C_1009", "뷰티/패션", 9),
+                new Category("C_1010", "취미", 10)
         );
-
-        Host host = new Host(user, null, null, true);
-
-        ChatRoom chatRoom = new ChatRoom(host, "테스트 채팅 룸1", 10, List.of("고민"), categories.get(0));
-        ChatRoom chatRoom2 = new ChatRoom(host, "테스트 채팅 룸2", 10, List.of("고민"), categories.get(0));
-        ChatRoom chatRoom3 = new ChatRoom(host, "테스트 채팅 룸3", 10, List.of("고민"), categories.get(1));
-        ChatRoom chatRoom4 = new ChatRoom(host, "테스트 채팅 룸4", 10, List.of("고민"), categories.get(2));
-        ChatRoom chatRoom5 = new ChatRoom(host, "테스트 채팅 룸5", 10, List.of("고민"), categories.get(3));
-
-        List<ChatRoom> chatRooms = List.of(
-                chatRoom, chatRoom2, chatRoom3, chatRoom4, chatRoom5
-        );
-
-        userRepository.save(user);
-        userRepository.save(user2);
         categoryRepository.saveAll(categories);
+        return categories;
+    }
+
+    private Host initializeHost(User user) {
+        Host host = new Host(user, null, null, true);
+        hostRepository.save(host);
+        return host;
+    }
+
+    private List<ChatRoom> initializeChatRooms(List<Category> categories, Host host) {
+        List<ChatRoom> chatRooms = new ArrayList<>();
+        Random random = new Random();
+
+        for (int i = 0; i < CHAT_ROOM_COUNT; i++) {
+            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, List.of("고민"), categories.get(random.nextInt(10)));
+            chatRooms.add(chatRoom);
+        }
+
         chatRoomRepository.saveAll(chatRooms);
+        return chatRooms;
+    }
 
-        Instant now = Instant.now();
-        Instant end = now.truncatedTo(ChronoUnit.DAYS);
-        Instant start = end.minus(1, ChronoUnit.DAYS);
-
+    private static ChatReaction initializeChatReaction() {
         ChatReaction chatReaction1 = new ChatReaction();
+        return chatReaction1;
+    }
 
-        Chat chat = new Chat(1L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat2 = new Chat(2L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat3 = new Chat(3L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat4 = new Chat(4L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat5 = new Chat(5L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat6 = new Chat(6L, "asdf", 2L, chatRoom3, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat7 = new Chat(7L, "asdf", 2L, chatRoom4, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat8 = new Chat(8L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat9 = new Chat(9L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+    private void initializeChats(List<ChatRoom> chatRooms, ChatReaction chatReaction1) {
+        int batchSize = 10000; // 한 번에 저장할 데이터의 수
+        int sleepTimeMillis = 200; // 각 배치 사이의 대기 시간 (밀리초)
 
-        List<Chat> chats = List.of(
-                chat, chat2, chat3, chat4, chat5, chat6, chat7, chat8, chat9
-        );
+        List<Chat> chats = new ArrayList<>();
+        Random random = new Random();
 
-        chatRepository.saveAll(chats);
+        for (long i = 0; i < CHAT_COUNT; i++) {
+            int randNum = random.nextInt(CHAT_ROOM_COUNT);
+            Chat chat = new Chat(i, "content" + i, 1L, chatRooms.get(randNum), Instant.now(), Set.of(chatReaction1));
+            chats.add(chat);
 
+            if (chats.size() >= batchSize) {
+                chatRepository.saveAll(chats);
+                chatRepository.flush();
+                chats.clear(); // 리스트 초기화
+                System.out.println("배치 수행중... " + (i + 1) + " 번째 데이터까지 저장 완료");
+
+                // 각 배치 사이에 일정 시간 대기
+                try {
+                    Thread.sleep(sleepTimeMillis);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    System.out.println("스레드 대기 중 오류 발생");
+                }
+            }
+        }
+
+        // 남은 데이터 저장
+        if (!chats.isEmpty()) {
+            chatRepository.saveAll(chats);
+            chatRepository.flush();
+        }
+    }
+
+    private void initializeTerms() {
         // 이용약관 저장
         TermsCreateRequest termsOfService = TermsCreateRequest.builder()
                 .termsType(TermsType.TERMS_OF_SERVICE)

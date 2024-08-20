@@ -74,15 +74,15 @@ public class SaveMessageCountRankedChatRoomJob {
 
     @Bean
     public RepositoryItemReader<Chat> recentChatsReader() {
-        Instant now = Instant.now();
+        Instant now = Instant.now().plus(30, ChronoUnit.DAYS);
         Instant end = now.truncatedTo(ChronoUnit.HOURS);
-        Instant start = end.minus(1, ChronoUnit.HOURS);
+        Instant start = end.minus(60, ChronoUnit.DAYS);
 
         return new RepositoryItemReaderBuilder<Chat>()
                 .name("recentChatsReader")
                 .repository(chatRepository)
                 .methodName("findAllByCreatedDateBetween")
-                .arguments(start, end)
+                .arguments(start, now)
                 .pageSize(CHUNK_SIZE)
                 .sorts(Collections.singletonMap("id", Sort.Direction.ASC))
                 .build();
