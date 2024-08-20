@@ -46,3 +46,6 @@ out/
 
 ### DB 파일 ###
 /master_db/*
+
+### .DS_Store ###
+.DS_Store

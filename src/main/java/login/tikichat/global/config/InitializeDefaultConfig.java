@@ -127,6 +127,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
 
     private Host initializeHost(User user) {
         Host host = new Host(user, null, null, true);
+        host.setId(1L);
         hostRepository.save(host);
         return host;
     }
