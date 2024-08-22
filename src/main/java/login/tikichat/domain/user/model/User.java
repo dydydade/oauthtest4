@@ -36,15 +36,19 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<SocialProfile> socialProfiles = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRefreshToken> userRefreshTokens = new ArrayList<>(); // 리프레시 토큰
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<AgreementHistory> termsAgreementHistories = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user")
     private List<ChatReaction> chatReactions = new ArrayList<>();
 

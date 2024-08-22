@@ -10,18 +10,13 @@ import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.chatroom_participant.service.ChatRoomParticipantService;
 import login.tikichat.domain.host.model.Host;
 import login.tikichat.domain.host.repository.HostRepository;
-import login.tikichat.domain.top_ranked_chatroom.member_count.model.MemberCountRankedChatRoom;
-import login.tikichat.domain.top_ranked_chatroom.member_count.repository.MemberCountRankedChatRoomRepository;
-import login.tikichat.domain.top_ranked_chatroom.message_count.model.MessageCountRankedChatRoom;
-import login.tikichat.domain.top_ranked_chatroom.message_count.repository.MessageCountRankedChatRoomRepository;
+import login.tikichat.domain.top_ranked_chatroom.dao.CountRankedChatRoomDao;
 import login.tikichat.domain.user.model.User;
 import login.tikichat.domain.user.repository.UserRepository;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
 import login.tikichat.global.exception.chatroom.ChatRoomNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +31,9 @@ public class ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final CategoryRepository categoryRepository;
     private final ChatRoomParticipantService chatRoomParticipantService;
-    private final MessageCountRankedChatRoomRepository messageCountRankedChatRoomRepository;
-    private final MemberCountRankedChatRoomRepository memberCountRankedChatRoomRepository;
     private final HostRepository hostRepository;
     private final UserRepository userRepository;
+    private final CountRankedChatRoomDao chatRoomDao;
 
 
     @Transactional
@@ -100,42 +94,44 @@ public class ChatRoomService {
         chatRoom.addAttachment(attachment);
     }
 
-
     public FindChatRoomDto.FindChatRoomRes findMessageCountRankedChatRooms(
-            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
-            Long userId
+            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq
     ) {
-        final var chatRooms = this.findMessageCountChatRooms(findChatRoomReq).stream()
-                .map(rankedChatRoom -> chatRoomRepository
-                        .findById(rankedChatRoom.getChatRoomId())
-                        .orElseThrow(ChatRoomNotFoundException::new))
-                .toList();
+        final var start = findChatRoomReq.pageNumber() * findChatRoomReq.pageSize();
+        final var end = start + findChatRoomReq.pageSize() - 1;
+        final var type = "message";
+        final var key = getKeyForRanking(findChatRoomReq.categoryCode(), type);
+        final var chatRooms = getRankedChatRooms(key, start, end);
 
         return convertToFindChatRoomRes(chatRooms);
     }
-
-    private List<MessageCountRankedChatRoom> findMessageCountChatRooms(FindChatRoomDto.FindChatRoomByPopularityReq request) {
-        Pageable limit = PageRequest.of(0, request.popularityRank());
-        return messageCountRankedChatRoomRepository.findMessageCountChatRooms(request.categoryCode(), limit);
-    }
-
 
     public FindChatRoomDto.FindChatRoomRes findMemberCountRankedChatRooms(
-            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq,
-            Long userId
+            FindChatRoomDto.FindChatRoomByPopularityReq findChatRoomReq
     ) {
-        final var chatRooms = this.findMemberCountChatRooms(findChatRoomReq).stream()
-                .map(rankedChatRoom -> chatRoomRepository
-                        .findById(rankedChatRoom.getChatRoomId())
-                        .orElseThrow(ChatRoomNotFoundException::new))
-                .toList();
+        final var start = findChatRoomReq.pageNumber() * findChatRoomReq.pageSize();
+        final var end = start + findChatRoomReq.pageSize() - 1;
+        final var type = "member";
+        final var key = getKeyForRanking(findChatRoomReq.categoryCode(), type);
+        final var chatRooms = getRankedChatRooms(key, start, end);
 
         return convertToFindChatRoomRes(chatRooms);
     }
 
-    private List<MemberCountRankedChatRoom> findMemberCountChatRooms(FindChatRoomDto.FindChatRoomByPopularityReq request) {
-        Pageable limit = PageRequest.of(0, request.popularityRank());
-        return memberCountRankedChatRoomRepository.findMemberCountChatRooms(request.categoryCode(), limit);
+    private String getKeyForRanking(String categoryCode, String type) {
+        if (categoryCode != null) {
+            return "rank:category:" + categoryCode + ":" + type + ":chatroom";
+        } else {
+            return "rank:total:" + type + ":chatroom";
+        }
+    }
+
+    private List<ChatRoom> getRankedChatRooms(String key, int start, int end) {
+        List<String> chatRoomIds = chatRoomDao.getChatRoomRank(key, start, end);
+
+        return chatRoomRepository.findByIdsInOrder(
+                chatRoomIds.stream().map(Long::parseLong).collect(Collectors.toList())
+        );
     }
 
     private FindChatRoomDto.FindChatRoomRes convertToFindChatRoomRes(List<ChatRoom> chatRooms) {
