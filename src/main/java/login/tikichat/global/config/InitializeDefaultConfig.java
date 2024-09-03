@@ -126,15 +126,15 @@ public class InitializeDefaultConfig implements CommandLineRunner {
 
         ChatReaction chatReaction1 = new ChatReaction();
 
-        Chat chat = new Chat(1L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat2 = new Chat(2L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat3 = new Chat(3L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat4 = new Chat(4L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat5 = new Chat(5L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat6 = new Chat(6L, "asdf", 2L, chatRoom3, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat7 = new Chat(7L, "asdf", 2L, chatRoom4, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat8 = new Chat(8L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
-        Chat chat9 = new Chat(9L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1));
+        Chat chat = new Chat(1L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat2 = new Chat(2L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat3 = new Chat(3L, "stradfs", 1L, chatRoom, end.minus(3, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat4 = new Chat(4L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat5 = new Chat(5L, "asdf", 2L, chatRoom2, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat6 = new Chat(6L, "asdf", 2L, chatRoom3, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat7 = new Chat(7L, "asdf", 2L, chatRoom4, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat8 = new Chat(8L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1), null);
+        Chat chat9 = new Chat(9L, "asdf", 2L, chatRoom5, end.minus(4, ChronoUnit.HOURS), Set.of(chatReaction1), null);
 
         List<Chat> chats = List.of(
                 chat, chat2, chat3, chat4, chat5, chat6, chat7, chat8, chat9
