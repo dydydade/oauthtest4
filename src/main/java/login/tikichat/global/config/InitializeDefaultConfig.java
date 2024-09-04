@@ -48,8 +48,8 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final ChatRepository chatRepository;
     private final HostRepository hostRepository;
 
-    private static final int CHAT_ROOM_COUNT = 1000;
-    private static final int CHAT_COUNT = 30000;
+    private static final int CHAT_ROOM_COUNT = 300;
+    private static final int CHAT_COUNT = 5000;
 
     /**
      * 각종 엔티티들 임시 초기화 수행(개발계 테스트용)
@@ -137,7 +137,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         Random random = new Random();
 
         for (int i = 0; i < CHAT_ROOM_COUNT; i++) {
-            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, List.of("고민"), categories.get(random.nextInt(10)));
+            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, null, List.of("고민"), categories.get(random.nextInt(10)));
             chatRooms.add(chatRoom);
         }
 
