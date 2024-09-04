@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,9 @@ public class ChatRoom {
 
     @Column(name = "current_user_count", nullable = false)
     private Integer currentUserCount;
+
+    @Column(name = "image_url", nullable = false)
+    private URL imageUrl; // 프로필 이미지
 
     @Column(name = "tags", columnDefinition = "json", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
@@ -52,12 +56,14 @@ public class ChatRoom {
             Host host,
             String name,
             Integer maxUserCount,
+            URL imageUrl,
             List<String> tags,
             Category category
     ) {
         this.host = host;
         this.name = name;
         this.maxUserCount = maxUserCount;
+        this.imageUrl = imageUrl;
         this.tags = tags;
         this.category = category;
         this.currentUserCount = 0;
