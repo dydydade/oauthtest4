@@ -15,6 +15,11 @@ services:
             - "3308:3306"
         networks:
             - tikichat_network
+        healthcheck:
+            test: ["CMD-SHELL", "mysqladmin ping -h localhost -u cos -pcos1234"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
     
     tikichat_redis:
         image: redis:7.0.0
@@ -23,13 +28,20 @@ services:
             - "6380:6379"
         networks:
             - tikichat_network
-            
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+
     tikichat_server:
         image: dydydade/tikichat-server:latest
         restart: always
         depends_on:
-            - tikichat_db
-            - tikichat_redis
+            tikichat_db:
+                condition: service_healthy
+            tikichat_redis:
+                condition: service_healthy
         ports:
             - "8080:8080"
         networks:

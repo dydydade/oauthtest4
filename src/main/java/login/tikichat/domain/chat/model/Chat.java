@@ -45,6 +45,7 @@ public class Chat {
     @CreatedDate
     private Instant createdDate;
 
+    @Builder.Default
     @OneToMany(mappedBy = "chat")
     private Set<ChatReaction> chatReactions = new HashSet<>();
 

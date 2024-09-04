@@ -1,6 +1,7 @@
 package login.tikichat.domain.host.model;
 
 import jakarta.persistence.*;
+import login.tikichat.domain.category.model.Category;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.user.model.User;
 import lombok.*;
@@ -28,9 +29,11 @@ public class Host {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
     private List<ChatRoom> chatRooms = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
     private List<HostFollowStatus> hostFollowStatuses = new ArrayList<>();
 
@@ -51,6 +54,19 @@ public class Host {
 
     public boolean isHostOnline() {
         return isOnline;
+    }
+
+
+    public Host(
+            User user,
+            List<ChatRoom> chatRooms,
+            List<HostFollowStatus> hostFollowStatuses,
+            boolean isOnline
+    ) {
+        this.user = user;
+        this.chatRooms = chatRooms;
+        this.hostFollowStatuses = hostFollowStatuses;
+        this.isOnline = isOnline;
     }
 
     // 연관관계 편의 메소드
