@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
@@ -40,7 +41,7 @@ public class UserService {
      * @return
      */
     @Transactional
-    public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) {
+    public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) throws MalformedURLException {
         return normalSignUpStrategy.signUp(baseUserSignUpRequest);
     }
 
@@ -50,7 +51,7 @@ public class UserService {
      * @return
      */
     @Transactional
-    public UserSignUpResponse socialSignUp(BaseUserSignUpRequest baseUserSignUpRequest) {
+    public UserSignUpResponse socialSignUp(BaseUserSignUpRequest baseUserSignUpRequest) throws MalformedURLException {
         return socialSignUpStrategy.signUp(baseUserSignUpRequest);
     }
 
@@ -146,7 +147,7 @@ public class UserService {
     public URL setUserProfileImage(String email, UserDetails currentUser, MultipartFile multipartFile) throws IOException {
         final var ext = FileUtils.getExtByContentType(multipartFile.getContentType());
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new RegisteredUserNotFoundException());
-        this.verifyUserMatch(currentUser, user);
+        verifyUserMatch(currentUser, user);
 
         final var path = "profile/" + FileUtils.getTimePath();  // 프로필 이미지용 디렉토리 구분
         final var filename = FileUtils.getRandomFilename(ext);
