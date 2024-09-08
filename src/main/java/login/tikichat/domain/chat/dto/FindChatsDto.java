@@ -39,7 +39,16 @@ public class FindChatsDto {
             Long id,
             String content,
             Instant createdAt,
-            List<FindChatReactionListRes> reactions
+            List<FindChatReactionListRes> reactions,
+            FindChatsParentItemRes parentChat
+    ) {
+
+    }
+
+    public record FindChatsParentItemRes (
+            Long id,
+            String content,
+            Instant createdAt
     ) {
 
     }

@@ -22,7 +22,7 @@ public class ChatRoomMessageCountRankedBatchScheduler {
 
     private final Job saveMessageCountRankedChatRoomsJob;
 
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void perform() throws JobInstanceAlreadyCompleteException, JobExecutionAlreadyRunningException, JobParametersInvalidException, JobRestartException {
         JobParameters params = new JobParametersBuilder()
                 .addString("JobID", String.valueOf(System.currentTimeMillis()))
