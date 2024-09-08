@@ -9,7 +9,10 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Repository
 public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements CustomChatRoomRepository {
@@ -68,5 +71,21 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
         updateQuery.set(chatRoomQ.currentUserCount, chatRoomQ.currentUserCount.add(-1));
 
         throw new OptimisticLockException(ChatRoom.class);
+    }
+
+    @Override
+    public List<ChatRoom> findByIdsInOrder(List<Long> chatRoomIds) {
+        final var chatRoomQ = QChatRoom.chatRoom;
+        final var selectQuery = super.from(chatRoomQ);
+
+        List<ChatRoom> chatRooms = selectQuery.where(chatRoomQ.id.in(chatRoomIds))
+                .fetch();
+
+        Map<Long, ChatRoom> chatRoomMap = chatRooms.stream()
+                .collect(Collectors.toMap(ChatRoom::getId, Function.identity()));
+
+        return chatRoomIds.stream()
+                .map(chatRoomMap::get)
+                .collect(Collectors.toList());
     }
 }

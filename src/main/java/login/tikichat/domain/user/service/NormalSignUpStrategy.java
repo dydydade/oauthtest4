@@ -14,6 +14,7 @@ import login.tikichat.domain.user.repository.UserRepository;
 import login.tikichat.global.exception.user.AlreadySignedUpUserException;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class NormalSignUpStrategy implements SignUpStrategy {
     private final TermsService termsService;
     private final HostRepository hostRepository;
     private final FollowerRepository followerRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * [회원가입 메서드]
@@ -40,7 +42,7 @@ public class NormalSignUpStrategy implements SignUpStrategy {
         // 회원가입 정보(이메일, 닉네임 등) 유효성 검증
         this.validateSignUpInfo(userNormalSignUpRequest);
 
-        User user = createUserEntity(baseUserSignUpRequest);
+        User user = createUserEntity(userNormalSignUpRequest);
 
         // 호스트, 팔로워 정보 저장
         createHostEntity(user);
@@ -53,11 +55,12 @@ public class NormalSignUpStrategy implements SignUpStrategy {
         return services.toSignUpResponse(user);
     }
 
-    private User createUserEntity(BaseUserSignUpRequest request) {
+    private User createUserEntity(UserNormalSignUpRequest request) {
         User user = User.builder()
                 .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
-                .role(Role.SOCIAL)
+                .role(Role.USER)
                 .build();
 
         return userRepository.save(user);

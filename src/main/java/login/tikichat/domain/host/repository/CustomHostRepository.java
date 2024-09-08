@@ -1,9 +1,11 @@
 package login.tikichat.domain.host.repository;
 
 import login.tikichat.domain.host.model.Host;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface HostRepository extends JpaRepository<Host, Long>, CustomHostRepository {
+public interface CustomHostRepository {
+    Optional<Host> findByHostUserId(Long hostUserId);
 }

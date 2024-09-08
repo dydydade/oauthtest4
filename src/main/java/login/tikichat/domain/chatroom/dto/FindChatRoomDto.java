@@ -78,11 +78,15 @@ public class FindChatRoomDto {
     }
 
     public record FindChatRoomByPopularityReq(
-            @NotNull(message = "인기순으로 조회할 채팅방 갯수는 필수 입력값입니다.")
-            @Schema(description = "인기순으로 조회할 채팅방 갯수", requiredMode = Schema.RequiredMode.NOT_REQUIRED, maxLength = 200, minLength = 1)
-            @Min(value = 1, message = "인기순으로 조회할 채팅방은 최소 1개 이상이어야 합니다.")
-            @Max(value = 25, message = "인기순으로 조회할 채팅방은 최대 25개 이하여야 합니다.")
-            Integer popularityRank,
+
+            @NotNull(message = "인기순으로 조회할 페이지 크기는 필수 입력값입니다.")
+            @Schema(description = "인기순으로 조회할 페이지 크기", requiredMode = Schema.RequiredMode.NOT_REQUIRED, maxLength = 15)
+            @Max(value = 15, message = "인기순으로 조회할 페이지 크기는 최대 15개 이하여야 합니다.")
+            Integer pageSize,
+
+            @NotNull(message = "인기순으로 조회할 페이지 번호는 필수 입력값입니다.")
+            @Schema(description = "인기순으로 조회할 페이지 번호", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            Integer pageNumber,
 
             @Schema(description = "인기순으로 조회할 카테고리", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String categoryCode,
@@ -90,11 +94,12 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, defaultValue = "false", description = "현재 팔로잉한 카테고리의 채팅방만 가져오기")
             Boolean isFetchOnlyFollowedCategoriesRooms
     ) {
-        public static final int HOME_PAGE_DEFAULT_POPULARITY_RANK = 25;
+        public static final int HOME_PAGE_DEFAULT_PAGE_SIZE = 15;
 
         public FindChatRoomByPopularityReq() {
             this(
-                    HOME_PAGE_DEFAULT_POPULARITY_RANK,
+                    HOME_PAGE_DEFAULT_PAGE_SIZE,
+                    0,
                     null,
                     false);
         }

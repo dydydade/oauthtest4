@@ -24,6 +24,7 @@ public class Follower {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL)
     private List<HostFollowStatus> hostFollowStatuses = new ArrayList<>();
 }
