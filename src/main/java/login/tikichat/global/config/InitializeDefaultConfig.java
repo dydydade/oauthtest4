@@ -48,8 +48,8 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     private final ChatRepository chatRepository;
     private final HostRepository hostRepository;
 
-    private static final int CHAT_ROOM_COUNT = 300;
-    private static final int CHAT_COUNT = 5000;
+    private static final int CHAT_ROOM_COUNT = 50;
+    private static final int CHAT_COUNT = 700;
 
     /**
      * 각종 엔티티들 임시 초기화 수행(개발계 테스트용)
@@ -151,7 +151,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
     }
 
     private void initializeChats(List<ChatRoom> chatRooms, ChatReaction chatReaction1) {
-        int batchSize = 10000; // 한 번에 저장할 데이터의 수
+        int batchSize = 50; // 한 번에 저장할 데이터의 수
         int sleepTimeMillis = 200; // 각 배치 사이의 대기 시간 (밀리초)
 
         List<Chat> chats = new ArrayList<>();
@@ -159,7 +159,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
 
         for (long i = 0; i < CHAT_COUNT; i++) {
             int randNum = random.nextInt(CHAT_ROOM_COUNT);
-            Chat chat = new Chat(i, "content" + i, 1L, chatRooms.get(randNum), Instant.now(), Set.of(chatReaction1));
+            Chat chat = new Chat(i, "content" + i, 1L, chatRooms.get(randNum), Instant.now(), Set.of(chatReaction1), null);
             chats.add(chat);
 
             if (chats.size() >= batchSize) {

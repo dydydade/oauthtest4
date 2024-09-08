@@ -58,4 +58,13 @@ public class ChatRoomParticipantService {
 
         this.chatRoomParticipantRepository.delete(chatRoomParticipant);
     }
+
+    public void existsJoinChatRoom(Long chatRoomId, Long userId) {
+        this.chatRoomParticipantRepository.findByUserIdAndChatRoomId(
+                userId,
+                chatRoomId
+        ).orElseThrow(() ->
+                new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
+        );
+    }
 }

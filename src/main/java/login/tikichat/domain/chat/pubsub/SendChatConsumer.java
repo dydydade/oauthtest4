@@ -1,6 +1,7 @@
 package login.tikichat.domain.chat.pubsub;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nonnull;
 import login.tikichat.domain.chat.dto.FindChatsDto;
 import login.tikichat.domain.chat.dto.SendChatEventDto;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class SendChatConsumer implements MessageListener {
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     @Override
-    public void onMessage(Message message, byte[] pattern) {
+    public void onMessage(@Nonnull Message message, byte[] pattern) {
         try {
             String publishMessage = redisTemplate.getStringSerializer().deserialize(message.getBody());
             SendChatEventDto sendChatEventDto = objectMapper.readValue(publishMessage, SendChatEventDto.class);
@@ -32,7 +33,12 @@ public class SendChatConsumer implements MessageListener {
                     sendChatEventDto.getId(),
                     sendChatEventDto.getContent(),
                     sendChatEventDto.getCreatedDate(),
-                    Collections.emptyList()
+                    Collections.emptyList(),
+                    sendChatEventDto.getParent() != null ? new FindChatsDto.FindChatsParentItemRes(
+                            sendChatEventDto.getParent().getId(),
+                            sendChatEventDto.getParent().getContent(),
+                            sendChatEventDto.getParent().getCreatedDate()
+                    ) : null
             );
 
             simpMessagingTemplate.convertAndSend(

@@ -15,4 +15,15 @@ public class SendChatEventDto {
     private Long senderUserId;
     private Long chatRoomId;
     private Instant createdDate;
+    private SendChatParentDto parent;
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SendChatParentDto {
+        private Long id;
+        private String content;
+        private Long senderUserId;
+        private Instant createdDate;
+    }
 }

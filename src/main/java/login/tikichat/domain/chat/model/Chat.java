@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -24,7 +25,12 @@ import java.util.Set;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "chats")
+@Table(
+        name = "chats",
+        indexes = {
+                @Index(columnList = "parent_chat_id")
+        }
+)
 @AllArgsConstructor
 @Builder(access = AccessLevel.PROTECTED)
 public class Chat {
@@ -49,16 +55,22 @@ public class Chat {
     @OneToMany(mappedBy = "chat")
     private Set<ChatReaction> chatReactions = new HashSet<>();
 
+    @Column(name = "parent_chat_id")
+    private Long parentChatId;
+
     public static Chat sendMessage(
             Long senderUserId,
             ChatRoom chatRoom,
-            String content
+            String content,
+            Long parentChatId
     ) {
         return Chat
                 .builder()
                 .chatRoom(chatRoom)
                 .content(content)
                 .senderUserId(senderUserId)
+                .parentChatId(parentChatId)
+                .createdDate(Instant.now())
                 .build();
     }
 }

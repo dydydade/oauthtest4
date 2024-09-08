@@ -10,9 +10,9 @@ import login.tikichat.domain.chat.dto.SendMessageDto;
 import login.tikichat.domain.chat.model.Chat;
 import login.tikichat.domain.chat.repository.ChatReactionRepository;
 import login.tikichat.domain.chat.repository.ChatRepository;
-import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
-import login.tikichat.domain.chatroom_participant.repository.ChatRoomParticipantRepository;
-import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.domain.chatroom.service.ChatRoomCommonService;
+import login.tikichat.domain.chatroom_participant.service.ChatRoomParticipantService;
+import login.tikichat.domain.user.service.UserCommonService;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -22,19 +22,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChatService {
     private final ChatRepository chatRepository;
-    private final ChatRoomParticipantRepository chatRoomParticipantRepository;
-    private final UserRepository userRepository;
-    private final ChatRoomRepository chatRoomRepository;
     private final SendChatProducer sendChatProducer;
     private final ChatReactionRepository chatReactionRepository;
+    private final UserCommonService userCommonService;
+    private final ChatRoomCommonService chatRoomCommonService;
+    private final ChatRoomParticipantService chatRoomParticipantService;
+    private final ChatCommonService chatCommonService;
 
     @Transactional
     public SendMessageDto.SendMessageResDto sendMessage(
@@ -42,24 +44,22 @@ public class ChatService {
             Long chatRoomId,
             SendMessageDto.SendMessageReqDto sendMessageReqDto
     ) {
-        final var user = this.userRepository.findById(userId).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_FOUND_USER)
-        );
-        final var chatRoom = this.chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_FOUND_CHAT_ROOM)
-        );
+        final var chatRoom = this.chatRoomCommonService.findById(chatRoomId);
 
-        this.chatRoomParticipantRepository.findByUserAndChatRoom(
-                user,
-                chatRoom
-        ).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
-        );
+        this.chatRoomParticipantService.existsJoinChatRoom(chatRoomId, userId);
+
+        final var parentChat = sendMessageReqDto.parentChatId() != null ? this.chatCommonService.findById(sendMessageReqDto.parentChatId()) : null;
+        if (Objects.nonNull(sendMessageReqDto.parentChatId())) {
+            if (!parentChat.getChatRoom().equals(chatRoom)) {
+                throw new BusinessException(ErrorCode.NOT_FOUND_CHAT);
+            }
+        }
 
         final var chat = Chat.sendMessage(
                 userId,
                 chatRoom,
-                sendMessageReqDto.content()
+                sendMessageReqDto.content(),
+                sendMessageReqDto.parentChatId()
         );
 
         this.chatRepository.saveAndFlush(chat);
@@ -70,7 +70,13 @@ public class ChatService {
                     chat.getContent(),
                     chat.getSenderUserId(),
                     chat.getChatRoom().getId(),
-                    chat.getCreatedDate()
+                    chat.getCreatedDate(),
+                    parentChat != null ? new SendChatEventDto.SendChatParentDto(
+                            parentChat.getId(),
+                            parentChat.getContent(),
+                            parentChat.getSenderUserId(),
+                            parentChat.getCreatedDate()
+                    ) : null
                 )
         );
 
@@ -86,19 +92,7 @@ public class ChatService {
             Long chatRoomId,
             FindChatsDto.FindChatsReq findChatsReq
     ) {
-        final var user = this.userRepository.findById(userId).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_FOUND_USER)
-        );
-        final var chatRoom = this.chatRoomRepository.findById(chatRoomId).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_FOUND_CHAT_ROOM)
-        );
-
-        this.chatRoomParticipantRepository.findByUserAndChatRoom(
-                user,
-                chatRoom
-        ).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
-        );
+        this.chatRoomParticipantService.existsJoinChatRoom(chatRoomId, userId);
 
         final var chats = this.chatRepository.findChats(
                 chatRoomId,
@@ -128,11 +122,18 @@ public class ChatService {
                             }
                     );
 
+                    final var parentChat = chat.getParentChatId() != null ? this.chatCommonService.findById(chat.getParentChatId()) : null;
+
                     return new FindChatsDto.FindChatsItemRes(
                             chat.getId(),
                             chat.getContent(),
                             chat.getCreatedDate(),
-                            reactions
+                            reactions,
+                            parentChat != null ? new FindChatsDto.FindChatsParentItemRes(
+                                    parentChat.getId(),
+                                    parentChat.getContent(),
+                                    parentChat.getCreatedDate()
+                            ) : null
                     );
                 }
                 ).toList(),
@@ -145,16 +146,11 @@ public class ChatService {
                                 Long userId,
                                 ChatReactionType chatReactionType
     ) {
-        final var user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
-        final var chat = this.chatRepository.findById(chatId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CHAT));
+        final var user = this.userCommonService.findById(userId);
+        final var chat = this.chatCommonService.findById(chatId);
 
-        this.chatRoomParticipantRepository.findByUserAndChatRoom(
-                user,
-                chat.getChatRoom()
-        ).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
+        this.chatRoomParticipantService.existsJoinChatRoom(
+                chat.getChatRoom().getId(), userId
         );
 
         if (this.chatReactionRepository.findByChatIdAndUserIdAndChatReactionType(
@@ -187,16 +183,10 @@ public class ChatService {
                                 Long userId,
                                 ChatReactionType chatReactionType
     ) {
-        final var user = this.userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
-        final var chat = this.chatRepository.findById(chatId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CHAT));
+        final var chat = this.chatCommonService.findById(chatId);
 
-        this.chatRoomParticipantRepository.findByUserAndChatRoom(
-                user,
-                chat.getChatRoom()
-        ).orElseThrow(() ->
-                new BusinessException(ErrorCode.NOT_CHAT_ROOM_PARTICIPANT)
+        this.chatRoomParticipantService.existsJoinChatRoom(
+                chat.getChatRoom().getId(), userId
         );
 
         final var chatReaction = this.chatReactionRepository.findByChatIdAndUserIdAndChatReactionType(
