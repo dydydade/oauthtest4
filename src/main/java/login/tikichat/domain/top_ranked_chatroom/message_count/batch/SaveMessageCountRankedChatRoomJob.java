@@ -35,7 +35,7 @@ public class SaveMessageCountRankedChatRoomJob {
     private final CountRankedChatRoomDao chatRoomDao;
     private final MessageKeyRenameListener messageKeyRenameListener;
 
-    private static final int CHUNK_SIZE = 10000;
+    private static final int CHUNK_SIZE = 300;
 
     @Bean(name = "saveMessageCountRankedChatRoomsJob")
     public Job saveMessageCountRankedChatRoomsJob(

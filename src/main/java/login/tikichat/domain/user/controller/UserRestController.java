@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 @Tag(name = "User API", description = "사용자 관리 API")
@@ -67,7 +69,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "404", description = "대상 약관을 찾을 수 없습니다."),
             @ApiResponse(responseCode = "409", description = "같은 이메일로 이미 가입한 계정이 있습니다.\t\n이미 사용 중인 닉네임입니다."),
     })
-    public ResponseEntity<ResultResponse> signUp(@RequestBody @Valid UserNormalSignUpRequest userNormalSignUpRequest) {
+    public ResponseEntity<ResultResponse> signUp(@RequestBody @Valid UserNormalSignUpRequest userNormalSignUpRequest) throws MalformedURLException {
         UserSignUpResponse userSignUpResponse = userService.signUp(userNormalSignUpRequest);
         ResultResponse result = ResultResponse.of(ResultCode.NORMAL_REGISTER_SUCCESS, userSignUpResponse);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
@@ -88,7 +90,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "404", description = "대상 약관을 찾을 수 없습니다."),
             @ApiResponse(responseCode = "409", description = "같은 이메일로 이미 가입한 계정이 있습니다.\t\n이미 사용 중인 닉네임입니다."),
     })
-    public ResponseEntity<ResultResponse> socialSignUp(@RequestBody @Valid UserSocialSignUpRequest userSocialSignUpRequest, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ResultResponse> socialSignUp(@RequestBody @Valid UserSocialSignUpRequest userSocialSignUpRequest, HttpServletRequest request, HttpServletResponse response) throws MalformedURLException {
         UserSignUpResponse userSignUpResponse = userService.socialSignUp(userSocialSignUpRequest);
         ResultResponse result = ResultResponse.of(ResultCode.SOCIAL_REGISTER_SUCCESS, userSignUpResponse);
 
@@ -203,10 +205,9 @@ public class UserRestController {
             @RequestPart(value = "file", required = true)
             MultipartFile profileImageFile
     ) throws IOException {
+        URL imageUrl = userService.setUserProfileImage(email, user, profileImageFile);
 
-        userService.setUserProfileImage(email, user, profileImageFile);
-
-        ResultResponse result = ResultResponse.of(ResultCode.NICKNAME_SET_SUCCESS, null);
+        ResultResponse result = ResultResponse.of(ResultCode.PROFILE_IMAGE_SET_SUCCESS, imageUrl);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 }

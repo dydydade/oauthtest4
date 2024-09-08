@@ -53,6 +53,7 @@ public class ChatRoomService {
                 host,
                 createChatRoomReq.name(),
                 createChatRoomReq.maxUserCount(),
+                user.getImageUrl(),
                 createChatRoomReq.tags(),
                 category
         );

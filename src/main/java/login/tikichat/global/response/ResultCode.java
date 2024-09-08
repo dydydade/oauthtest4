@@ -15,6 +15,7 @@ public enum ResultCode {
     FIND_USER_INFO_SUCCESS(200, "U005", "회원 정보 조회에 성공하였습니다."),
     LOGIN_SUCCESS(200, "U006", "로그인에 성공하였습니다."),
     NICKNAME_SET_SUCCESS(200, "U007", "닉네임 설정을 완료하였습니다."),
+    PROFILE_IMAGE_SET_SUCCESS(200, "U008", "프로필 사진 설정을 완료하였습니다."),
 
     // Auth
     PASSWORD_SET_SUCCESS(200, "A001", "비밀번호 설정을 완료하였습니다."),

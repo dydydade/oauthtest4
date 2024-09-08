@@ -41,7 +41,7 @@ class UserServiceTest {
 
     @Test
     @DisplayName("회원 가입 요청이 유효하면 일반 회원 가입이 정상적으로 진행된다.")
-    void normalSignUpSuccessTest() {
+    void normalSignUpSuccessTest() throws MalformedURLException {
         // given
         UserNormalSignUpRequest request = UserNormalSignUpRequest.builder()
                 .email("test1234@gmail.com")
