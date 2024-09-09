@@ -17,6 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 @Component
 @RequiredArgsConstructor
 public class SocialSignUpStrategy implements SignUpStrategy {
@@ -28,6 +31,8 @@ public class SocialSignUpStrategy implements SignUpStrategy {
     private final HostRepository hostRepository;
     private final FollowerRepository followerRepository;
 
+    private static final String DEFAULT_IMAGE_URL_STRING = "https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png";
+
     /**
      * [회원가입 메서드]
      * @param baseUserSignUpRequest
@@ -35,7 +40,7 @@ public class SocialSignUpStrategy implements SignUpStrategy {
      */
     @Override
     @Transactional
-    public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) {
+    public UserSignUpResponse signUp(BaseUserSignUpRequest baseUserSignUpRequest) throws MalformedURLException {
         // 회원가입 정보(이메일, 닉네임 등) 유효성 검증
         this.validateSignUpInfo(baseUserSignUpRequest);
 
@@ -57,10 +62,11 @@ public class SocialSignUpStrategy implements SignUpStrategy {
         return services.toSignUpResponse(user);
     }
 
-    private User createUserEntity(BaseUserSignUpRequest request) {
+    private User createUserEntity(BaseUserSignUpRequest request) throws MalformedURLException {
         User user = User.builder()
                 .email(request.getEmail())
                 .nickname(request.getNickname())
+                .imageUrl(new URL(DEFAULT_IMAGE_URL_STRING))
                 .role(Role.SOCIAL)
                 .build();
 

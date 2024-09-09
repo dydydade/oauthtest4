@@ -43,8 +43,8 @@ public class ChatRepositoryImpl extends QuerydslRepositorySupport implements Cus
         final var categoryQ = QCategory.category;
         final var query = super.from(chatQ);
 
-        query.leftJoin(chatQ.chatRoom, chatRoomQ).fetchJoin()
-                .leftJoin(chatRoomQ.category, categoryQ).fetchJoin();
+        query.join(chatQ.chatRoom, chatRoomQ).fetchJoin()
+                .join(chatRoomQ.category, categoryQ).fetchJoin();
 
         query.where(
                 chatQ.createdDate.between(startDate, endDate)

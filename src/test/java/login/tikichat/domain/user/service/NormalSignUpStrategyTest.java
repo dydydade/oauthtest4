@@ -94,7 +94,7 @@ class NormalSignUpStrategyTest {
 
     @Test
     @DisplayName("회원가입 요청이 유효하면 회원가입이 되고 응답이 반환된다.")
-    void testSignUpWithValidData() {
+    void testSignUpWithValidData() throws MalformedURLException {
         // given
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByNickname(anyString())).thenReturn(Optional.empty());

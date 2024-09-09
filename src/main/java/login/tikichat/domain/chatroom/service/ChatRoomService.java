@@ -38,27 +38,22 @@ public class ChatRoomService {
 
     @Transactional
     public CreateChatRoomDto.CreateChatRoomRes createChatRoom(
-            Long hostId,
+            Long hostUserId,
             CreateChatRoomDto.CreateChatRoomReq createChatRoomReq
     ) {
         final var category = this.categoryRepository.findByCode(
                 createChatRoomReq.categoryCode()
         ).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_CATEGORY));
 
-        User user = this.userRepository.findById(hostId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
+        User user = this.userRepository.findById(hostUserId).orElseThrow(() -> new BusinessException(ErrorCode.NOT_FOUND_USER));
 
-        final var host = this.hostRepository.findById(hostId)
-                .orElse(Host.builder()
-                        .user(user)
-                        .isOnline(true)
-                        .build());
-
-        this.hostRepository.save(host);
+        final Host host = findHost(hostUserId, user);
 
         final var chatRoom = new ChatRoom(
                 host,
                 createChatRoomReq.name(),
                 createChatRoomReq.maxUserCount(),
+                user.getImageUrl(),
                 createChatRoomReq.tags(),
                 category
         );
@@ -73,6 +68,22 @@ public class ChatRoomService {
                 chatRoom.getId(),
                 host.getId()
         );
+    }
+
+    private Host findHost(Long hostUserId, User user) {
+        final var hostOptional = this.hostRepository.findByHostUserId(hostUserId);
+        final Host host;
+
+        if (hostOptional.isPresent()) {
+            host = hostOptional.get();
+        } else {
+            host = Host.builder()
+                    .user(user)
+                    .isOnline(true)
+                    .build();
+            this.hostRepository.save(host);
+        }
+        return host;
     }
 
     public FindChatRoomDto.FindChatRoomRes findChatRooms(

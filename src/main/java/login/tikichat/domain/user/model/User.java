@@ -25,12 +25,16 @@ public class User {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email; // 이메일
     private String password; // 비밀번호
+
+    @Column(nullable = false)
     private String nickname; // 닉네임
     // TODO: 현재 UI상 description 등록/수정하는 페이지가 없음. 추가되는 대로 작업 필요
     private String description; // 사용자가 직접 설정한 상세설명(자기소개 등)
+
+    @Column(nullable = false)
     private URL imageUrl; // 프로필 이미지
 
     @Enumerated(EnumType.STRING)

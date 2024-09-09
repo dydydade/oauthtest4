@@ -16,7 +16,12 @@ public class SendMessageDto {
     public record SendMessageReqDto (
         @Length(min = 1, max = 1000)
         @Schema(minLength = 1, maxLength = 1000)
-        String content
+        String content,
+        @Schema(
+                requiredMode = Schema.RequiredMode.NOT_REQUIRED,
+                nullable = true
+        )
+        Long parentChatId
     ) {
 
     }
