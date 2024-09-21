@@ -13,6 +13,7 @@ import login.tikichat.domain.host.repository.HostRepository;
 import login.tikichat.domain.top_ranked_chatroom.dao.CountRankedChatRoomDao;
 import login.tikichat.domain.user.model.User;
 import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.domain.user.service.UserStatusService;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
 import login.tikichat.global.exception.chatroom.ChatRoomNotFoundException;
@@ -34,6 +35,7 @@ public class ChatRoomService {
     private final HostRepository hostRepository;
     private final UserRepository userRepository;
     private final CountRankedChatRoomDao chatRoomDao;
+    private final UserStatusService userStatusService;
 
 
     @Transactional
@@ -79,7 +81,6 @@ public class ChatRoomService {
         } else {
             host = Host.builder()
                     .user(user)
-                    .isOnline(true)
                     .build();
             this.hostRepository.save(host);
         }
@@ -149,6 +150,8 @@ public class ChatRoomService {
         List<FindChatRoomDto.FindChatRoomItemRes> chatRoomItems = IntStream.range(0, chatRooms.size())
                 .mapToObj(index -> {
                     ChatRoom chatRoom = chatRooms.get(index);
+                    Boolean hostOnlineStatus = userStatusService.getUserStatus(chatRoom.getHost().getUser().getId());
+
                     return new FindChatRoomDto.FindChatRoomItemRes(
                             chatRoom.getName(),
                             chatRoom.getMaxUserCount(),
@@ -161,7 +164,8 @@ public class ChatRoomService {
                                     chatRoom.getCategory().getOrderNum()
                             ),
                             index + 1,
-                            chatRoom.isRoomClosed()
+                            chatRoom.isRoomClosed(),
+                            hostOnlineStatus
                     );
                 })
                 .collect(Collectors.toList());

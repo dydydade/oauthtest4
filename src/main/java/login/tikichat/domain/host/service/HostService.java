@@ -14,6 +14,7 @@ import login.tikichat.domain.host.repository.HostRepository;
 import login.tikichat.domain.host.repository.HostFollowStatusRepository;
 import login.tikichat.domain.user.model.User;
 import login.tikichat.domain.user.repository.UserRepository;
+import login.tikichat.domain.user.service.UserStatusService;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class HostService {
     private final HostRepository hostRepository;
     private final FollowerRepository followerRepository;
     private final UserRepository userRepository;
+    private final UserStatusService userStatusService;
 
     @Transactional
     public HostFollowDto.HostFollowRes follow(Long hostId, Long userId) {
@@ -97,7 +99,7 @@ public class HostService {
                         .hostId(host.getId())
                         .hostNickname(host.getHostNickname())
                         .hostProfileImageUrl(host.getHostProfileImageUrl())
-                        .isOnline(host.isHostOnline())
+                        .isOnline(userStatusService.getUserStatus(host.getUser().getId()))
                         .build())
                 .toList();
 
@@ -112,7 +114,7 @@ public class HostService {
                         .hostId(host.getId())
                         .hostNickname(host.getHostNickname())
                         .hostProfileImageUrl(host.getHostProfileImageUrl())
-                        .isOnline(host.isHostOnline())
+                        .isOnline(userStatusService.getUserStatus(host.getUser().getId()))
                         .build())
                 .toList();
 
