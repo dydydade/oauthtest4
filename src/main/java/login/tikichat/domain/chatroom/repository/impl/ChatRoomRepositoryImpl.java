@@ -5,6 +5,8 @@ import login.tikichat.domain.chatroom.dto.FindChatRoomDto;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.model.QChatRoom;
 import login.tikichat.domain.chatroom.repository.CustomChatRoomRepository;
+import login.tikichat.domain.host.model.QHost;
+import login.tikichat.domain.user.model.QUser;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +25,8 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
     @Override
     public List<ChatRoom> findChatRooms(FindChatRoomDto.FindChatRoomReq findChatRoomReq, Long userId) {
         final var chatRoomQ = QChatRoom.chatRoom;
+        final var hostQ = QHost.host;
+        final var userQ = QUser.user;
         final var query = super.from(chatRoomQ);
 
         if (
@@ -33,13 +37,18 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
             findChatRoomReq.searchKeywordColumns().forEach((keywordColumn) -> {
                 switch (keywordColumn) {
                     case NAME:
-                        query.where(chatRoomQ.name.contains(
+                        query
+                                .where(chatRoomQ.name.contains(
                                 findChatRoomReq.searchKeyword()
                         ));
                         break;
                 }
             });
         }
+
+        query
+            .join(chatRoomQ.host, hostQ).fetchJoin()
+            .join(hostQ.user, userQ).fetchJoin();
 
         return query.fetch();
     }
@@ -76,9 +85,13 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
     @Override
     public List<ChatRoom> findByIdsInOrder(List<Long> chatRoomIds) {
         final var chatRoomQ = QChatRoom.chatRoom;
+        final var hostQ = QHost.host;
+        final var userQ = QUser.user;
         final var selectQuery = super.from(chatRoomQ);
 
         List<ChatRoom> chatRooms = selectQuery.where(chatRoomQ.id.in(chatRoomIds))
+                .join(chatRoomQ.host, hostQ).fetchJoin()
+                .join(hostQ.user, userQ).fetchJoin()
                 .fetch();
 
         Map<Long, ChatRoom> chatRoomMap = chatRooms.stream()
