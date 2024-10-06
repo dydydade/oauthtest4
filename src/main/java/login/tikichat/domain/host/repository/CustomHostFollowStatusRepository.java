@@ -10,4 +10,5 @@ public interface CustomHostFollowStatusRepository {
     boolean existsByHostIdAndFollowerUserId(Long hostId, Long userId);
     List<HostFollowStatus> findByFollowerUserId(Long userId);
     List<HostFollowStatus> findByHostUserId(Long userId);
+    List<HostFollowStatus> findByFollowerId(Long followerId);
 }

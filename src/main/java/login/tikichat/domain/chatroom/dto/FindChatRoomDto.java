@@ -65,7 +65,9 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             Integer orderNum,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            Boolean isRoomClosed
+            Boolean isRoomClosed,
+            @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+            Boolean isHostOnline
     ) {
 
     }

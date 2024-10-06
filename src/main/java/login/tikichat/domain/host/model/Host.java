@@ -37,9 +37,6 @@ public class Host {
     @OneToMany(mappedBy = "host", cascade = CascadeType.ALL)
     private List<HostFollowStatus> hostFollowStatuses = new ArrayList<>();
 
-    // TODO: 실제 호스트 접속 정보 반환하도록 수정(추후)
-    private boolean isOnline;
-
     public URL getHostProfileImageUrl() {
         return user.getImageUrl();
     }
@@ -52,21 +49,13 @@ public class Host {
         return user.getDescription();
     }
 
-    public boolean isHostOnline() {
-        return isOnline;
-    }
-
-
-    public Host(
-            User user,
-            List<ChatRoom> chatRooms,
-            List<HostFollowStatus> hostFollowStatuses,
-            boolean isOnline
+    public Host(User user,
+                List<ChatRoom> chatRooms,
+                List<HostFollowStatus> hostFollowStatuses
     ) {
         this.user = user;
         this.chatRooms = chatRooms;
         this.hostFollowStatuses = hostFollowStatuses;
-        this.isOnline = isOnline;
     }
 
     // 연관관계 편의 메소드
@@ -76,16 +65,5 @@ public class Host {
             this.chatRooms.add(chatRoom);
             chatRoom.setHost(this);
         }
-    }
-
-    public Host(User user,
-                List<ChatRoom> chatRooms,
-                List<HostFollowStatus> hostFollowStatuses,
-                Boolean isOnline
-    ) {
-        this.user = user;
-        this.chatRooms = chatRooms;
-        this.hostFollowStatuses = hostFollowStatuses;
-        this.isOnline = isOnline;
     }
 }

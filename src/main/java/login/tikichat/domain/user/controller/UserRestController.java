@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import login.tikichat.domain.user.dto.*;
 import login.tikichat.domain.user.service.UserService;
+import login.tikichat.domain.user.service.UserStatusService;
 import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.auth.verification.service.AuthService;
 import login.tikichat.global.exception.user.NicknameAlreadyInUseException;
@@ -38,6 +39,7 @@ import java.net.URL;
 public class UserRestController {
 
     private final UserService userService;
+    private final UserStatusService userStatusService;
     private final AuthService authService;
 
     @GetMapping("/search")
@@ -208,6 +210,18 @@ public class UserRestController {
         URL imageUrl = userService.setUserProfileImage(email, user, profileImageFile);
 
         ResultResponse result = ResultResponse.of(ResultCode.PROFILE_IMAGE_SET_SUCCESS, imageUrl);
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    @GetMapping("/{userId}/status")
+    @Operation(summary = "회원 On/Offline 상태 조회", description = "회원 On/Offline 상태를 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 On/Offline 상태 조회에 성공하였습니다."),
+            @ApiResponse(responseCode = "404", description = "가입된 계정을 찾을 수 없습니다.")
+    })
+    public ResponseEntity<ResultResponse> findUserStatus(@RequestParam Long userId) {
+        Boolean userStatus = userStatusService.getUserStatus(userId).orElse(false);
+        ResultResponse result = ResultResponse.of(ResultCode.FIND_USER_STATUS_SUCCESS, userStatus);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 }

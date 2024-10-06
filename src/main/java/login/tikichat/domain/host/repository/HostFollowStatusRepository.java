@@ -12,6 +12,4 @@ import java.util.Optional;
 public interface HostFollowStatusRepository extends JpaRepository<HostFollowStatus, Long>, CustomHostFollowStatusRepository {
     long countByHostId(Long hostId);
     Optional<HostFollowStatus> findByHostIdAndFollowerId(Long hostId, Long followerId);
-
-    List<HostFollowStatus> findByFollowerId(Long followerId);
 }
