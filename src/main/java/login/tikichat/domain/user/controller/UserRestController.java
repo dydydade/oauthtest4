@@ -220,7 +220,7 @@ public class UserRestController {
             @ApiResponse(responseCode = "404", description = "가입된 계정을 찾을 수 없습니다.")
     })
     public ResponseEntity<ResultResponse> findUserStatus(@RequestParam Long userId) {
-        Boolean userStatus = userStatusService.getUserStatus(userId);
+        Boolean userStatus = userStatusService.getUserStatus(userId).orElse(false);
         ResultResponse result = ResultResponse.of(ResultCode.FIND_USER_STATUS_SUCCESS, userStatus);
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }

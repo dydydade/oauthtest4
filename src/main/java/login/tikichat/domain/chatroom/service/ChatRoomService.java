@@ -150,14 +150,14 @@ public class ChatRoomService {
         List<FindChatRoomDto.FindChatRoomItemRes> chatRoomItems = IntStream.range(0, chatRooms.size())
                 .mapToObj(index -> {
                     ChatRoom chatRoom = chatRooms.get(index);
-                    Boolean hostOnlineStatus = userStatusService.getUserStatus(chatRoom.getHost().getUser().getId());
+                    Boolean hostOnlineStatus = userStatusService.getUserStatus(chatRoom.getHost().getUser().getId()).orElse(false);
 
                     return new FindChatRoomDto.FindChatRoomItemRes(
                             chatRoom.getName(),
                             chatRoom.getMaxUserCount(),
                             chatRoom.getCurrentUserCount(),
                             chatRoom.getTags(),
-                            chatRoom.getHost().getUser().getId(),
+                            chatRoom.getImageUrl(),
                             new FindCategoryDto.FindCategoryItemRes(
                                     chatRoom.getCategory().getCode(),
                                     chatRoom.getCategory().getName(),
