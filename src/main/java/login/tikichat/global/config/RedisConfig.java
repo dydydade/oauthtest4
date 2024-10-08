@@ -9,6 +9,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class RedisConfig {
@@ -26,6 +28,7 @@ public class RedisConfig {
     public StringRedisTemplate redisTemplate(RedisConnectionFactory redisMailConnectionFactory) {
         StringRedisTemplate stringRedisTemplate = new StringRedisTemplate();
         stringRedisTemplate.setConnectionFactory(redisMailConnectionFactory);
+        stringRedisTemplate.setEnableTransactionSupport(true);
         return stringRedisTemplate;
     }
 
@@ -37,5 +40,10 @@ public class RedisConfig {
     @Bean
     public ChannelTopic chatReactionChannelTopic() {
         return new ChannelTopic("chat_reaction");
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager() {
+        return new JpaTransactionManager();
     }
 }
