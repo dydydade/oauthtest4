@@ -3,8 +3,8 @@ on:
   pull_request:
     types: [ opened, synchronize, closed ]
     branches: [ master ]
-    paths: 
-    - 'src/**'
+    # paths: 
+    # - 'src/**'
 
 jobs:
   test:
