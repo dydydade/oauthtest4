@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.net.URL;
 
 /**
  * 초기 상태 등록 Config
