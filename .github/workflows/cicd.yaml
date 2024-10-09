@@ -46,6 +46,26 @@ jobs:
       run: |
         sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.sha }}|g" docker-compose.yml
     - name: docker-compose up
+      env:
+        DB_ID: ${{ secrets.DB_ID }}
+        DB_PW: ${{ secrets.DB_PW }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        FACEBOOK_CLIENT_ID: ${{ secrets.FACEBOOK_CLIENT_ID }}
+        FACEBOOK_CLIENT_SECRET: ${{ secrets.FACEBOOK_CLIENT_SECRET }}
+        NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
+        NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
+        KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+        KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+        GMAIL_SMTP_PASSWORD: ${{ secrets.GMAIL_SMTP_PASSWORD }}
+        HOST: ${{ secrets.HOST }}
+        PORT: ${{ secrets.PORT }}
+        KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+        AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+      timeout-minutes: 2
       run: |
         docker-compose up
     - name: dummy test
@@ -69,13 +89,12 @@ jobs:
           ssh-keyscan -H ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
 
       - name: SSH to EC2 instance
-        # env:
-        #   DOCKER_IMAGE_TAG: ${{ github.sha }}
         run: |
           ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com << 'EOF'
             ls -al
+            ls ${{ github.sha }}
           EOF
-        # sed -i "/tikichat_server:/,/image: /s|image: .*|image: dydydade/tikichat-server:${DOCKER_IMAGE_TAG}|g" docker-compose.yml
+        # sed -i "/tikichat_server:/,/image: /s|image: .*|image: dydydade/tikichat-server:${{ github.sha }}|g" docker-compose.yml
         # docker-compose down
         # sudo rm -r master_db
         # docker-compose up -d
