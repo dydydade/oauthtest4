@@ -68,15 +68,17 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         initializeTerms();
     }
 
-    private User initializeUser() {
+    private User initializeUser() throws MalformedURLException {
         User user = User.builder()
                 .id(1L)
                 .email("dydydade@gmail.com")
+                .imageUrl(new URL("https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png"))
                 .role(Role.SOCIAL)
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .email("n4oahdev@gmail.com")
+                .imageUrl(new URL("https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png"))
                 .role(Role.USER)
                 .password(passwordEncoder.encode("1234"))
                 .build();
