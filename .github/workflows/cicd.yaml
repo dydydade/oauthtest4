@@ -73,7 +73,7 @@ jobs:
     - name: docker-compose up
       timeout-minutes: 2
       run: |
-        docker-compose up -d
+        docker-compose up 
 
     - name: Wait for service
       run: |
@@ -92,7 +92,7 @@ jobs:
     # Shut down docker-compose services
     - name: Stop docker-compose
       run: docker-compose down
-      
+
     - name: dummy test
       run: |
         echo "test done"
