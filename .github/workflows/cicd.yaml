@@ -7,19 +7,8 @@ on:
     # - 'src/**'
 
 jobs:
-  test:
-    if: github.event.action == 'opened' || github.event.action == 'synchronize'
-    runs-on: ubuntu-latest
-    steps:
-    - name: checkout the code
-      uses: actions/checkout@v4
-    - name: dummy test
-      run: |
-        echo "test done"
-
   image-build:
-    needs: [ test ]
-    # if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
     runs-on: ubuntu-latest
     steps:
     - name: checkout the code
@@ -31,9 +20,21 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-    - name: docker build & push
+    - name: docker build
       run: |
         docker build -f Dockerfile --tag ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }} .
+
+  image-run-test:
+    if: github.event.action == 'opened' || github.event.action == 'synchronize'
+    needs: [ image-build ]
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout the code
+      uses: actions/checkout@v4
+    - name: dummy test
+      run: |
+        
+        echo "test done"
 
   image-push:
     if: github.event.pull_request.merged == true
@@ -65,9 +66,16 @@ jobs:
           ssh-keyscan -H ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
 
       - name: SSH to EC2 instance
+        env:
+          DOCKER_IMAGE_TAG: ${{ github.sha }}
         run: |
-          ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com
+          ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com << 'EOF'
           ls -al
+        EOF
+          # sed -i "/tikichat_server:/,/image: /s|image: .*|image: dydydade/tikichat-server:${DOCKER_IMAGE_TAG}|g" docker-compose.yml
+          # docker-compose down
+          # sudo rm -r master_db
+          # docker-compose up -d
           
       - name: Remove mainkey.pem
         run: rm mainkey.pem
