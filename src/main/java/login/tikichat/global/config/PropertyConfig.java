@@ -6,7 +6,7 @@ import org.springframework.context.annotation.PropertySources;
 
 @Configuration
 @PropertySources({
-        @PropertySource("classpath:env.properties", ignoreResourceNotFound = true)
+        @PropertySource("classpath:env.properties")
 })
 public class PropertyConfig {
 }
