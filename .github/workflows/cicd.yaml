@@ -65,6 +65,7 @@ jobs:
         echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> env.properties
         echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> env.properties
         echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> env.properties
+        mv env.properties src/main/resources/env.properties
     - name: ls -al
       run: |
         ls -al
