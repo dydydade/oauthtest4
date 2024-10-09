@@ -32,6 +32,17 @@ jobs:
     steps:
     - name: checkout the code
       uses: actions/checkout@v4
+    - name: login to DockerHub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+    - name: update docker-compose.yml
+      run: |
+        sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.sha }}|g" docker-compose.yml
+    - name: docker-compose up
+      run: |
+        docker-compose up
     - name: dummy test
       run: |
         echo "test done"
