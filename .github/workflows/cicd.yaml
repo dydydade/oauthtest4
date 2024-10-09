@@ -71,6 +71,10 @@ jobs:
           echo "${{ secrets.MAINKEY_PEM }}" > mainkey.pem
           chmod 600 mainkey.pem
 
+      - name: Add EC2 host to known_hosts
+        run: |
+          ssh-keyscan -H ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+
       - name: SSH to EC2 instance
         run: |
           ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com
