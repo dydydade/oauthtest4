@@ -137,7 +137,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         Random random = new Random();
 
         for (int i = 0; i < CHAT_ROOM_COUNT; i++) {
-            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, null, List.of("고민"), categories.get(random.nextInt(10)));
+            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, new URL("https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png"), List.of("고민"), categories.get(random.nextInt(10)));
             chatRooms.add(chatRoom);
         }
 
