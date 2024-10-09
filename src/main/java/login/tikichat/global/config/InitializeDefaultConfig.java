@@ -134,7 +134,7 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         return host;
     }
 
-    private List<ChatRoom> initializeChatRooms(List<Category> categories, Host host) {
+    private List<ChatRoom> initializeChatRooms(List<Category> categories, Host host) throws MalformedURLException {
         List<ChatRoom> chatRooms = new ArrayList<>();
         Random random = new Random();
 
