@@ -60,7 +60,11 @@ public enum ErrorCode {
 
     // HostFollowStatus
     NOT_FOUND_HOST_FOLLOW_STATUS(404, "HF001", "팔로우 정보가 존재하지 않습니다."),
-    ALREADY_FOLLOWING_HOST(409, "HF002", "이미 팔로우 중인 호스트입니다.")
+    ALREADY_FOLLOWING_HOST(409, "HF002", "이미 팔로우 중인 호스트입니다."),
+
+    // Bookmark
+    ALREADY_BOOKMARKED_CHATROOM(HttpStatus.CONFLICT.value(), "BM001", "이미 북마크한 채팅방입니다."),
+    NOT_FOUND_BOOKMARK(404, "BM002", "북마크 정보가 존재하지 않습니다."),
     ;
 
 
