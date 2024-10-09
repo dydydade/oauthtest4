@@ -43,35 +43,36 @@ jobs:
       run: |
         docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
 
-  # deploy:
-  #   runs-on: ubuntu-latest
-  #   needs: [ image-push ]
-  #   steps:
-  #     - name: Create .ssh directory
-  #       run: mkdir -p ~/.ssh
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    needs: [ image-push ]
+    steps:
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
 
-  #     - name: Create mainkey.pem from secrets
-  #       run: |
-  #         echo "${{ secrets.MAINKEY_PEM }}" > mainkey.pem
-  #         chmod 600 mainkey.pem
+      - name: Create mainkey.pem from secrets
+        run: |
+          echo "${{ secrets.MAINKEY_PEM }}" > mainkey.pem
+          chmod 600 mainkey.pem
 
-  #     - name: Add EC2 host to known_hosts
-  #       run: |
-  #         ssh-keyscan -H ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
+      - name: Add EC2 host to known_hosts
+        run: |
+          ssh-keyscan -H ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
 
-  #     - name: SSH to EC2 instance
-  #       # env:
-  #       #   DOCKER_IMAGE_TAG: ${{ github.sha }}
-  #       run: |
-  #         ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com << 'EOF'
-  #         ls -al
-  #       EOF
-  #         # sed -i "/tikichat_server:/,/image: /s|image: .*|image: dydydade/tikichat-server:${DOCKER_IMAGE_TAG}|g" docker-compose.yml
-  #         # docker-compose down
-  #         # sudo rm -r master_db
-  #         # docker-compose up -d
+      - name: SSH to EC2 instance
+        # env:
+        #   DOCKER_IMAGE_TAG: ${{ github.sha }}
+        run: |
+          ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com << 'EOF'
+          ls -al
+        EOF
+          # sed -i "/tikichat_server:/,/image: /s|image: .*|image: dydydade/tikichat-server:${DOCKER_IMAGE_TAG}|g" docker-compose.yml
+          # docker-compose down
+          # sudo rm -r master_db
+          # docker-compose up -d
           
-  #     - name: Remove mainkey.pem
-  #       run: rm mainkey.pem
+      - name: Remove mainkey.pem
+        run: rm mainkey.pem
 
 
