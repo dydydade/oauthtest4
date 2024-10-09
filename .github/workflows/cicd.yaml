@@ -73,7 +73,7 @@ jobs:
     - name: docker-compose up
       timeout-minutes: 2
       run: |
-        docker-compose up 
+        docker-compose up -d
 
     - name: Wait for service
       run: |
