@@ -35,13 +35,13 @@ jobs:
       run: |
         echo "test done"
 
-  # image-push:
-  #   if: github.event.pull_request.merged == true
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: docker push
-  #     run: |
-  #       docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
+  image-push:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+    - name: docker push
+      run: |
+        docker push ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}:${{ github.sha }}
 
   # deploy:
   #   runs-on: ubuntu-latest
