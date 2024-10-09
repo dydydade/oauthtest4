@@ -73,7 +73,26 @@ jobs:
     - name: docker-compose up
       timeout-minutes: 2
       run: |
-        docker-compose up
+        docker-compose up -d
+
+    - name: Wait for service
+      run: |
+        echo "Waiting for service to start..."
+        sleep 60
+
+    # Optionally test if the container is running correctly (use curl or any other test you want)
+    - name: Test application
+      run: |
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)
+        if [ $STATUS -ne 200 ]; then
+          echo "Service is not healthy, status code: $STATUS"
+          exit 1
+        fi
+
+    # Shut down docker-compose services
+    - name: Stop docker-compose
+      run: docker-compose down
+      
     - name: dummy test
       run: |
         echo "test done"
