@@ -45,26 +45,27 @@ jobs:
     - name: update docker-compose.yml
       run: |
         sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.sha }}|g" docker-compose.yml
+    - name: create env.properties file
+      run: |
+        echo "DB_ID=${{ secrets.DB_ID }}" >> env.properties
+        echo "DB_PW=${{ secrets.DB_PW }}" >> env.properties
+        echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY }}" >> env.properties
+        echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> env.properties
+        echo "FACEBOOK_CLIENT_ID=${{ secrets.FACEBOOK_CLIENT_ID }}" >> env.properties
+        echo "FACEBOOK_CLIENT_SECRET=${{ secrets.FACEBOOK_CLIENT_SECRET }}" >> env.properties
+        echo "NAVER_CLIENT_ID=${{ secrets.NAVER_CLIENT_ID }}" >> env.properties
+        echo "NAVER_CLIENT_SECRET=${{ secrets.NAVER_CLIENT_SECRET }}" >> env.properties
+        echo "KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }}" >> env.properties
+        echo "KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}" >> env.properties
+        echo "GMAIL_SMTP_PASSWORD=${{ secrets.GMAIL_SMTP_PASSWORD }}" >> env.properties
+        echo "HOST=${{ secrets.HOST }}" >> env.properties
+        echo "PORT=${{ secrets.PORT }}" >> env.properties
+        echo "KEY_STORE_PASSWORD=${{ secrets.KEY_STORE_PASSWORD }}" >> env.properties
+        echo "AWS_ACCESS_KEY=${{ secrets.AWS_ACCESS_KEY }}" >> env.properties
+        echo "AWS_SECRET_KEY=${{ secrets.AWS_SECRET_KEY }}" >> env.properties
+        echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET }}" >> env.properties
+        echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> env.properties
     - name: docker-compose up
-      env:
-        DB_ID: ${{ secrets.DB_ID }}
-        DB_PW: ${{ secrets.DB_PW }}
-        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
-        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-        FACEBOOK_CLIENT_ID: ${{ secrets.FACEBOOK_CLIENT_ID }}
-        FACEBOOK_CLIENT_SECRET: ${{ secrets.FACEBOOK_CLIENT_SECRET }}
-        NAVER_CLIENT_ID: ${{ secrets.NAVER_CLIENT_ID }}
-        NAVER_CLIENT_SECRET: ${{ secrets.NAVER_CLIENT_SECRET }}
-        KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
-        KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
-        GMAIL_SMTP_PASSWORD: ${{ secrets.GMAIL_SMTP_PASSWORD }}
-        HOST: ${{ secrets.HOST }}
-        PORT: ${{ secrets.PORT }}
-        KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-        AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
-        AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
-        AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-        AWS_REGION: ${{ secrets.AWS_REGION }}
       timeout-minutes: 2
       run: |
         docker-compose up
