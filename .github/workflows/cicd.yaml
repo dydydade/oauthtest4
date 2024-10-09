@@ -60,8 +60,8 @@ jobs:
           ssh-keyscan -H ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com >> ~/.ssh/known_hosts
 
       - name: SSH to EC2 instance
-        env:
-          DOCKER_IMAGE_TAG: ${{ github.sha }}
+        # env:
+        #   DOCKER_IMAGE_TAG: ${{ github.sha }}
         run: |
           ssh -i mainkey.pem ubuntu@ec2-54-253-245-207.ap-southeast-2.compute.amazonaws.com << 'EOF'
           ls -al
