@@ -66,6 +66,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ image-build ]
     steps:
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
+
       - name: Create mainkey.pem from secrets
         run: |
           echo "${{ secrets.MAINKEY_PEM }}" > mainkey.pem
