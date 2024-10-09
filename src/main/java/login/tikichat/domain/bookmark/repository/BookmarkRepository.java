@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface BookmarkRepository extends JpaRepository<Bookmark, Long> {
-    boolean existsByUserIdAndChatroomId(Long userId, Long chatroomId);
+    // boolean existsByUserIdAndChatroomId(Long userId, Long chatroomId);
 
-    Optional<Bookmark> findByUserIdAndChatroomId(Long userId, Long chatroomId);
+    // Optional<Bookmark> findByUserIdAndChatroomId(Long userId, Long chatroomId);
 }

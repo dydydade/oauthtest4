@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -66,15 +68,19 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         initializeTerms();
     }
 
-    private User initializeUser() {
+    private User initializeUser() throws MalformedURLException {
         User user = User.builder()
                 .id(1L)
                 .email("dydydade@gmail.com")
+                .nickname("dydydade")
+                .imageUrl(new URL("https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png"))
                 .role(Role.SOCIAL)
                 .build();
         User user2 = User.builder()
                 .id(2L)
                 .email("n4oahdev@gmail.com")
+                .nickname("n4oahdev")
+                .imageUrl(new URL("https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png"))
                 .role(Role.USER)
                 .password(passwordEncoder.encode("1234"))
                 .build();
@@ -132,12 +138,12 @@ public class InitializeDefaultConfig implements CommandLineRunner {
         return host;
     }
 
-    private List<ChatRoom> initializeChatRooms(List<Category> categories, Host host) {
+    private List<ChatRoom> initializeChatRooms(List<Category> categories, Host host) throws MalformedURLException {
         List<ChatRoom> chatRooms = new ArrayList<>();
         Random random = new Random();
 
         for (int i = 0; i < CHAT_ROOM_COUNT; i++) {
-            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, null, List.of("고민"), categories.get(random.nextInt(10)));
+            ChatRoom chatRoom = new ChatRoom(host, "채팅방" + String.valueOf(i), 200, new URL("https://tiki-chat-bucket.s3.ap-southeast-2.amazonaws.com/profile_default.png"), List.of("고민"), categories.get(random.nextInt(10)));
             chatRooms.add(chatRoom);
         }
 

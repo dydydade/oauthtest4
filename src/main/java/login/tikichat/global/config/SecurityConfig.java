@@ -69,6 +69,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/auth/social/**").permitAll() // 소셜 로그인 요청 경로는 인증 대상 제외
                         .requestMatchers(HttpMethod.GET, "/login/oauth2/**").permitAll() // 소셜 로그인 리다이렉트 경로는 인증 대상 제외
                         .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/api-docs/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()    // 헬스 체크 경로에 대한 접근 허용
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()  // 정적 리소스에 대한 접근 허용
                         .anyRequest().authenticated()
                 )
