@@ -78,7 +78,7 @@ jobs:
 
     - name: install wait-on
       run: |
-        sudo apt-get install -y npm > /dev/null
+        sudo apt-get install -y npm > /dev/null 
         npm install -g wait-on > /dev/null
 
     - name: wait for service to be ready
