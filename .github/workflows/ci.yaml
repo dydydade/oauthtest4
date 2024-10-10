@@ -81,6 +81,11 @@ jobs:
     #     echo "Waiting for service to start..."
     #     sleep 60
 
+    - name: Install wait-on
+      run: |
+        sudo apt-get install -y npm
+        npm install -g wait-on
+
     - name: wait for service to be ready
       run: wait-on http://localhost:8080/actuator/health --timeout 60000
 
