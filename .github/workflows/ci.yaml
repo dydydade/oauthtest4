@@ -61,7 +61,7 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
-    - name: Install Docker Compose
+    - name: install docker compose
       run: |
         sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
         sudo chmod +x /usr/local/bin/docker-compose
@@ -76,13 +76,16 @@ jobs:
       run: |
         docker-compose up -d
 
-    - name: Wait for service
-      run: |
-        echo "Waiting for service to start..."
-        sleep 60
+    # - name: wait for service
+    #   run: |
+    #     echo "Waiting for service to start..."
+    #     sleep 60
+
+    - name: wait for service to be ready
+      run: wait-on http://localhost:8080/actuator/health --timeout 60000
 
     # Optionally test if the container is running correctly (use curl or any other test you want)
-    - name: Test application
+    - name: test application
       run: |
         STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)
         if [ $STATUS -ne 200 ]; then
@@ -91,12 +94,7 @@ jobs:
         fi
 
     # Shut down docker-compose services
-    - name: Stop docker-compose
+    - name: stop docker-compose
       run: docker-compose down
-
-    - name: dummy test
-      run: |
-        echo "test done"
-
 
 
