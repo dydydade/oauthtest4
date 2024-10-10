@@ -76,27 +76,20 @@ jobs:
       run: |
         docker-compose up -d
 
-    # - name: wait for service
-    #   run: |
-    #     echo "Waiting for service to start..."
-    #     sleep 60
-
-    - name: Install wait-on
-      run: |
-        sudo apt-get install -y npm
-        npm install -g wait-on
-
-    - name: wait for service to be ready
-      run: wait-on http://localhost:8080/actuator/health --timeout 60000
-
-    # Optionally test if the container is running correctly (use curl or any other test you want)
     - name: test application
       run: |
-        STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)
-        if [ $STATUS -ne 200 ]; then
-          echo "Service is not healthy, status code: $STATUS"
-          exit 1
-        fi
+        echo "Waiting for service to start..."
+        for i in {1..60}; do
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/actuator/health)
+          if [ $STATUS -eq 200 ]; then
+            echo "Service is ready!"
+            exit 0
+          fi
+          echo "Service not ready yet (status: $STATUS), retrying in 5 seconds..."
+          sleep 5
+        done
+        echo "Service did not start in time."
+        exit 1
 
     # Shut down docker-compose services
     - name: stop docker-compose
