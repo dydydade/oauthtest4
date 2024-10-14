@@ -16,9 +16,19 @@ import java.time.Instant;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "bookmarks")
 @AllArgsConstructor
 @Builder(access = AccessLevel.PROTECTED)
+@Table(
+        name = "bookmarks",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {
+                                "user_id",
+                                "chat_room_id"
+                        }
+                )
+        }
+)
 public class Bookmark {
 
     @Id

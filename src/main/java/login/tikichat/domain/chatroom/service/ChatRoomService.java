@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.*;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -110,22 +111,21 @@ public class ChatRoomService {
         return findChatRoomRes;
     }
 
-    // TODO: 이 코드 완성시키기
     private FindChatRoomDto.FindChatRoomRes sortChatRooms(FindChatRoomDto.FindChatRoomReq findChatRoomReq, FindChatRoomDto.FindChatRoomRes findChatRoomRes) {
         Comparator<FindChatRoomDto.FindChatRoomItemRes> comparator = Comparator.comparing((FindChatRoomDto.FindChatRoomItemRes chatroom) -> 0);
 
         for (ChatRoomSortType sortType : findChatRoomReq.sortPriority()) {
             switch (sortType) {
                 case BOOKMARK_CREATED_TIME: // 북마크가 있는 채팅방이 우선, 북마크 설정 시간 순으로 정렬
-                    comparator = comparator;
-//                            .thenComparing((chatroom1, chatroom2) -> Boolean.compare(chatroom1.isBookMarked(), chatroom2.isBookMarked())) // 북마크 여부 우선 정렬
-//                            .thenComparing(FindChatRoomDto.FindChatRoomItemRes::getBookmarkCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())); // 북마크 생성 시간 기준 정렬
+                    comparator = comparator
+                            .thenComparing(FindChatRoomDto.FindChatRoomItemRes::isBookmarked, Comparator.reverseOrder()) // 북마크 여부 우선 정렬
+                            .thenComparing(FindChatRoomDto.FindChatRoomItemRes::bookmarkSetTime, Comparator.nullsLast(Comparator.reverseOrder())); // 북마크 생성 시간 기준 정렬
                     break;
                 case UNREAD_CHAT_EXIST: // 미읽음 메시지가 있는 방이 우선, 최근 미읽음 메시지 시간 순으로 정렬
                     comparator = comparator
                             .thenComparing((chatroom1, chatroom2) -> {
-                                boolean chatroom1HasUnread = chatroom1.unreadChatCount() > 0;
-                                boolean chatroom2HasUnread = chatroom2.unreadChatCount() > 0;
+                                boolean chatroom1HasUnread = Optional.ofNullable(chatroom1.unreadChatCount()).orElse(0) > 0;
+                                boolean chatroom2HasUnread = Optional.ofNullable(chatroom2.unreadChatCount()).orElse(0) > 0;
                                 return Boolean.compare(chatroom2HasUnread, chatroom1HasUnread); // 미읽음 메시지가 있는 방이 우선
                             });
                     break;
@@ -212,9 +212,10 @@ public class ChatRoomService {
                             index + 1,
                             chatRoom.isRoomClosed(),
                             hostOnlineStatus,
-                            false, // TODO: 실제 값으로 수정
-                            32, // TODO: 실제 값으로 수정
-                            Instant.now().minus(3, ChronoUnit.HOURS) // TODO: 실제 값으로 수정
+                            false,                                             // TODO: 실제 값으로 수정
+                            Instant.now().minus(4, ChronoUnit.HOURS),      // TODO: 실제 값으로 수정
+                            32,                                                             // TODO: 실제 값으로 수정
+                            Instant.now().minus(3, ChronoUnit.HOURS)       // TODO: 실제 값으로 수정
                     );
                 })
                 .collect(Collectors.toList());
