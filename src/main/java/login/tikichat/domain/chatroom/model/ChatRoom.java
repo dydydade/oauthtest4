@@ -3,6 +3,7 @@ package login.tikichat.domain.chatroom.model;
 import jakarta.persistence.*;
 import login.tikichat.domain.attachment.model.Attachment;
 import login.tikichat.domain.category.model.Category;
+import login.tikichat.domain.chatroom_participant.model.ChatRoomParticipant;
 import login.tikichat.domain.host.model.Host;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,9 @@ public class ChatRoom {
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_code", nullable = false)
     private Category category;
+
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    private List<ChatRoomParticipant> participants = new ArrayList<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<Attachment> attachments = new ArrayList<>();
