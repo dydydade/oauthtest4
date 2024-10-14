@@ -2,8 +2,8 @@ name: cd
 on:
   pull_request:
     types: [ closed ]
-    branches: [ dev ]
-    # paths:
+    branches: [ master ]
+    # paths: 
     # - 'src/**'
 
 jobs:

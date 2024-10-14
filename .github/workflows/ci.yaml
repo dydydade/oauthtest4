@@ -2,8 +2,8 @@ name: ci
 on:
   pull_request:
     types: [ opened, synchronize ]
-    branches: [ dev ]
-    # paths:
+    branches: [ master ]
+    # paths: 
     # - 'src/**'
 
 jobs:
