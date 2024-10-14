@@ -46,6 +46,16 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
             });
         }
 
+        if (findChatRoomReq.isFetchOnlyParticipatedRoom() != null) {
+            query
+                .where(chatRoomQ.participants.any().user.id.eq(userId));
+        }
+
+        if (findChatRoomReq.categoryCode() != null) {
+            query
+                .where(chatRoomQ.category.code.eq(findChatRoomReq.categoryCode()));
+        }
+
         query
             .join(chatRoomQ.host, hostQ).fetchJoin()
             .join(hostQ.user, userQ).fetchJoin();

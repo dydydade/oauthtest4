@@ -165,6 +165,9 @@ public class HostService {
                             .orderNum(index)
                             .isRoomClosed(chatRoom.isRoomClosed())
                             .isHostOnline(hostOnlineStatus)
+                            .isBookmarked(null)
+                            .unreadChatCount(null)
+                            .lastChatTime(null)
                             .build();
                 })
                 .collect(Collectors.toList());
