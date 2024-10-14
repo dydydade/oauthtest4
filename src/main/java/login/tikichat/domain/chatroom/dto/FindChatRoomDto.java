@@ -1,5 +1,6 @@
 package login.tikichat.domain.chatroom.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
@@ -42,7 +43,6 @@ public class FindChatRoomDto {
             @Schema(description = "조회할 채팅방의 카테고리 (미입력 시 전체 카테고리 채팅방 조회)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             String categoryCode,
 
-            // TODO: isBookmarked 필드 추가 필요 여부 검토
             @Schema(description = "조회할 채팅방 정렬 기준", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             List<ChatRoomSortType> sortPriority,
 
@@ -83,6 +83,8 @@ public class FindChatRoomDto {
             Boolean isHostOnline,
             @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             Boolean isBookmarked,
+            @JsonIgnore
+            Instant bookmarkSetTime,    // 정렬용 (응답에는 미포함)
             @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
             Integer unreadChatCount,
             @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
