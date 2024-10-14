@@ -1,15 +1,18 @@
 package login.tikichat.domain.chatroom.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import login.tikichat.domain.category.dto.FindCategoryDto;
+import login.tikichat.domain.chatroom.constants.ChatRoomSortType;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.validator.constraints.Length;
 
+import java.net.URL;
+import java.time.Instant;
 import java.util.List;
 
 public class FindChatRoomDto {
@@ -29,12 +32,20 @@ public class FindChatRoomDto {
             @Length(max = 200, min = 1)
             @Nullable
             String searchKeyword,
+
             @Schema(
                     description = "채팅방 검색 키워드로 검색할 항목들",
                     requiredMode = Schema.RequiredMode.NOT_REQUIRED,
                     defaultValue = "[NAME]"
             )
             List<FindChatRoomSearchKeywordColumns> searchKeywordColumns,
+
+            @Schema(description = "조회할 채팅방의 카테고리 (미입력 시 전체 카테고리 채팅방 조회)", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            String categoryCode,
+
+            @Schema(description = "조회할 채팅방 정렬 기준", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            List<ChatRoomSortType> sortPriority,
+
             @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED, defaultValue = "false", description = "현재 참가한 채팅방만 가져오기")
             Boolean isFetchOnlyParticipatedRoom
     ) {
@@ -44,6 +55,8 @@ public class FindChatRoomDto {
                     List.of(
                         FindChatRoomSearchKeywordColumns.NAME
                     ),
+                    null,
+                    null,
                     false);
         }
     }
@@ -59,7 +72,7 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             List<String> tags,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            Long hostId,
+            URL chatRoomImageUrl,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             FindCategoryDto.FindCategoryItemRes category,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
@@ -67,7 +80,15 @@ public class FindChatRoomDto {
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
             Boolean isRoomClosed,
             @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-            Boolean isHostOnline
+            Boolean isHostOnline,
+            @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            Boolean isBookmarked,
+            @JsonIgnore
+            Instant bookmarkSetTime,    // 정렬용 (응답에는 미포함)
+            @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            Integer unreadChatCount,
+            @Schema(requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            Instant lastChatTime
     ) {
 
     }
