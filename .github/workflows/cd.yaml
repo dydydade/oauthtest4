@@ -16,13 +16,14 @@ jobs:
         with:
           fetch-depth: 0  # 전체 Git 기록을 가져옵니다.
 
-      - name: Get previous commit SHA
-        run: |
-          PREV_SHA=$(git rev-parse HEAD^1)
-          echo "Previous commit SHA: $PREV_SHA"
+      # - name: Get previous commit SHA
+      #   run: |
+      #     PREV_SHA=$(git rev-parse HEAD^1)
+      #     echo "Previous commit SHA: $PREV_SHA"
 
       - name: echo
-        run: echo "${{ github.event.pull_request.head.sha }}"
+        run: echo "${GITHUB_SHA::7}"
+        # run: echo "${{ github.event.pull_request.head.sha }}"
 
       - name: Create .ssh directory
         run: mkdir -p ~/.ssh

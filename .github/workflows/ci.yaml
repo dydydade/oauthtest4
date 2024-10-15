@@ -96,4 +96,5 @@ jobs:
         run: docker-compose down
 
       - name: echo
-        run: echo "${{ github.sha }}"
+        # run: echo "${{ github.sha }}"
+        run: echo "${GITHUB_SHA::7}"
