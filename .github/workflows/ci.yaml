@@ -94,12 +94,3 @@ jobs:
 
       - name: stop docker-compose
         run: docker-compose down
-
-      - name: save artifact
-        run: echo "${{ github.sha }}" > github-sha.txt
-
-      - name: upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: github-sha
-          path: github-sha.txt
