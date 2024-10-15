@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: echo
-        run: echo "${{ github.event.pull_request.head.sha }}"
+        run: echo "${{ github.event.pull_request.head.sha::7 }}"
 
       - name: Create .ssh directory
         run: mkdir -p ~/.ssh
