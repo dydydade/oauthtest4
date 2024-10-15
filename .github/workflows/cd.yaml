@@ -27,7 +27,7 @@ jobs:
         run: |
           ssh -i mainkey.pem ubuntu@ec2-${{ secrets.AWS_EC_IP }}.${{ secrets.AWS_REGION }}.compute.amazonaws.com << EOF
             ls -al
-            sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.sha }}|g" docker-compose.yml
+            sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.event.pull_request.head.sha }}|g" docker-compose.yml
             docker-compose down
             sudo rm -r master_db
             docker rmi ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}
