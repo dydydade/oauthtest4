@@ -101,21 +101,11 @@ jobs:
 
   deploy:
     if: github.event.pull_request.merged == true
+    needs: [ image-run-test ]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # 전체 Git 기록을 가져옵니다.
-
-      # - name: Get previous commit SHA
-      #   run: |
-      #     PREV_SHA=$(git rev-parse HEAD^1)
-      #     echo "Previous commit SHA: $PREV_SHA"
-
       - name: echo
-        run: echo "${GITHUB_SHA::7}"
-        # run: echo "${{ github.event.pull_request.head.sha }}"
+        run: echo "${{ github.event.pull_request.head.sha }}"
 
       - name: Create .ssh directory
         run: mkdir -p ~/.ssh
@@ -133,7 +123,7 @@ jobs:
         run: |
           ssh -i mainkey.pem ubuntu@ec2-${{ secrets.AWS_EC_IP }}.${{ secrets.AWS_REGION }}.compute.amazonaws.com << EOF
             ls -al
-            sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.event.pull_request.head.sha }}|g" docker-compose.yml
+            sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.sha }}|g" docker-compose.yml
             docker-compose down
             sudo rm -r master_db
             docker rmi ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}
