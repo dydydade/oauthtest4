@@ -99,7 +99,7 @@ jobs:
         # run: echo "${{ github.sha }}"
         run: echo "${GITHUB_SHA::7}"
 
-deploy:
+  deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
