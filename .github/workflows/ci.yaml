@@ -97,7 +97,6 @@ jobs:
 
   deploy:
     if: github.event.pull_request.merged == true
-    needs: [image-build, image-run-test]
     runs-on: ubuntu-latest
     steps:
       - name: Create .ssh directory
