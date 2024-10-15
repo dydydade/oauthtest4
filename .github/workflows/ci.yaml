@@ -95,12 +95,9 @@ jobs:
       - name: stop docker-compose
         run: docker-compose down
 
-      - name: echo
-        # run: echo "${{ github.sha }}"
-        run: echo "${GITHUB_SHA::7}"
-
   deploy:
     if: github.event.pull_request.merged == true
+    needs: [image-build, image-run-test]
     runs-on: ubuntu-latest
     steps:
       - name: Create .ssh directory
