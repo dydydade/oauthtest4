@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: github-sha
-          paths: ./github-sha.txt
+          path: ./github-sha.txt
 
 
   deploy:
