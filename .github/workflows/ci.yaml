@@ -97,7 +97,8 @@ jobs:
 
 
   deploy:
-    if: github.event.pull_request.merged == true && github.event.action == 'closed'
+    if: github.event.pull_request.merge_commit_sha != null
+    # if: github.event.pull_request.merged == true && github.event.action == 'closed'
     needs: [ image-run-test ]
     runs-on: ubuntu-latest
     steps:
