@@ -1,52 +1,44 @@
-# name: cd
-# on:
-#   pull_request:
-#     types: [ closed ]
-#     branches: [ master ]
-#     # paths:
-#     # - 'src/**'
+name: cd
+on:
+  workflow_run:
+    workflows: ["ci"]
+    types:
+      - completed
+  # pull_request:
+  #   types: [ closed ]
+  #   branches: [ master ]
+  #   # paths:
+  #   # - 'src/**'
 
-# jobs:
-#   deploy:
-#     if: github.event.pull_request.merged == true
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v3
-#         with:
-#           fetch-depth: 0  # 전체 Git 기록을 가져옵니다.
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.pull_request.merged == true }}
+    needs: [ image-run-test ]
+    runs-on: ubuntu-latest
+    steps:
 
-#       # - name: Get previous commit SHA
-#       #   run: |
-#       #     PREV_SHA=$(git rev-parse HEAD^1)
-#       #     echo "Previous commit SHA: $PREV_SHA"
+      - name: Create .ssh directory
+        run: mkdir -p ~/.ssh
 
-#       - name: echo
-#         run: echo "${GITHUB_SHA::7}"
-#         # run: echo "${{ github.event.pull_request.head.sha }}"
+      - name: Create mainkey.pem from secrets
+        run: |
+          echo "${{ secrets.MAINKEY_PEM }}" > mainkey.pem
+          chmod 600 mainkey.pem
 
-#       - name: Create .ssh directory
-#         run: mkdir -p ~/.ssh
+      - name: Add EC2 host to known_hosts
+        run: |
+          ssh-keyscan -H ec2-${{ secrets.AWS_EC_IP }}.${{ secrets.AWS_REGION }}.compute.amazonaws.com >> ~/.ssh/known_hosts
 
-#       - name: Create mainkey.pem from secrets
-#         run: |
-#           echo "${{ secrets.MAINKEY_PEM }}" > mainkey.pem
-#           chmod 600 mainkey.pem
+      - name: SSH to EC2 instance
+        run: |
+          ssh -i mainkey.pem ubuntu@ec2-${{ secrets.AWS_EC_IP }}.${{ secrets.AWS_REGION }}.compute.amazonaws.com << EOF
+            ls -al
+            sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.sha }}|g" docker-compose.yml
+            docker-compose down
+            sudo rm -r master_db
+            docker rmi ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}
+            docker-compose up -d
+          EOF
 
-#       - name: Add EC2 host to known_hosts
-#         run: |
-#           ssh-keyscan -H ec2-${{ secrets.AWS_EC_IP }}.${{ secrets.AWS_REGION }}.compute.amazonaws.com >> ~/.ssh/known_hosts
-
-#       - name: SSH to EC2 instance
-#         run: |
-#           ssh -i mainkey.pem ubuntu@ec2-${{ secrets.AWS_EC_IP }}.${{ secrets.AWS_REGION }}.compute.amazonaws.com << EOF
-#             ls -al
-#             sed -i "/tikichat_server:/,/image: /s|image: .*|image: ${{ vars.REPOSITORY }}:${{ github.event.pull_request.head.sha }}|g" docker-compose.yml
-#             docker-compose down
-#             sudo rm -r master_db
-#             docker rmi ${{ secrets.REGISTRY }}/${{ vars.REPOSITORY }}
-#             docker-compose up -d
-#           EOF
-
-#       - name: Remove mainkey.pem
-#         run: rm mainkey.pem
+      - name: Remove mainkey.pem
+        run: rm mainkey.pem
