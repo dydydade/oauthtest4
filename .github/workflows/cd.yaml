@@ -52,7 +52,6 @@ jobs:
     needs: [ re-build-image ]
     runs-on: ubuntu-latest
     steps:
-
       - name: Create .ssh directory
         run: mkdir -p ~/.ssh
 
