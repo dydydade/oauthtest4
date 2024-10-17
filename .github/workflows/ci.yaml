@@ -2,7 +2,7 @@ name: ci
 on:
   pull_request:
     types: [ opened, synchronize ]
-    branches: [ master ]
+    branches: [ dev ]
     # paths:
     # - 'src/**'
 
