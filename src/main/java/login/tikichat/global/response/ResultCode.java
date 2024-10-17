@@ -33,6 +33,7 @@ public enum ResultCode {
 
     // ChatRoom
     FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다."),
+    CREATE_CHAT_ROOM_SUCCESS(200, "CR002", "채팅방을 생성하였습니다."),
 
     // Chat
     SEND_CHAT_SUCCESS(200, "CHAT001", "채팅이 전송되었습니다."),

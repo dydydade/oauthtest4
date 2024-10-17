@@ -37,7 +37,7 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_USER_INFO_SUCCESS,
+                ResultCode.CREATE_CHAT_ROOM_SUCCESS,
                 this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
@@ -53,7 +53,7 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_USER_INFO_SUCCESS,
+                ResultCode.FIND_CHAT_ROOMS_SUCCESS,
                 this.chatRoomService.findChatRooms(findChatRoomReq, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));

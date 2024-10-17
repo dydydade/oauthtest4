@@ -116,7 +116,7 @@ public class ChatRoomService {
 
         for (ChatRoomSortType sortType : findChatRoomReq.sortPriority()) {
             switch (sortType) {
-                case BOOKMARK_CREATED_TIME: // 북마크가 있는 채팅방이 우선, 북마크 설정 시간 순으로 정렬
+                case BOOKMARK_EXIST: // 북마크가 있는 채팅방이 우선, 북마크 설정 시간 순으로 정렬
                     comparator = comparator
                             .thenComparing(FindChatRoomDto.FindChatRoomItemRes::isBookmarked, Comparator.reverseOrder()) // 북마크 여부 우선 정렬
                             .thenComparing(FindChatRoomDto.FindChatRoomItemRes::bookmarkSetTime, Comparator.nullsLast(Comparator.reverseOrder())); // 북마크 생성 시간 기준 정렬
