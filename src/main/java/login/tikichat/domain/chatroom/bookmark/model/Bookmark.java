@@ -1,4 +1,4 @@
-package login.tikichat.domain.bookmark.model;
+package login.tikichat.domain.chatroom.bookmark.model;
 
 import jakarta.persistence.*;
 import login.tikichat.domain.chatroom.model.ChatRoom;

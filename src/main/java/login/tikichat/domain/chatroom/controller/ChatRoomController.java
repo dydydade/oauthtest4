@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import login.tikichat.domain.chatroom.bookmark.service.BookmarkService;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
 import login.tikichat.domain.chatroom.dto.FindChatRoomDto;
 import login.tikichat.domain.chatroom.service.ChatRoomService;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ChatRoomController {
     private final ChatRoomService chatRoomService;
+    private final BookmarkService bookmarkService;
 
     @PostMapping(
             value = ""
@@ -87,6 +89,36 @@ public class ChatRoomController {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_CHAT_ROOMS_SUCCESS,
                 this.chatRoomService.findMemberCountRankedChatRooms(findChatRoomReq)
+        );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    @PostMapping(
+            value = "/{chatRoomId}/bookmarks"
+    )
+    @Operation(summary = "채팅방 즐겨찾기 등록", description = "채팅방 즐겨찾기 등록 API 입니다.")
+    public ResponseEntity<ResultResponse> saveBookmark(
+            @PathVariable Long chatRoomId,
+            @AuthenticationPrincipal UserDetailInfo user
+    ) {
+        ResultResponse result = ResultResponse.of(
+                ResultCode.SAVE_BOOKMARK_SUCCESS,
+                this.bookmarkService.saveBookmark(user.getUserId(), chatRoomId)
+        );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    @DeleteMapping(
+            value = "/{chatRoomId}/bookmarks"
+    )
+    @Operation(summary = "채팅방 즐겨찾기 해제", description = "채팅방 즐겨찾기 해제 API 입니다.")
+    public ResponseEntity<ResultResponse> deleteBookmark(
+            @PathVariable Long chatRoomId,
+            @AuthenticationPrincipal UserDetailInfo user
+    ) {
+        ResultResponse result = ResultResponse.of(
+                ResultCode.SAVE_BOOKMARK_SUCCESS,
+                this.bookmarkService.deleteBookmark(user.getUserId(), chatRoomId)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
