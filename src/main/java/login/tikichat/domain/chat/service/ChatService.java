@@ -135,6 +135,11 @@ public class ChatService {
                         ).add(chatReaction.getUser().getId());
                     }
 
+                    final List<String> imageUrls = !chat.getAttachments().isEmpty() ?
+                            chat.getAttachments().stream().map((chatAttachment ->
+                                    this.attachmentService.getAttachmentUrl(chatAttachment.getId())
+                            )).collect(Collectors.toList()) : Collections.emptyList();
+
                     final List<FindChatsDto.FindChatReactionListRes> reactions = new ArrayList<>();
                     chatCounts.forEach((chatReactionType, list) -> {
                                 reactions.add(new FindChatsDto.FindChatReactionListRes(
@@ -156,7 +161,8 @@ public class ChatService {
                                     parentChat.getId(),
                                     parentChat.getContent(),
                                     parentChat.getCreatedDate()
-                            ) : null
+                            ) : null,
+                            imageUrls
                     );
                 }
                 ).toList(),

@@ -88,6 +88,7 @@ public class ChatRoomService {
             host = hostOptional.get();
         } else {
             host = Host.builder()
+                    .user(user)
                     .build();
             this.hostRepository.save(host);
         }

@@ -69,6 +69,8 @@ public class AttachmentService {
 
         fileStorage.upload(path + "/" + filename, multipartFile.getInputStream());
 
+        System.out.println("chat" + chat.getAttachments());
+
         final var attachment = new ChatAttachment(
                 uploader,
                 chat,

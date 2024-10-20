@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
+
 @SecurityRequirement(name = "JWT")
 @RestController
 @Tag(name = "Chat API", description = "채팅 API")
@@ -38,7 +40,7 @@ public class ChatController {
             @ModelAttribute @Valid SendMessageDto.SendMessageReqDto sendMessageReqDto,
             @AuthenticationPrincipal UserDetailInfo user,
             @PathVariable("chatRoomId") Long chatRoomId
-    ) {
+    ) throws IOException {
         ResultResponse result = ResultResponse.of(
                 ResultCode.SEND_CHAT_SUCCESS,
                 this.chatService.sendMessage(user.getUserId(), chatRoomId, sendMessageReqDto)
