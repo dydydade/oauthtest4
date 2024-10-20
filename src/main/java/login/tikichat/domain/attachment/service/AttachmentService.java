@@ -1,6 +1,7 @@
 package login.tikichat.domain.attachment.service;
 
 import login.tikichat.domain.attachment.model.Attachment;
+import login.tikichat.domain.attachment.model.ChatRoomAttachment;
 import login.tikichat.domain.attachment.repository.AttachmentRepository;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import login.tikichat.domain.chatroom.service.ChatRoomService;
@@ -35,7 +36,7 @@ public class AttachmentService {
 
         fileStorage.upload(path + "/" + filename, multipartFile.getInputStream());
 
-        final var attachment = new Attachment(
+        final var attachment = new ChatRoomAttachment(
                 uploader,
                 chatRoom,
                 path,
