@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,10 +32,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
     private final ChatService chatService;
 
-    @PostMapping("")
+    @PostMapping(value = "", consumes = { "multipart/form-data" })
     @Operation(summary = "채팅 메세지 보내기", description = "채팅 메세지를 보내는 API입니다.")
     public ResponseEntity<ResultResponse> sendChat(
-            @RequestBody @Valid SendMessageDto.SendMessageReqDto sendMessageReqDto,
+            @ModelAttribute @Valid SendMessageDto.SendMessageReqDto sendMessageReqDto,
             @AuthenticationPrincipal UserDetailInfo user,
             @PathVariable("chatRoomId") Long chatRoomId
     ) {

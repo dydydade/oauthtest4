@@ -1,5 +1,6 @@
 package login.tikichat.domain.chat.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import login.tikichat.domain.attachment.model.ChatAttachment;
+import login.tikichat.domain.attachment.model.ChatRoomAttachment;
 import login.tikichat.domain.chatroom.model.ChatRoom;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -19,7 +22,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -57,6 +62,9 @@ public class Chat {
 
     @Column(name = "parent_chat_id")
     private Long parentChatId;
+
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatAttachment> attachments = new ArrayList<>();
 
     public static Chat sendMessage(
             Long senderUserId,
