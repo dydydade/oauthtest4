@@ -1,7 +1,7 @@
 package login.tikichat.domain.chatroom.bookmark.dto;
 
-public class SaveBookmarkDto {
-    public record SaveBookmarkRes(
+public class BookmarkStatusDto {
+    public record BookmarkStatusRes(
         Long bookmarkId,
         Long userId,
         Long chatRoomId

@@ -1,6 +1,6 @@
 package login.tikichat.domain.chatroom.bookmark.service;
 
-import login.tikichat.domain.chatroom.bookmark.dto.SaveBookmarkDto;
+import login.tikichat.domain.chatroom.bookmark.dto.BookmarkStatusDto;
 import login.tikichat.domain.chatroom.bookmark.model.Bookmark;
 import login.tikichat.domain.chatroom.bookmark.repository.BookmarkRepository;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
@@ -22,7 +22,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     @Transactional
-    public SaveBookmarkDto.SaveBookmarkRes saveBookmark(Long userId, Long chatRoomId) {
+    public BookmarkStatusDto.BookmarkStatusRes saveBookmark(Long userId, Long chatRoomId) {
         final var user = this.userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(ErrorCode.NOT_FOUND_USER)
         );
@@ -37,11 +37,11 @@ public class BookmarkService {
 
         this.bookmarkRepository.save(bookmark);
 
-        return new SaveBookmarkDto.SaveBookmarkRes(bookmark.getId(), userId, chatRoomId);
+        return new BookmarkStatusDto.BookmarkStatusRes(bookmark.getId(), userId, chatRoomId);
     }
 
     @Transactional
-    public SaveBookmarkDto.SaveBookmarkRes deleteBookmark(Long userId, Long chatRoomId) {
+    public BookmarkStatusDto.BookmarkStatusRes deleteBookmark(Long userId, Long chatRoomId) {
         final var user = this.userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(ErrorCode.NOT_FOUND_USER)
         );
@@ -54,6 +54,6 @@ public class BookmarkService {
 
         this.bookmarkRepository.delete(bookmark);
 
-        return new SaveBookmarkDto.SaveBookmarkRes(bookmark.getId(), userId, chatRoomId);
+        return new BookmarkStatusDto.BookmarkStatusRes(bookmark.getId(), userId, chatRoomId);
     }
 }
