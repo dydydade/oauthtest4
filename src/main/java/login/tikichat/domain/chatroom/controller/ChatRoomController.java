@@ -117,7 +117,7 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.SAVE_BOOKMARK_SUCCESS,
+                ResultCode.DELETE_BOOKMARK_SUCCESS,
                 this.bookmarkService.deleteBookmark(user.getUserId(), chatRoomId)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
