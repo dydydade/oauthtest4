@@ -64,6 +64,7 @@ public class Chat {
     @Column(name = "parent_chat_id")
     private Long parentChatId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatAttachment> attachments = new ArrayList<>();
 

@@ -1,7 +1,7 @@
 package login.tikichat.domain.chatroom.bookmark.repository.impl;
 
 import login.tikichat.domain.chatroom.bookmark.model.Bookmark;
-import login.tikichat.domain.bookmark.model.QBookmark;
+import login.tikichat.domain.chatroom.bookmark.model.QBookmark;
 import login.tikichat.domain.chatroom.bookmark.repository.CustomBookmarkRepository;
 import login.tikichat.domain.chatroom.model.QChatRoom;
 import login.tikichat.domain.user.model.QUser;
