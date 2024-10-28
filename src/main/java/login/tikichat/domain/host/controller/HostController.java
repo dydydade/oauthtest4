@@ -4,12 +4,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import login.tikichat.domain.host.dto.FindHostDto;
 import login.tikichat.domain.host.service.HostService;
 import login.tikichat.global.auth.UserDetailInfo;
 import login.tikichat.global.response.ResultCode;
 import login.tikichat.global.response.ResultResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -86,6 +87,22 @@ public class HostController {
         ResultResponse result = ResultResponse.of(
                 ResultCode.TARGET_HOST_FOLLOWERS_FOUND,
                 this.hostService.findTargetHostFollowers(hostId)
+        );
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
+    @GetMapping("")
+    @Operation(summary = "호스트 조회(키워드)", description = "검색 키워드를 통해 해당하는 호스트를 조회하는 API 입니다.")
+    public ResponseEntity<ResultResponse> searchHostsByHostName(
+            @RequestBody
+            @Valid
+            @Parameter(required = true)
+            FindHostDto.FindHostReq findHostReq,
+            @AuthenticationPrincipal UserDetailInfo user
+    ) {
+        ResultResponse result = ResultResponse.of(
+                ResultCode.FIND_HOSTS_SUCCESS,
+                this.hostService.searchHostsByHostName(findHostReq.searchKeyword())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }

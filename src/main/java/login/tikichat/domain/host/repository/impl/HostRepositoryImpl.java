@@ -7,6 +7,7 @@ import login.tikichat.domain.user.model.QUser;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -26,5 +27,15 @@ public class HostRepositoryImpl extends QuerydslRepositorySupport implements Cus
                 .fetchOne();
 
         return Optional.ofNullable(host);
+    }
+
+    @Override
+    public List<Host> findBySearchKeyword(String searchKeyword) {
+        final var hostQ = QHost.host;
+        final var query = super.from(hostQ);
+
+        return query
+                .where(hostQ.user.nickname.contains(searchKeyword))
+                .fetch();
     }
 }
