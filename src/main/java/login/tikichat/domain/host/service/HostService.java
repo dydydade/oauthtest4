@@ -174,4 +174,18 @@ public class HostService {
 
         return new FindChatRoomDto.FindChatRoomRes(chatRoomResponses);
     }
+
+    @Transactional(readOnly = true)
+    public FindHostDto.FindHostRes searchHostsByHostName(String searchKeyword) {
+        List<FindHostDto.FindHostItemRes> hostItems = hostRepository.findBySearchKeyword(searchKeyword).stream()
+                .map(host -> FindHostDto.FindHostItemRes.builder()
+                        .hostId(host.getId())
+                        .hostNickname(host.getHostNickname())
+                        .hostProfileImageUrl(host.getHostProfileImageUrl())
+                        .isOnline(userStatusService.getUserStatus(host.getUser().getId()).orElse(false))
+                        .build())
+                .toList();
+
+        return new FindHostDto.FindHostRes(hostItems);
+    }
 }
