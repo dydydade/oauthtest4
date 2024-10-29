@@ -87,38 +87,8 @@ public class HostService {
                 .hostDescription(host.getHostDescription())
                 .followerCount(this.countByHostId(hostId))
                 .isFollowing(this.existsByHostIdAndFollowerUserId(host.getId(), userId))
-                .chatRooms(this.convertChatRoomsToResponse(host.getChatRooms()))
+                .chatRooms(this.toResponse(host.getChatRooms()))
                 .build();
-    }
-
-    @Transactional(readOnly = true)
-    public FindHostDto.FindHostRes findMyFollowedHosts(Long followerUserId) {
-        List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerUserId(followerUserId).stream()
-                .map(HostFollowStatus::getHost)
-                .map(host -> FindHostDto.FindHostItemRes.builder()
-                        .hostId(host.getId())
-                        .hostNickname(host.getHostNickname())
-                        .hostProfileImageUrl(host.getHostProfileImageUrl())
-                        .isOnline(userStatusService.getUserStatus(host.getUser().getId()).orElse(false))
-                        .build())
-                .toList();
-
-        return new FindHostDto.FindHostRes(hostItems);
-    }
-
-    @Transactional(readOnly = true)
-    public FindHostDto.FindHostRes findTargetFollowerHosts(Long followerId) {
-        List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerId(followerId).stream()
-                .map(HostFollowStatus::getHost)
-                .map(host -> FindHostDto.FindHostItemRes.builder()
-                        .hostId(host.getId())
-                        .hostNickname(host.getHostNickname())
-                        .hostProfileImageUrl(host.getHostProfileImageUrl())
-                        .isOnline(userStatusService.getUserStatus(host.getUser().getId()).orElse(false))
-                        .build())
-                .toList();
-
-        return new FindHostDto.FindHostRes(hostItems);
     }
 
     @Transactional(readOnly = true)
@@ -145,7 +115,7 @@ public class HostService {
         return hostFollowStatusRepository.countByHostId(hostId);
     }
 
-    public FindChatRoomDto.FindChatRoomRes convertChatRoomsToResponse(List<ChatRoom> chatRooms) {
+    public FindChatRoomDto.FindChatRoomRes toResponse(List<ChatRoom> chatRooms) {
         List<FindChatRoomDto.FindChatRoomItemRes> chatRoomResponses = IntStream.range(0, chatRooms.size())
                 .mapToObj(index -> {
                     ChatRoom chatRoom = chatRooms.get(index);
@@ -176,8 +146,8 @@ public class HostService {
     }
 
     @Transactional(readOnly = true)
-    public FindHostDto.FindHostRes searchHostsByHostName(String searchKeyword) {
-        List<FindHostDto.FindHostItemRes> hostItems = hostRepository.findBySearchKeyword(searchKeyword).stream()
+    public FindHostDto.FindHostRes findHosts(FindHostDto.FindHostReq findHostReq) {
+        List<FindHostDto.FindHostItemRes> hostItems = hostRepository.findHosts(findHostReq).stream()
                 .map(host -> FindHostDto.FindHostItemRes.builder()
                         .hostId(host.getId())
                         .hostNickname(host.getHostNickname())

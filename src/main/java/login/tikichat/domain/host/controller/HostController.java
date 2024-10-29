@@ -25,20 +25,6 @@ public class HostController {
 
     private final HostService hostService;
 
-    @GetMapping("")
-    @Operation(summary = "팔로워가 팔로우한 호스트 목록 조회", description = "팔로워가 팔로우하고 있는 호스트 목록을 조회하는 API 입니다. followerId 파라미터를 넘기지 않으면 인증된 사용자(나)가 팔로우하고 있는 호스트 명단이 조회됩니다.")
-    public ResponseEntity<ResultResponse> findFollowedHosts(
-            @Parameter(description = "팔로워 ID (필수값 아님)")
-            @RequestParam(name = "followerId", required = false) Long followerId,
-            @AuthenticationPrincipal UserDetailInfo user
-    ) {
-        ResultResponse result = ResultResponse.of(
-                ResultCode.FOLLOWED_HOSTS_FOUND,
-                followerId != null ? this.hostService.findTargetFollowerHosts(followerId) : this.hostService.findMyFollowedHosts(user.getUserId())
-        );
-        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
-    }
-
     @GetMapping("/{hostId}")
     @Operation(summary = "호스트 상세 정보 조회", description = "호스트의 상세 정보를 조회하는 API 입니다.")
     public ResponseEntity<ResultResponse> findHostProfile(
@@ -92,8 +78,8 @@ public class HostController {
     }
 
     @GetMapping("")
-    @Operation(summary = "호스트 조회(키워드)", description = "검색 키워드를 통해 해당하는 호스트를 조회하는 API 입니다.")
-    public ResponseEntity<ResultResponse> searchHostsByHostName(
+    @Operation(summary = "호스트 조회(키워드)", description = "호스트를 조회하는 API 입니다.")
+    public ResponseEntity<ResultResponse> findHosts(
             @RequestBody
             @Valid
             @Parameter(required = true)
@@ -102,7 +88,7 @@ public class HostController {
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_HOSTS_SUCCESS,
-                this.hostService.searchHostsByHostName(findHostReq.searchKeyword())
+                this.hostService.findHosts(findHostReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
