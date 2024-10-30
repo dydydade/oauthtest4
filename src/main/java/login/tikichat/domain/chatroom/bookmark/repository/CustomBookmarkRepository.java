@@ -1,6 +1,6 @@
-package login.tikichat.domain.bookmark.repository;
+package login.tikichat.domain.chatroom.bookmark.repository;
 
-import login.tikichat.domain.bookmark.model.Bookmark;
+import login.tikichat.domain.chatroom.bookmark.model.Bookmark;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
