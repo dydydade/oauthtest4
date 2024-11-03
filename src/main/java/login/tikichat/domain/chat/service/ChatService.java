@@ -103,7 +103,8 @@ public class ChatService {
                 chat.getId(),
                 chat.getContent(),
                 chat.getCreatedDate(),
-                imageUrls
+                imageUrls,
+                chat.getDeletedAt()
         );
     }
 
@@ -159,7 +160,8 @@ public class ChatService {
                                     parentChat.getContent(),
                                     parentChat.getCreatedDate()
                             ) : null,
-                            imageUrls
+                            imageUrls,
+                            chat.getDeletedAt()
                     );
                 }
                 ).toList(),

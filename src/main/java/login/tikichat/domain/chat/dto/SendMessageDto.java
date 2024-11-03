@@ -12,7 +12,8 @@ public class SendMessageDto {
         Long id,
         String content,
         Instant createdAt,
-        List<String> imageUrls
+        List<String> imageUrls,
+        Instant deletedAt
     ) {
     }
 

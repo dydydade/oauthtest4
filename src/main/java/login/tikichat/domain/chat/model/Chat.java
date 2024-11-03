@@ -58,7 +58,7 @@ public class Chat {
     private Instant createdDate;
 
     @Builder.Default
-    @OneToMany(mappedBy = "chat")
+    @OneToMany(mappedBy = "chat", orphanRemoval = true)
     private Set<ChatReaction> chatReactions = new HashSet<>();
 
     @Column(name = "parent_chat_id")
@@ -94,5 +94,6 @@ public class Chat {
 
         this.deletedAt = Instant.now();
         this.content = null;
+        this.chatReactions = new HashSet<>();
     }
 }
