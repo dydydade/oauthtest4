@@ -1,7 +1,8 @@
-package login.tikichat.domain.bookmark.service;
+package login.tikichat.domain.chatroom.bookmark.service;
 
-import login.tikichat.domain.bookmark.model.Bookmark;
-import login.tikichat.domain.bookmark.repository.BookmarkRepository;
+import login.tikichat.domain.chatroom.bookmark.dto.BookmarkStatusDto;
+import login.tikichat.domain.chatroom.bookmark.model.Bookmark;
+import login.tikichat.domain.chatroom.bookmark.repository.BookmarkRepository;
 import login.tikichat.domain.chatroom.repository.ChatRoomRepository;
 import login.tikichat.domain.user.repository.UserRepository;
 import login.tikichat.global.exception.BusinessException;
@@ -21,7 +22,7 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     @Transactional
-    public void saveBookmark(Long userId, Long chatRoomId) {
+    public BookmarkStatusDto.BookmarkStatusRes saveBookmark(Long userId, Long chatRoomId) {
         final var user = this.userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(ErrorCode.NOT_FOUND_USER)
         );
@@ -35,10 +36,12 @@ public class BookmarkService {
         final var bookmark = new Bookmark(user, chatRoom);
 
         this.bookmarkRepository.save(bookmark);
+
+        return new BookmarkStatusDto.BookmarkStatusRes(bookmark.getId(), userId, chatRoomId);
     }
 
     @Transactional
-    public void deleteBookmark(Long userId, Long chatRoomId) {
+    public BookmarkStatusDto.BookmarkStatusRes deleteBookmark(Long userId, Long chatRoomId) {
         final var user = this.userRepository.findById(userId).orElseThrow(
                 () -> new BusinessException(ErrorCode.NOT_FOUND_USER)
         );
@@ -50,5 +53,7 @@ public class BookmarkService {
         );
 
         this.bookmarkRepository.delete(bookmark);
+
+        return new BookmarkStatusDto.BookmarkStatusRes(bookmark.getId(), userId, chatRoomId);
     }
 }

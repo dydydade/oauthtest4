@@ -46,7 +46,7 @@ public class ChatRoomRepositoryImpl extends QuerydslRepositorySupport implements
             });
         }
 
-        if (findChatRoomReq.isFetchOnlyParticipatedRoom()) {
+        if (findChatRoomReq.isFetchOnlyParticipatedRoom() != null) {
             query
                 .where(chatRoomQ.participants.any().user.id.eq(userId));
         }
