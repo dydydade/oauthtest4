@@ -12,8 +12,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import login.tikichat.domain.attachment.model.ChatAttachment;
-import login.tikichat.domain.attachment.model.ChatRoomAttachment;
 import login.tikichat.domain.chatroom.model.ChatRoom;
+import login.tikichat.global.exception.BusinessException;
+import login.tikichat.global.exception.ErrorCode;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +24,6 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +44,7 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 1000)
+    @Column(nullable = true, length = 1000)
     private String content;
 
     @Column(nullable = false, name = "sender_user_id")
@@ -67,6 +67,9 @@ public class Chat {
     @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatAttachment> attachments = new ArrayList<>();
 
+    @Column(name = "deleted_at", nullable = true)
+    private Instant deletedAt;
+
     public static Chat sendMessage(
             Long senderUserId,
             ChatRoom chatRoom,
@@ -82,5 +85,14 @@ public class Chat {
                 .createdDate(Instant.now())
                 .attachments(new ArrayList<>())
                 .build();
+    }
+
+    public void remove() {
+        if (this.deletedAt != null) {
+            throw new BusinessException(ErrorCode.ALREADY_REMOVE_CHAT);
+        }
+
+        this.deletedAt = Instant.now();
+        this.content = null;
     }
 }
