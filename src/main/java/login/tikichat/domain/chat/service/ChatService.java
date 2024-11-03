@@ -95,7 +95,8 @@ public class ChatService {
                             parentChat.getSenderUserId(),
                             parentChat.getCreatedDate()
                     ) : null,
-                    imageUrls
+                    imageUrls,
+                    chat.getDeletedAt()
                 )
         );
 
