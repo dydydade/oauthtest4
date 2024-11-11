@@ -180,6 +180,7 @@ public class UserRestController {
      * @return
      */
     @PutMapping("/{email}/nickname")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "회원 닉네임 설정", description = "회원 닉네임 설정 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "닉네임 설정을 완료하였습니다.", useReturnTypeSchema = true),
@@ -197,6 +198,7 @@ public class UserRestController {
 
 
     @PutMapping("/{email}/profile/image")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "회원 프로필 이미지 설정", description = "회원 프로필 이미지 설정 API 입니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "프로필 이미지 설정을 완료하였습니다.", useReturnTypeSchema = true),

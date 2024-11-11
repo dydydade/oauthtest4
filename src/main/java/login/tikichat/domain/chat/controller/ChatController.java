@@ -1,6 +1,10 @@
 package login.tikichat.domain.chat.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -35,7 +39,13 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping(value = "", consumes = { "multipart/form-data" })
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅 메세지 보내기", description = "채팅 메세지를 보내는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅이 전송되었습니다.",
+                    content = {@Content(schema = @Schema(implementation = SendMessageDto.SendMessageResDto.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> sendChat(
             @ModelAttribute @Valid SendMessageDto.SendMessageReqDto sendMessageReqDto,
             @AuthenticationPrincipal UserDetailInfo user,
@@ -50,7 +60,11 @@ public class ChatController {
     }
 
     @PostMapping("/{chatId}/reaction")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅 반응 보내기", description = "채팅 반응을 보내는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content)
+    })
     public void addChatReaction(
             @RequestBody @Valid AddChatReactionDto.AddChatReactionReq addChatReactionReq,
             @AuthenticationPrincipal UserDetailInfo user,
@@ -65,7 +79,11 @@ public class ChatController {
     }
 
     @DeleteMapping("/{chatId}/reaction")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅 반응 취소하기", description = "채팅 반응을 취소하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content)
+    })
     public void removeChatReaction(
             @RequestBody @Valid AddChatReactionDto.AddChatReactionReq addChatReactionReq,
             @AuthenticationPrincipal UserDetailInfo user,
@@ -80,7 +98,13 @@ public class ChatController {
     }
 
     @GetMapping("")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 메세지 목록 조회", description = "채팅방 메세지 목록을 조회하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅 리스트 조회가 완료 되었습니다.",
+                    content = {@Content(schema = @Schema(implementation = FindChatsDto.FindChatsRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> getChats(
             @Valid FindChatsDto.FindChatsReq findChatsReq,
             @AuthenticationPrincipal UserDetailInfo user,
