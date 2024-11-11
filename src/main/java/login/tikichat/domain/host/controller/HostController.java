@@ -88,7 +88,7 @@ public class HostController {
     ) {
         ResultResponse result = ResultResponse.of(
                 ResultCode.FIND_HOSTS_SUCCESS,
-                this.hostService.findHosts(findHostReq)
+                findHostReq.isFetchMyFollowedHost() ? this.hostService.findMyFollowedHosts(user.getUserId()) : this.hostService.findHosts(findHostReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }

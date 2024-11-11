@@ -158,4 +158,19 @@ public class HostService {
 
         return new FindHostDto.FindHostRes(hostItems);
     }
+
+    @Transactional(readOnly = true)
+    public FindHostDto.FindHostRes findMyFollowedHosts(Long followerUserId) {
+        List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerUserId(followerUserId).stream()
+                .map(HostFollowStatus::getHost)
+                .map(host -> FindHostDto.FindHostItemRes.builder()
+                        .hostId(host.getId())
+                        .hostNickname(host.getHostNickname())
+                        .hostProfileImageUrl(host.getHostProfileImageUrl())
+                        .isOnline(userStatusService.getUserStatus(host.getUser().getId()).orElse(false))
+                        .build())
+                .toList();
+
+        return new FindHostDto.FindHostRes(hostItems);
+    }
 }
