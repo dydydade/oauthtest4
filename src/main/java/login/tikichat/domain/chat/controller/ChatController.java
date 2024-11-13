@@ -49,6 +49,22 @@ public class ChatController {
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
+    @DeleteMapping("{chatId}")
+    @Operation(summary = "채팅 메세지 삭제하기", description = "채팅 메시를 삭제하는 API 입니다.")
+    public ResponseEntity<ResultResponse> removeChat(
+            @AuthenticationPrincipal UserDetailInfo user,
+            @PathVariable("chatRoomId") Long chatRoomId,
+            @PathVariable("chatId") Long chatId
+    ) {
+        this.chatService.removeChat(user.getUserId(), chatRoomId, chatId);
+
+        ResultResponse result = ResultResponse.of(
+                ResultCode.REMOVE_CHAT_SUCCESS
+        );
+
+        return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
+    }
+
     @PostMapping("/{chatId}/reaction")
     @Operation(summary = "채팅 반응 보내기", description = "채팅 반응을 보내는 API입니다.")
     public void addChatReaction(

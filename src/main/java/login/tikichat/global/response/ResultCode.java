@@ -39,6 +39,7 @@ public enum ResultCode {
     // Chat
     SEND_CHAT_SUCCESS(200, "CHAT001", "채팅이 전송되었습니다."),
     FIND_CHAT_LIST_SUCCESS(200, "CHAT002", "채팅 리스트 조회가 완료 되었습니다."),
+    REMOVE_CHAT_SUCCESS(204, "CHAT003", "채팅이 삭제되었습니다."),
 
     // Host
     FOLLOWED_HOSTS_FOUND(200, "H001", "내가 팔로우한 호스트 목록을 조회하였습니다."),

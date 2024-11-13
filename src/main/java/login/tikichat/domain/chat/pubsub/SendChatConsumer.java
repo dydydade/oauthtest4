@@ -39,7 +39,8 @@ public class SendChatConsumer implements MessageListener {
                             sendChatEventDto.getParent().getContent(),
                             sendChatEventDto.getParent().getCreatedDate()
                     ) : null,
-                    sendChatEventDto.getImageUrls()
+                    sendChatEventDto.getImageUrls(),
+                    sendChatEventDto.getDeletedAt()
             );
 
             simpMessagingTemplate.convertAndSend(

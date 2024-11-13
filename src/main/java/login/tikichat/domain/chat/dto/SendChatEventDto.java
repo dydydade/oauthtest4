@@ -18,6 +18,7 @@ public class SendChatEventDto {
     private Instant createdDate;
     private SendChatParentDto parent;
     private List<String> imageUrls;
+    private Instant deletedAt;
 
     @Getter
     @AllArgsConstructor
