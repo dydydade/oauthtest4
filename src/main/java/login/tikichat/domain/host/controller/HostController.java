@@ -117,10 +117,7 @@ public class HostController {
             )
     })
     public ResponseEntity<ResultResponse> findHosts(
-            @RequestBody
-            @Valid
-            @Parameter(required = true)
-            FindHostDto.FindHostReq findHostReq,
+            @Valid FindHostDto.FindHostReq findHostReq,
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
