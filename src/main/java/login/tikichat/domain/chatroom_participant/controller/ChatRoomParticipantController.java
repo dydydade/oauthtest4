@@ -1,5 +1,9 @@
 package login.tikichat.domain.chatroom_participant.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import login.tikichat.domain.chatroom_participant.service.ChatRoomParticipantService;
@@ -21,6 +25,11 @@ public class ChatRoomParticipantController {
     private final ChatRoomParticipantService chatRoomParticipantService;
 
     @PostMapping
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "채팅방 입장하기", description = "채팅방에 입장하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content)
+    })
     public void joinChatRoom(
             @PathVariable Long chatRoomId,
             @AuthenticationPrincipal UserDetailInfo user
@@ -29,6 +38,11 @@ public class ChatRoomParticipantController {
     }
 
     @DeleteMapping
+    @SecurityRequirement(name = "JWT")
+    @Operation(summary = "채팅방 퇴장하기", description = "채팅방에서 퇴장하는 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "No Content", content = @Content)
+    })
     public void leaveChatRoom(
             @PathVariable Long chatRoomId,
             @AuthenticationPrincipal UserDetailInfo user

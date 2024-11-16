@@ -35,6 +35,7 @@ public enum ResultCode {
     FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다."),
     SAVE_BOOKMARK_SUCCESS(200, "CR002", "채팅방 즐겨찾기 설정에 성공하였습니다."),
     DELETE_BOOKMARK_SUCCESS(200, "CR003", "채팅방 즐겨찾기 해제에 성공하였습니다."),
+    CREATE_CHAT_ROOMS_SUCCESS(200, "CR004", "채팅방 생성에 성공하였습니다.."),
 
     // Chat
     SEND_CHAT_SUCCESS(200, "CHAT001", "채팅이 전송되었습니다."),
@@ -48,8 +49,7 @@ public enum ResultCode {
     HOST_UNFOLLOWED(200, "H004", "호스트 팔로우를 취소하였습니다."),
     TARGET_HOST_FOLLOWERS_FOUND(200, "H005", "대상 호스트를 팔로우하는 팔로워 목록을 조회하였습니다."),
     TARGET_FOLLOWER_HOSTS_FOUND(200, "H006", "대상 팔로워가 팔로우하는 호스트 목록을 조회하였습니다."),
-
-
+    FIND_HOSTS_SUCCESS(200, "H007", "호스트 목록을 조회하였습니다."),
     ;
 
     private int status;
