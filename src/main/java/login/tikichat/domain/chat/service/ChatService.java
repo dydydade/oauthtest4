@@ -155,6 +155,7 @@ public class ChatService {
                             chat.getId(),
                             chat.getContent(),
                             chat.getCreatedDate(),
+                            chat.getSenderUserId(),
                             reactions,
                             parentChat != null ? new FindChatsDto.FindChatsParentItemRes(
                                     parentChat.getId(),
