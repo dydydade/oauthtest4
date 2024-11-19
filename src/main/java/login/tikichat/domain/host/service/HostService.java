@@ -158,7 +158,7 @@ public class HostService {
 
         return new FindHostDto.FindHostRes(hostItems);
     }
-
+  
     @Transactional(readOnly = true)
     public FindHostDto.FindHostRes findMyFollowedHosts(Long followerUserId) {
         List<FindHostDto.FindHostItemRes> hostItems = hostFollowStatusRepository.findByFollowerUserId(followerUserId).stream()
