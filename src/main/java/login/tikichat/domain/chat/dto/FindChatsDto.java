@@ -39,9 +39,11 @@ public class FindChatsDto {
             Long id,
             String content,
             Instant createdAt,
+            Long senderUserId,
             List<FindChatReactionListRes> reactions,
             FindChatsParentItemRes parentChat,
-            List<String> iamgeUrls
+            List<String> imageUrls,
+            Instant deletedAt
     ) {
 
     }

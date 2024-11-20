@@ -14,6 +14,10 @@ public class ResultResponse {
         return new ResultResponse(resultCode, data);
     }
 
+    public static ResultResponse of(ResultCode resultCode) {
+        return new ResultResponse(resultCode, null);
+    }
+
     public ResultResponse(ResultCode resultCode, Object data) {
         this.status = resultCode.getStatus();
         this.code = resultCode.getCode();

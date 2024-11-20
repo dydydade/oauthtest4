@@ -1,6 +1,8 @@
 package login.tikichat.domain.category.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -23,13 +25,11 @@ public class CategoryController {
     @Operation(
             summary = "카테고리 리스트를 불러옵니다."
     )
-    @ApiResponses(
-            value = {
-                @ApiResponse(
-                        responseCode = "200"
-                )
-            }
-    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "카테고리 리스트 조회가 완료 되었습니다.",
+                    content = {@Content(schema = @Schema(implementation = FindCategoryDto.FindCategoryRes.class))}
+            )
+    })
     @GetMapping("")
     public FindCategoryDto.FindCategoryRes findCategories() {
         return this.categoryService.findCategories();

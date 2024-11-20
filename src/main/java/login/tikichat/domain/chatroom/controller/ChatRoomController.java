@@ -2,9 +2,14 @@ package login.tikichat.domain.chatroom.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import login.tikichat.domain.chatroom.bookmark.dto.BookmarkStatusDto;
 import login.tikichat.domain.chatroom.bookmark.service.BookmarkService;
 import login.tikichat.domain.chatroom.dto.CreateChatRoomDto;
 import login.tikichat.domain.chatroom.dto.FindChatRoomDto;
@@ -30,7 +35,13 @@ public class ChatRoomController {
     @PostMapping(
             value = ""
     )
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 생성", description = "채팅방을 생성하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 생성에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = CreateChatRoomDto.CreateChatRoomRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> createChatRoom(
             @RequestBody
             @Valid
@@ -39,14 +50,20 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_USER_INFO_SUCCESS,
+                ResultCode.CREATE_CHAT_ROOMS_SUCCESS,
                 this.chatRoomService.createChatRoom(user.getUserId(), createChatRoomReq)
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     @GetMapping("")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 조회(키워드)", description = "검색 키워드를 통해 해당하는 채팅방을 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 조회에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = FindChatRoomDto.FindChatRoomRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> findChatRooms(
             @RequestBody
             @Valid
@@ -55,14 +72,20 @@ public class ChatRoomController {
             @AuthenticationPrincipal UserDetailInfo user
     ) {
         ResultResponse result = ResultResponse.of(
-                ResultCode.FIND_USER_INFO_SUCCESS,
+                ResultCode.FIND_CHAT_ROOMS_SUCCESS,
                 this.chatRoomService.findChatRooms(findChatRoomReq, user.getUserId())
         );
         return new ResponseEntity<>(result, HttpStatus.valueOf(result.getStatus()));
     }
 
     @GetMapping("/ranked/message-count")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 조회(메세지수 순)", description = "[홈 화면용] 메세지수 순으로 채팅방을 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 조회에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = FindChatRoomDto.FindChatRoomRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> findMessageCountRankedChatRooms(
             @RequestBody
             @Valid
@@ -78,7 +101,13 @@ public class ChatRoomController {
     }
 
     @GetMapping("/ranked/member-count")
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 조회(멤버수 순)", description = "[홈 화면용] 멤버수 순으로 채팅방을 조회하는 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 조회에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = FindChatRoomDto.FindChatRoomRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> findMemberCountRankedChatRooms(
             @RequestBody
             @Valid
@@ -96,7 +125,13 @@ public class ChatRoomController {
     @PostMapping(
             value = "/{chatRoomId}/bookmarks"
     )
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 즐겨찾기 등록", description = "채팅방 즐겨찾기 등록 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 즐겨찾기 설정에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = BookmarkStatusDto.BookmarkStatusRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> saveBookmark(
             @PathVariable Long chatRoomId,
             @AuthenticationPrincipal UserDetailInfo user
@@ -111,7 +146,13 @@ public class ChatRoomController {
     @DeleteMapping(
             value = "/{chatRoomId}/bookmarks"
     )
+    @SecurityRequirement(name = "JWT")
     @Operation(summary = "채팅방 즐겨찾기 해제", description = "채팅방 즐겨찾기 해제 API 입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅방 즐겨찾기 해제에 성공하였습니다.",
+                    content = {@Content(schema = @Schema(implementation = BookmarkStatusDto.BookmarkStatusRes.class))}
+            )
+    })
     public ResponseEntity<ResultResponse> deleteBookmark(
             @PathVariable Long chatRoomId,
             @AuthenticationPrincipal UserDetailInfo user

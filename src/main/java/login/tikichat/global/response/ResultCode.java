@@ -35,10 +35,12 @@ public enum ResultCode {
     FIND_CHAT_ROOMS_SUCCESS(200, "CR001", "채팅방 조회에 성공하였습니다."),
     SAVE_BOOKMARK_SUCCESS(200, "CR002", "채팅방 즐겨찾기 설정에 성공하였습니다."),
     DELETE_BOOKMARK_SUCCESS(200, "CR003", "채팅방 즐겨찾기 해제에 성공하였습니다."),
+    CREATE_CHAT_ROOMS_SUCCESS(200, "CR004", "채팅방 생성에 성공하였습니다.."),
 
     // Chat
     SEND_CHAT_SUCCESS(200, "CHAT001", "채팅이 전송되었습니다."),
     FIND_CHAT_LIST_SUCCESS(200, "CHAT002", "채팅 리스트 조회가 완료 되었습니다."),
+    REMOVE_CHAT_SUCCESS(204, "CHAT003", "채팅이 삭제되었습니다."),
 
     // Host
     FOLLOWED_HOSTS_FOUND(200, "H001", "내가 팔로우한 호스트 목록을 조회하였습니다."),

@@ -17,18 +17,15 @@ import login.tikichat.domain.user.service.UserCommonService;
 import login.tikichat.global.exception.BusinessException;
 import login.tikichat.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.sql.ast.tree.expression.Collation;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,7 +95,8 @@ public class ChatService {
                             parentChat.getSenderUserId(),
                             parentChat.getCreatedDate()
                     ) : null,
-                    imageUrls
+                    imageUrls,
+                    chat.getDeletedAt()
                 )
         );
 
@@ -106,7 +104,8 @@ public class ChatService {
                 chat.getId(),
                 chat.getContent(),
                 chat.getCreatedDate(),
-                imageUrls
+                imageUrls,
+                chat.getDeletedAt()
         );
     }
 
@@ -156,13 +155,15 @@ public class ChatService {
                             chat.getId(),
                             chat.getContent(),
                             chat.getCreatedDate(),
+                            chat.getSenderUserId(),
                             reactions,
                             parentChat != null ? new FindChatsDto.FindChatsParentItemRes(
                                     parentChat.getId(),
                                     parentChat.getContent(),
                                     parentChat.getCreatedDate()
                             ) : null,
-                            imageUrls
+                            imageUrls,
+                            chat.getDeletedAt()
                     );
                 }
                 ).toList(),
@@ -239,5 +240,21 @@ public class ChatService {
                 userId,
                 chatReactionType
         );
+    }
+
+    @Transactional
+    public void removeChat(Long userId, Long chatRoomId, Long chatId) {
+        final var user = this.userCommonService.findById(userId);
+        final var chat = this.chatCommonService.findById(chatId);
+
+        this.chatRoomParticipantService.existsJoinChatRoom(
+                chatRoomId, userId
+        );
+
+        if (!chat.getSenderUserId().equals(user.getId())) {
+            throw new BusinessException(ErrorCode.REMOVE_CHAT_FORBIDDEN);
+        }
+
+        chat.remove();
     }
 }

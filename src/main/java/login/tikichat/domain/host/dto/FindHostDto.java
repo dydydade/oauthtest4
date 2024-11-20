@@ -20,7 +20,10 @@ public class FindHostDto {
             String searchKeyword,
 
             @Schema(description = "특정 팔로워가 팔로우하는 호스트 정보만 조회", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-            Long followerId
+            Long followerId,
+
+            @Schema(description = "내가 팔로우하는 호스트 정보만 조회할지 여부", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+            Boolean isFetchMyFollowedHost
     ) {
 
     }
